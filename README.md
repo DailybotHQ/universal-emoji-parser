@@ -1,7 +1,7 @@
 # Universal Emoji Parser
 
-This tool allow parse emojis **char unicodes** and **shortcodes** to html images using [emojilib](https://github.com/muan/emojilib) && [Twemoji](https://github.com/jdecked/twemoji-parser).
-This allows emojis to be standard across browsers, and avoid compatibility issues.
+This tool parses emojis from **unicode** and **shortcodes** into HTML images using [emojilib](https://github.com/muan/emojilib) and [Twemoji](https://github.com/jdecked/twemoji-parser).
+That keeps emoji rendering consistent across browsers and avoids compatibility issues.
 
 Emojis Support:
 
