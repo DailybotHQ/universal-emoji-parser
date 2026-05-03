@@ -62,13 +62,14 @@ jobs:
           done
 
       - name: Step 3 - 🧪🧪 Calculate PR Size and Label
+        env:
+          CURRENT_SIZE: ${{ steps.check_pr_size_label_step.outputs.size_label_found }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          CURRENT_SIZE="${{ steps.check_pr_size_label_step.outputs.size_label_found }}"
-          PR_BASE_REF=${{ github.event.pull_request.base.ref }}
-          PR_HEAD_REF=${{ github.event.pull_request.head.ref }}
-          git fetch origin $PR_BASE_REF
-          git fetch origin $PR_HEAD_REF
-          CHANGES_STATS=$(git diff --shortstat origin/$PR_BASE_REF..origin/$PR_HEAD_REF)
+          git fetch origin "$PR_BASE_REF"
+          git fetch origin "$PR_HEAD_REF"
+          CHANGES_STATS=$(git diff --shortstat "origin/$PR_BASE_REF..origin/$PR_HEAD_REF")
           echo $CHANGES_STATS
           LINES_CHANGED=$(echo $CHANGES_STATS | awk '{print $4+$6}')
           echo "Lines changed: $LINES_CHANGED"
@@ -134,9 +135,10 @@ jobs:
           fi
 
       - name: Step 4 - 🧪🧪🧪 Check "TITLE" length
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           MIN_TITLE_LENGTH=10
-          PR_TITLE="${{ github.event.pull_request.title }}"
           TITLE_LENGTH=$(echo -n "$PR_TITLE" | wc -c)
           if [ "$TITLE_LENGTH" -lt "$MIN_TITLE_LENGTH" ]; then
             echo "Pull request title is too short. It must have at least $MIN_TITLE_LENGTH characters."
@@ -144,9 +146,10 @@ jobs:
           fi
 
       - name: Step 5 - 🧪🧪🧪🧪 Check "BODY" length
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           MIN_BODY_LENGTH=30
-          PR_BODY='${{ github.event.pull_request.body }}'
           BODY_LENGTH=$(echo -n "$PR_BODY" | wc -c)
           if [ "$BODY_LENGTH" -lt "$MIN_BODY_LENGTH" ]; then
             echo "Pull request body is too short. It must have at least $MIN_BODY_LENGTH characters."
