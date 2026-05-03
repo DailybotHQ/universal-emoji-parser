@@ -6,7 +6,7 @@ services:
     init: true
     build:
       context: .
-      dockerfile: ./uemojiparser/Dockerfile
+      dockerfile: ./universalemojiparser/Dockerfile
     working_dir: /app
     volumes:
       - ../..:/app
@@ -18,7 +18,7 @@ services:
       - ${HOME}/.ssh:/home/node/.ssh_host:ro
       - ${HOME}/.gitconfig:/home/node/.gitconfig:ro
     env_file:
-      - uemojiparser/.env
+      - universalemojiparser/.env
     environment:
       - DOCKER_DEV_ENV=vscode
     command:
