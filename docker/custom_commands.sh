@@ -68,7 +68,10 @@ function build() {
 	fi
 }
 
-# Same gates as CI: code_check.yml (eslint + prettier + test) plus build:tsc + webpack (pre-merge / pre-publish)
+# Same gates as CI plus build:tsc + webpack (pre-merge / pre-publish).
+# Order: lint/format -> build -> test. Build runs before test so the bundle suite
+# in test/exports.test.ts validates an up-to-date dist/index.js (otherwise it
+# self-skips with a hint).
 function codecheck() {
 	check
 	if [ $? != 0 ]; then
@@ -76,17 +79,17 @@ function codecheck() {
 		print.error "⚠️ Lint/format check failed."
 		return 1
 	fi
-	test
-	if [ $? != 0 ]; then
-		print.error "⚠️ Tests failed."
-		return 1
-	fi
 	build
 	if [ $? != 0 ]; then
 		print.error "⚠️ Build failed."
 		return 1
 	fi
-	print.success "✅ codecheck passed (eslint + prettier + test + build:tsc + webpack)"
+	test
+	if [ $? != 0 ]; then
+		print.error "⚠️ Tests failed."
+		return 1
+	fi
+	print.success "✅ codecheck passed (eslint + prettier + build:tsc + webpack + test)"
 }
 
 function install() {

@@ -292,7 +292,12 @@ module.exports.emojiLibJsonData = emojiLibJsonData
 module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
 ```
 
-This is **intentionally redundant**. Webpack with `libraryTarget: 'commonjs2'` exposes the default export as `module.exports.default`, which breaks `require('universal-emoji-parser').parse(...)`. The three assignments at the bottom of `src/index.ts` reattach the API and the named exports to `module.exports` itself so `require` users get the same shape as `import` users. **Every `export const` in `src/index.ts` must also be reattached here**, otherwise it ships as `undefined` to CommonJS consumers (covered by `test/exports.test.ts`).
+This is **intentionally redundant**. Webpack with `libraryTarget: 'commonjs2'` exposes the default export as `module.exports.default`, which breaks `require('universal-emoji-parser').parse(...)`. The three assignments at the bottom of `src/index.ts` reattach the API and the named exports to `module.exports` itself so `require` users get the same shape as `import` users. **Every `export const` in `src/index.ts` must also be reattached here**, otherwise it ships as `undefined` to CommonJS consumers.
+
+`test/exports.test.ts` enforces this rule two ways:
+
+1. **Static check (always runs, no build needed)** — parses `src/index.ts` and asserts every `export const X` has a matching `module.exports.X = X`. Fails CI on PR with the exact line to add. This is the line of defense that runs in `code_check.yml` (which doesn't build before testing).
+2. **Bundle smoke test (runs when `dist/` is fresh)** — `require('./dist/index.js')` and asserts the same property at runtime. Self-skips with a clear hint if `dist/` is missing or older than `src/`, so `npm test` and `npm run test:watch` never fail spuriously when you forget to rebuild. The `codecheck` shell helper builds before testing, so this suite always exercises in the local pre-merge gate.
 
 ### 6. CI-Driven Releases
 
