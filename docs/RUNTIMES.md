@@ -53,6 +53,7 @@ The dual export shape is implemented in `src/index.ts`:
 export default uEmojiParser
 module.exports = uEmojiParser
 module.exports.emojiLibJsonData = emojiLibJsonData
+module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
 ```
 
 This means **both** `require('universal-emoji-parser').parse(...)` and `import uEmojiParser from '...'` give you the same object — see [Architecture → CommonJS reattachment](ARCHITECTURE.md#commonjs-reattachment).

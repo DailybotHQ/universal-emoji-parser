@@ -123,12 +123,12 @@ The runtime never imports from `emojilib` or `unicode-emoji-json` directly. Ever
 
 The public API of the package is defined by `src/index.ts` and consists of:
 
-| Export                                                                                             | Purpose                                                                                                                        |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `default` (`uEmojiParser`)                                                                         | Object exposing `parse`, `parseToHtml`, `parseToUnicode`, `parseToShortcode`, `getEmojiObjectByShortcode`, `getDefaultOptions` |
-| Named: `emojiLibJsonData`                                                                          | The full catalog as `EmojiLibJsonType` — read-only consumers                                                                   |
-| Named: `DEFAULT_EMOJI_CDN`                                                                         | Twemoji CDN URL string                                                                                                         |
-| CommonJS: `module.exports = uEmojiParser` and `module.exports.emojiLibJsonData = emojiLibJsonData` | Required for `require()` consumers                                                                                             |
+| Export                                                                                                                                                  | Purpose                                                                                                                        |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `default` (`uEmojiParser`)                                                                                                                              | Object exposing `parse`, `parseToHtml`, `parseToUnicode`, `parseToShortcode`, `getEmojiObjectByShortcode`, `getDefaultOptions` |
+| Named: `emojiLibJsonData`                                                                                                                               | The full catalog as `EmojiLibJsonType` — read-only consumers                                                                   |
+| Named: `DEFAULT_EMOJI_CDN`                                                                                                                              | Twemoji CDN URL string                                                                                                         |
+| CommonJS: `module.exports = uEmojiParser`, `module.exports.emojiLibJsonData = emojiLibJsonData`, `module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN` | Required for `require()` consumers                                                                                             |
 
 Rules:
 
@@ -289,9 +289,10 @@ This package never hardcodes emoji-to-URL mappings — it delegates to `@twemoji
 export default uEmojiParser
 module.exports = uEmojiParser
 module.exports.emojiLibJsonData = emojiLibJsonData
+module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
 ```
 
-This is **intentionally redundant**. Webpack with `libraryTarget: 'commonjs2'` exposes the default export as `module.exports.default`, which breaks `require('universal-emoji-parser').parse(...)`. The two assignments at the bottom of `src/index.ts` reattach the API to `module.exports` itself so `require` users get the same shape as `import` users.
+This is **intentionally redundant**. Webpack with `libraryTarget: 'commonjs2'` exposes the default export as `module.exports.default`, which breaks `require('universal-emoji-parser').parse(...)`. The three assignments at the bottom of `src/index.ts` reattach the API and the named exports to `module.exports` itself so `require` users get the same shape as `import` users. **Every `export const` in `src/index.ts` must also be reattached here**, otherwise it ships as `undefined` to CommonJS consumers (covered by `test/exports.test.ts`).
 
 ### 6. CI-Driven Releases
 

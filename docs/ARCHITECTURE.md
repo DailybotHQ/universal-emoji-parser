@@ -185,9 +185,10 @@ Order matters: shortcode → unicode → HTML. Each stage is a no-op if its opti
 export default uEmojiParser
 module.exports = uEmojiParser
 module.exports.emojiLibJsonData = emojiLibJsonData
+module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
 ```
 
-Webpack's `libraryTarget: 'commonjs2'` exposes the default export as `module.exports.default`, which would break `require('universal-emoji-parser').parse(...)`. The two `module.exports` assignments at the bottom flatten the API so `require` and `import` users see the same shape.
+Webpack's `libraryTarget: 'commonjs2'` exposes the default export as `module.exports.default`, which would break `require('universal-emoji-parser').parse(...)`. The three `module.exports` assignments at the bottom flatten the API so `require` and `import` users see the same shape. Every `export const` declared at the top of `src/index.ts` must be reattached here too, otherwise it ships as `undefined` to CommonJS consumers (regression-tested in `test/exports.test.ts`).
 
 ## Type model — `src/lib/type.ts`
 
