@@ -79,19 +79,20 @@ jobs:
       - name: Step 1 - 🔔 Send notification on channel
         env:
           SIZE_LABEL_FOUND: ${{ needs.check_pr_size_label.outputs.size_label_found }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           NOTIFICATION_MESSAGE="> *WorkFlow: <https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|$GITHUB_WORKFLOW>*"$'\n'
           NOTIFICATION_MESSAGE+="> *Repository:* <https://github.com/$GITHUB_REPOSITORY|$GITHUB_REPOSITORY>"$'\n'
           NOTIFICATION_MESSAGE+="> *User Actor:* $GITHUB_ACTOR"$'\n\n'
-          NOTIFICATION_MESSAGE+="> *Pull request:* <https://github.com/$GITHUB_REPOSITORY/pull/${{ github.event.pull_request.number }}|#${{github.event.pull_request.number}}>"$'\n'
-          PR_TITLE='${{ github.event.pull_request.title }}'
-          PR_BODY='${{ github.event.pull_request.body }}'
-          PR_BODY=$(echo $PR_BODY | sed 's/\r/\n/g')
+          NOTIFICATION_MESSAGE+="> *Pull request:* <https://github.com/$GITHUB_REPOSITORY/pull/$PR_NUMBER|#$PR_NUMBER>"$'\n'
+          PR_BODY=$(echo "$PR_BODY" | sed 's/\r/\n/g')
           NOTIFICATION_MESSAGE+="> *Pull request size label:* $SIZE_LABEL_FOUND"$'\n'
           NOTIFICATION_MESSAGE+="> *Pull request title:*"$'\n'
           NOTIFICATION_MESSAGE+="> \`\`\`🚩 $PR_TITLE\`\`\`"$'\n'
           NOTIFICATION_MESSAGE+="> *Pull request body content:*"$'\n'
-          NOTIFICATION_MESSAGE+="> \`\`\`$(echo $PR_BODY | sed 's/⬆️/\n⬆️/g')\`\`\`"$'\n\n'
+          NOTIFICATION_MESSAGE+="> \`\`\`$(echo "$PR_BODY" | sed 's/⬆️/\n⬆️/g')\`\`\`"$'\n\n'
           NOTIFICATION_MESSAGE="*👉 #$GITHUB_RUN_NUMBER ($GITHUB_REF_NAME) - 🏁 DEPLOYMENT STARTED*"$'\n\n'"$NOTIFICATION_MESSAGE"
           JSON_DATA=$(jq -n \
                         --arg msg "$NOTIFICATION_MESSAGE" \
@@ -296,10 +297,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Step 8 - 🗑️ Deleting source branch
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           PR_MERGED=$(jq --raw-output .pull_request.merged "$GITHUB_EVENT_PATH")
           if [ "$PR_MERGED" = "true" ]; then
-            git push origin --delete "${{ github.event.pull_request.head.ref }}"
+            git push origin --delete "$PR_HEAD_REF"
           fi
 
     outputs:
@@ -342,6 +345,9 @@ jobs:
         env:
           NEEDS_JSON: ${{ toJSON(needs) }}
           SIZE_LABEL_FOUND: ${{ needs.check_pr_size_label.outputs.size_label_found }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           NOTIFICATION_MESSAGE="> *WorkFlow: <https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|$GITHUB_WORKFLOW>*"$'\n'
           NOTIFICATION_MESSAGE+="> *Repository:* <https://github.com/$GITHUB_REPOSITORY|$GITHUB_REPOSITORY>"$'\n'
@@ -351,15 +357,13 @@ jobs:
             NOTIFICATION_MESSAGE+="> *New Version:* $PACKAGE_VERSION"$'\n'
           fi
           NOTIFICATION_MESSAGE+=""$'\n'
-          NOTIFICATION_MESSAGE+="> *Pull request:* <https://github.com/$GITHUB_REPOSITORY/pull/${{ github.event.pull_request.number }}|#${{github.event.pull_request.number}}>"$'\n'
-          PR_TITLE='${{ github.event.pull_request.title }}'
-          PR_BODY='${{ github.event.pull_request.body }}'
-          PR_BODY=$(echo $PR_BODY | sed 's/\r/\n/g')
+          NOTIFICATION_MESSAGE+="> *Pull request:* <https://github.com/$GITHUB_REPOSITORY/pull/$PR_NUMBER|#$PR_NUMBER>"$'\n'
+          PR_BODY=$(echo "$PR_BODY" | sed 's/\r/\n/g')
           NOTIFICATION_MESSAGE+="> *Pull request size label:* $SIZE_LABEL_FOUND"$'\n'
           NOTIFICATION_MESSAGE+="> *Pull request title:*"$'\n'
           NOTIFICATION_MESSAGE+="> \`\`\`🚩 $PR_TITLE\`\`\`"$'\n'
           NOTIFICATION_MESSAGE+="> *Pull request body content:*"$'\n'
-          NOTIFICATION_MESSAGE+="> \`\`\`$(echo $PR_BODY | sed 's/⬆️/\n⬆️/g')\`\`\`"$'\n\n'
+          NOTIFICATION_MESSAGE+="> \`\`\`$(echo "$PR_BODY" | sed 's/⬆️/\n⬆️/g')\`\`\`"$'\n\n'
           NOTIFICATION_MESSAGE+="> *Jobs:*"$'\n'
           INDEX=1
           NEEDS_ORDER=("check_pr_size_label" "deploy_setup" "deploy_validate_linters_and_code_format" "deploy_tests" "build" "release_and_publish" "cleanup_caches")

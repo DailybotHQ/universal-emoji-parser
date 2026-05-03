@@ -67,7 +67,7 @@ RUN git config --global init.defaultBranch main \
 USER root
 
 # Copy and setup entrypoint script
-COPY uemojiparser/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY universalemojiparser/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the entrypoint
