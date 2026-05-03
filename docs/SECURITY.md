@@ -30,7 +30,7 @@ Both are safe under normal use. The risks come from:
 
 ```ts
 // ❌ DANGEROUS — never do this
-const userCdn = req.query.cdn  // user-controlled
+const userCdn = req.query.cdn // user-controlled
 uEmojiParser.parse(text, { emojiCDN: userCdn })
 ```
 
@@ -59,24 +59,24 @@ uEmojiParser.parse(text, { emojiCDN: safeCdn(req.query.cdn) })
 
 ```ts
 // ❌ DANGEROUS
-const userMessage = req.body.message    // "<script>alert(1)</script> :smile:"
+const userMessage = req.body.message // "<script>alert(1)</script> :smile:"
 const html = uEmojiParser.parseToHtml(userMessage)
-res.send(html)                          // ships the script tag
+res.send(html) // ships the script tag
 ```
 
-The package **does not escape** the surrounding text. It's a *transformer*, not a sanitizer. Consumers who feed user input through it must escape first:
+The package **does not escape** the surrounding text. It's a _transformer_, not a sanitizer. Consumers who feed user input through it must escape first:
 
 ```ts
 import escape from 'lodash.escape'
 
-const safe = escape(req.body.message)              // escapes <, >, &, "
-const html = uEmojiParser.parseToHtml(safe)         // emojis still resolve; HTML is escaped
+const safe = escape(req.body.message) // escapes <, >, &, "
+const html = uEmojiParser.parseToHtml(safe) // emojis still resolve; HTML is escaped
 res.send(html)
 ```
 
 The reason: HTML-escaping inside `parseToHtml` would corrupt content for consumers who already consider the input safe (e.g., trusted markdown rendered to HTML by another library, then emoji-replaced). Escaping is the consumer's choice and timing.
 
-This package's responsibility is to never *introduce* unsafe HTML. The output template is safe under all inputs because:
+This package's responsibility is to never _introduce_ unsafe HTML. The output template is safe under all inputs because:
 
 - `entity.text` is always a unicode emoji (Twemoji's regex doesn't match arbitrary strings)
 - `emojiUrl` is either trusted (default CDN) or consumer-supplied (their responsibility)
@@ -150,7 +150,7 @@ CI workflows check out the repo with `actions/checkout@v4` (pinned major version
 
 ### Dependency upgrade automation
 
-`check_packages_versions.yml` runs `ncu -u` weekly and opens an auto-PR. The PR goes through `code_check.yml` (lint + format + test) before auto-merging. This means a malicious new release of any devDep that breaks the build is caught — but a malicious release that *passes* all checks would auto-merge.
+`check_packages_versions.yml` runs `ncu -u` weekly and opens an auto-PR. The PR goes through `code_check.yml` (lint + format + test) before auto-merging. This means a malicious new release of any devDep that breaks the build is caught — but a malicious release that _passes_ all checks would auto-merge.
 
 Mitigations:
 
@@ -180,7 +180,7 @@ If an automation token can't satisfy 2FA (typically the case), use an "automatio
 
 The package is built by Webpack from TypeScript source. Build is deterministic for a given:
 
-- Node version (CI: 22.13.1)
+- Node version (CI: Node 24)
 - npm lockfile state (note: no lockfile committed; see [`.gitignore`](../.gitignore))
 - Source tree
 
@@ -204,7 +204,7 @@ Included:
 
 Excluded:
   src/, test/, docker/, .github/, docs/, .agents/, .claude/, .vscode/, .devcontainer/
-  *.config.js, .eslintrc, .prettierrc, .editorconfig, .babelrc, tsconfig.json
+  *.config.js, eslint.config.mjs, .prettierrc, .editorconfig, .babelrc, tsconfig.json
   package-lock.json, *.txt
 ```
 
@@ -259,7 +259,7 @@ For maintainers of this package:
 
 ## What we don't protect against
 
-- **Consumer-side XSS** — if a consumer's templating system is misconfigured and renders the package's output unescaped while *also* rendering attacker-controlled text unescaped, that's the consumer's vulnerability. Document the safe pattern, don't try to make every misuse safe
+- **Consumer-side XSS** — if a consumer's templating system is misconfigured and renders the package's output unescaped while _also_ rendering attacker-controlled text unescaped, that's the consumer's vulnerability. Document the safe pattern, don't try to make every misuse safe
 - **CDN compromise** — if the Twemoji CDN itself is compromised, every consumer using the default CDN serves compromised SVGs. Mitigation: pin a Twemoji version (so a future compromise of `@latest` doesn't propagate), or self-host
 - **DoS via huge inputs** — `parse('a'.repeat(10_000_000))` will be slow (linear in input length × catalog regex). Consumers facing DoS risk should bound input size before calling
 - **Catastrophic regex** — the `parseToShortcode` alternation regex doesn't have catastrophic backtracking under standard inputs, but with a maliciously crafted input that's mostly partial-emoji-prefixes, performance could degrade. We don't currently fuzz-test for this

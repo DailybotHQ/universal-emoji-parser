@@ -9,23 +9,23 @@
 
 **Comprehensive guides for specific tasks:**
 
-| Category | Guide | Purpose |
-|----------|-------|---------|
-| Architecture | [Architecture](docs/ARCHITECTURE.md) | Module layout, data flow, parse pipeline, emoji catalog |
-| Technologies | [Technologies](docs/TECHNOLOGIES.md) | Stack overview with versions and roles |
-| Standards | [Standards](docs/STANDARDS.md) | TypeScript / lint / Prettier conventions, naming, exports |
-| Commands | [Development Commands](docs/DEVELOPMENT_COMMANDS.md) | npm scripts, Mocha runs, Webpack, watch loops |
-| Testing | [Testing](docs/TESTING_GUIDE.md) | Mocha + Chai setup, test conventions, regenerating expectations |
-| Runtimes | [Runtimes](docs/RUNTIMES.md) | Node, browsers, ESM vs CommonJS, bundlers consuming the package |
-| Build & Deploy | [Build & Deploy](docs/BUILD_DEPLOY.md) | Webpack production bundle, npm publish, GitHub release pipeline |
-| Emoji Providers | [Emoji Providers](docs/EMOJI_PROVIDERS.md) | Twemoji CDN, custom CDNs, shortcode dialects (Slack/GitHub/Discord) |
-| Performance | [Performance](docs/PERFORMANCE.md) | Lookup hot paths, RegExp caches, bundle size, large catalog handling |
-| API Reference | [API Reference](docs/API_REFERENCE.md) | Public methods, types, options, return values |
-| Security | [Security](docs/SECURITY.md) | XSS in HTML output, input validation, npm publish security, dependency hygiene |
-| Documentation | [Documentation Guide](docs/DOCUMENTATION_GUIDE.md) | When and how to update docs |
-| AI Agents | [Agent Onboarding](docs/AI_AGENT_ONBOARDING.md), [Agent Collaboration](docs/AI_AGENT_COLLAB.md) | Setup, handoff, coordination |
-| Forking | [Fork Customization](docs/FORK_CUSTOMIZATION.md) | Step-by-step rebrand of the package into a new product |
-| Skills/Agents | [.agents/README.md](.agents/README.md) | Available skills, slash commands, and subagents for this repo |
+| Category        | Guide                                                                                           | Purpose                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Architecture    | [Architecture](docs/ARCHITECTURE.md)                                                            | Module layout, data flow, parse pipeline, emoji catalog                        |
+| Technologies    | [Technologies](docs/TECHNOLOGIES.md)                                                            | Stack overview with versions and roles                                         |
+| Standards       | [Standards](docs/STANDARDS.md)                                                                  | TypeScript / lint / Prettier conventions, naming, exports                      |
+| Commands        | [Development Commands](docs/DEVELOPMENT_COMMANDS.md)                                            | npm scripts, Mocha runs, Webpack, watch loops                                  |
+| Testing         | [Testing](docs/TESTING_GUIDE.md)                                                                | Mocha + Chai setup, test conventions, regenerating expectations                |
+| Runtimes        | [Runtimes](docs/RUNTIMES.md)                                                                    | Node, browsers, ESM vs CommonJS, bundlers consuming the package                |
+| Build & Deploy  | [Build & Deploy](docs/BUILD_DEPLOY.md)                                                          | Webpack production bundle, npm publish, GitHub release pipeline                |
+| Emoji Providers | [Emoji Providers](docs/EMOJI_PROVIDERS.md)                                                      | Twemoji CDN, custom CDNs, shortcode dialects (Slack/GitHub/Discord)            |
+| Performance     | [Performance](docs/PERFORMANCE.md)                                                              | Lookup hot paths, RegExp caches, bundle size, large catalog handling           |
+| API Reference   | [API Reference](docs/API_REFERENCE.md)                                                          | Public methods, types, options, return values                                  |
+| Security        | [Security](docs/SECURITY.md)                                                                    | XSS in HTML output, input validation, npm publish security, dependency hygiene |
+| Documentation   | [Documentation Guide](docs/DOCUMENTATION_GUIDE.md)                                              | When and how to update docs                                                    |
+| AI Agents       | [Agent Onboarding](docs/AI_AGENT_ONBOARDING.md), [Agent Collaboration](docs/AI_AGENT_COLLAB.md) | Setup, handoff, coordination                                                   |
+| Forking         | [Fork Customization](docs/FORK_CUSTOMIZATION.md)                                                | Step-by-step rebrand of the package into a new product                         |
+| Skills/Agents   | [.agents/README.md](.agents/README.md)                                                          | Available skills, slash commands, and subagents for this repo                  |
 
 ## Project Overview
 
@@ -35,21 +35,21 @@ The package targets:
 
 - Twitter, GitHub, Slack, Discord, Google Chat, and Microsoft Teams shortcode dialects (single dictionary, normalized to one canonical slug per emoji)
 - Both **CommonJS** (`require('universal-emoji-parser')`) and **ES modules** (`import uEmojiParser from 'universal-emoji-parser'`)
-- Server-side (Node ≥ 20.16) and browser environments (consumers bundle via webpack/rollup/vite)
+- Server-side (Node ≥ 20.19) and browser environments (consumers bundle via webpack/rollup/vite)
 
 > **Forking this?** The package name (`universal-emoji-parser`), the npm scope, the maintainer block in `package.json`, the GitHub remote, and the DailyBot release-bot identity are the renameable identifiers. Walk [Fork Customization](docs/FORK_CUSTOMIZATION.md) before merging product code.
 
 **Technology Stack** (full list with versions: [Technologies](docs/TECHNOLOGIES.md))
 
-- **TypeScript 5.9.3** — strict-null source language, compiles to `dist/index.js` + `dist/index.d.ts`
-- **Node.js ≥ 20.16.0** — `engines.node` constraint enforced by package.json
+- **TypeScript 6** — strict-null source language, compiles to `dist/index.js` + `dist/index.d.ts` (see `package.json` for exact semver)
+- **Node.js ≥ 20.19.0** — `engines.node` constraint enforced by package.json (CI and the dev container use Node 24)
 - **`@twemoji/parser` 17** — single runtime dependency; finds emoji entities in text and produces CDN URLs
 - **emojilib 4 + unicode-emoji-json** (build/test only) — sources used to regenerate `src/lib/emoji-lib.json`
 - **Webpack 5 + ts-loader** — production bundler, emits a single CommonJS entry at `dist/index.js`
-- **Mocha 11 + Chai 4 + ts-node** — test runner (no transpile step, runs `.ts` directly)
-- **ESLint 8 + `@typescript-eslint`** — code linting
+- **Mocha 11 + Chai 6 + tsx** — test runner; `tsx` loads `.ts` specs (Chai 6 is ESM-first — `ts-node/register` alone is insufficient)
+- **ESLint 10 + `typescript-eslint` (flat config)** — code linting via `eslint.config.mjs`
 - **Prettier 3** — code formatting (`semi: false`, `singleQuote: true`, `trailingComma: 'es5'`)
-- **npm-check-updates** — dependency upgrade automation (gated by `.ncurc.json`)
+- **npm-check-updates** — dependency upgrade automation (optional rejects in `.ncurc.json`; empty by default)
 - **GitHub Actions** — CI/CD: lint → tests → build → npm publish + GitHub release on PR merge to `main`
 
 ## Project Structure
@@ -79,10 +79,11 @@ docker/local/                          # Dev container Docker Compose + Dockerfi
 docs/                                  # Project documentation
 tmp/                                   # Scratch workspace (git-ignored, see below)
 package.json                           # npm scripts, deps, version, engines
-tsconfig.json                          # strict TS config (declaration: true, strictNullChecks: true)
+tsconfig.json                          # strict TS config for src + tests (declaration: true, strictNullChecks: true)
+tsconfig.build.json                    # `tsc --build` / ts-loader: emit from `src/` only (`rootDir`)
 webpack.config.js                      # commonjs2 output, ts-loader, clean-webpack-plugin on prod
-.eslintrc / .prettierrc / .editorconfig   # Style enforcement
-.ncurc.json                            # npm-check-updates: rejects chai 5 and eslint 9 (intentional pins)
+eslint.config.mjs / .prettierrc / .editorconfig   # Style enforcement (ESLint flat config)
+.ncurc.json                            # npm-check-updates defaults (`reject` optional)
 .npmignore                             # Trims source/test/config from the npm tarball
 ```
 
@@ -91,11 +92,13 @@ webpack.config.js                      # commonjs2 output, ts-loader, clean-webp
 The `tmp/` directory at the project root is a **git-ignored scratch space** for agents and developers.
 
 **Use it for:**
+
 - Temporary prompts, outputs, or drafts
 - One-off analysis results, debug logs, build artifacts copied for inspection
 - Throw-away `.ts` snippets you want to compile/run outside of `src/`
 
 **Rules:**
+
 - Everything inside `tmp/` is ignored by git (except `.gitkeep`)
 - Do NOT store anything permanent or important here — it can be deleted at any time
 - When a user asks for a temporary file, prompt output, or scratch artifact, **use `tmp/`**. Subdirectories are fine (e.g., `tmp/prompts/`, `tmp/analysis/`).
@@ -120,12 +123,12 @@ The runtime never imports from `emojilib` or `unicode-emoji-json` directly. Ever
 
 The public API of the package is defined by `src/index.ts` and consists of:
 
-| Export | Purpose |
-|---|---|
-| `default` (`uEmojiParser`) | Object exposing `parse`, `parseToHtml`, `parseToUnicode`, `parseToShortcode`, `getEmojiObjectByShortcode`, `getDefaultOptions` |
-| Named: `emojiLibJsonData` | The full catalog as `EmojiLibJsonType` — read-only consumers |
-| Named: `DEFAULT_EMOJI_CDN` | Twemoji CDN URL string |
-| CommonJS: `module.exports = uEmojiParser` and `module.exports.emojiLibJsonData = emojiLibJsonData` | Required for `require()` consumers |
+| Export                                                                                             | Purpose                                                                                                                        |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `default` (`uEmojiParser`)                                                                         | Object exposing `parse`, `parseToHtml`, `parseToUnicode`, `parseToShortcode`, `getEmojiObjectByShortcode`, `getDefaultOptions` |
+| Named: `emojiLibJsonData`                                                                          | The full catalog as `EmojiLibJsonType` — read-only consumers                                                                   |
+| Named: `DEFAULT_EMOJI_CDN`                                                                         | Twemoji CDN URL string                                                                                                         |
+| CommonJS: `module.exports = uEmojiParser` and `module.exports.emojiLibJsonData = emojiLibJsonData` | Required for `require()` consumers                                                                                             |
 
 Rules:
 
@@ -166,11 +169,11 @@ The CI runs `eslint:check` + `prettier:check` + `test` + `build` on every PR (`.
 ### 6. Testing (MANDATORY)
 
 ```bash
-npm test                  # Run all Mocha specs (ts-node, no compile step)
+npm test                  # Run all Mocha specs (tsx + mocha; no compile step)
 npm run test:watch        # Re-run on file change
 ```
 
-Specs live in `test/*.test.ts`. The runner config: `mocha --require ts-node/register test/**.ts --timeout 25000 --colors`.
+Specs live in `test/*.test.ts`. The runner config: `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors`.
 
 - **Always add a regression test** when fixing a parsing bug — paste the exact input that broke and the expected output
 - **Snapshot the catalog count** when regenerating: `emojiLibJson.test.ts` asserts `TOTAL_EMOJIS = 1906`. Bump it intentionally if a regeneration changes the count
@@ -183,7 +186,7 @@ Conventions: **[Testing Guide](docs/TESTING_GUIDE.md)**.
 Every emoji rendered to HTML by `parseToHtml` / `parse` (with `parseToHtml: true`) MUST follow this exact structure:
 
 ```html
-<img class="emoji" alt="<unicode-emoji>" src="<cdn-url>"/>
+<img class="emoji" alt="<unicode-emoji>" src="<cdn-url>" />
 ```
 
 - `class="emoji"` — load-bearing; consumers style emojis with `img.emoji { ... }` (see `README.md`)
@@ -308,7 +311,7 @@ Update docs after: changing the public API, adding/removing a runtime dependency
 4. Add a new top-level export — extend the `uEmojiParser` object instead
 5. Use `console.*` in `src/` — ESLint blocks it (`no-console: 2`); test files are exempt
 6. Commit `dist/` — it's built by CI; locally regenerated on demand
-7. Bump `chai` to 5 or `eslint` to 9 — `.ncurc.json` rejects them deliberately (see [Technologies → Pinned exclusions](docs/TECHNOLOGIES.md#pinned-exclusions))
+7. Strip `eslint.config.mjs` or revert to legacy `.eslintrc` — ESLint 10 uses flat config only in this repo
 8. Run `npm run release` locally — it bumps the version and creates a tag; CI does this on merge
 9. Add new emoji metadata fields to `EmojiType` — they ship in 540 KB JSON to every browser consumer
 10. Use `==` (TypeScript ESLint allows `===` only); use `Boolean(x)` instead of `!!x` in option parsing — see `getDefaultOptions`
@@ -375,12 +378,12 @@ This repository ships with a `.agents/` directory (symlinked as `.claude/`) cont
 
 ### How to Invoke Commands
 
-| Agent | Prefix | Example |
-|-------|--------|---------|
-| **Claude Code** | `/` (native) | `/regenerate-emoji-lib` |
-| **OpenAI Codex** | `#` | `#regenerate-emoji-lib` |
-| **Cursor AI** | `#` | `#regenerate-emoji-lib` |
-| **Gemini / others** | `#` | `#regenerate-emoji-lib` |
+| Agent               | Prefix       | Example                 |
+| ------------------- | ------------ | ----------------------- |
+| **Claude Code**     | `/` (native) | `/regenerate-emoji-lib` |
+| **OpenAI Codex**    | `#`          | `#regenerate-emoji-lib` |
+| **Cursor AI**       | `#`          | `#regenerate-emoji-lib` |
+| **Gemini / others** | `#`          | `#regenerate-emoji-lib` |
 
 > **Why `#` for non-Claude agents?** Most AI CLIs (Codex, Cursor) intercept `/` as their own system commands. Using `#` avoids interception. You can also write the command name in plain text: "run regenerate-emoji-lib".
 
@@ -398,6 +401,7 @@ When a command is invoked (via `/`, `#`, or by name), the agent MUST:
 **Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `perf`, `ci`, `build`
 
 Examples:
+
 - `feat: support :neckbeard: as a Slack dialect alias`
 - `fix: parse :star: even when followed by VS-16 modifier`
 - `chore: bump @twemoji/parser to 17.1.0`

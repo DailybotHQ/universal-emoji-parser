@@ -80,8 +80,8 @@ document.getElementById('chat').innerHTML = renderMessage(userInput)
 ### Convert between unicode and shortcode
 
 ```ts
-uEmojiParser.parseToShortcode('hello 🚀')         // → 'hello :rocket:'
-uEmojiParser.parseToUnicode('hello :rocket:')     // → 'hello 🚀'
+uEmojiParser.parseToShortcode('hello 🚀') // → 'hello :rocket:'
+uEmojiParser.parseToUnicode('hello :rocket:') // → 'hello 🚀'
 ```
 
 Round-tripping isn't lossless: `:thumbsup:` → 👍 → `:thumbs_up:` (output is always the canonical slug).
@@ -115,10 +115,10 @@ const emoji = uEmojiParser.getEmojiObjectByShortcode('thumbsup')
 // → { name: 'thumbs up', slug: 'thumbs_up', char: '👍', keywords: [...], group: '...', ... }
 
 // Both with and without colons work:
-uEmojiParser.getEmojiObjectByShortcode(':smile:')   // same as 'smile'
+uEmojiParser.getEmojiObjectByShortcode(':smile:') // same as 'smile'
 
 // Returns undefined for unknown shortcodes
-uEmojiParser.getEmojiObjectByShortcode('not_a_real_emoji')   // undefined
+uEmojiParser.getEmojiObjectByShortcode('not_a_real_emoji') // undefined
 ```
 
 ### Iterate the catalog
@@ -127,13 +127,13 @@ uEmojiParser.getEmojiObjectByShortcode('not_a_real_emoji')   // undefined
 import { emojiLibJsonData } from 'universal-emoji-parser'
 
 const allEmojis = Object.values(emojiLibJsonData)
-console.log(`Catalog has ${allEmojis.length} emojis`)   // → 1906
+console.log(`Catalog has ${allEmojis.length} emojis`) // → 1906
 
 // Filter by group
-const smileys = allEmojis.filter(e => e.group === 'Smileys & Emotion')
+const smileys = allEmojis.filter((e) => e.group === 'Smileys & Emotion')
 
 // Filter by keyword
-const coolEmojis = allEmojis.filter(e => e.keywords.includes('cool'))
+const coolEmojis = allEmojis.filter((e) => e.keywords.includes('cool'))
 ```
 
 The catalog is read-only — **don't mutate**. If you need a modified copy:
@@ -159,7 +159,7 @@ function EmojiText({ text }: { text: string }) {
 }
 
 // Usage:
-<EmojiText text="hello :smile: 🚀" />
+;<EmojiText text="hello :smile: 🚀" />
 ```
 
 **Sanitize before parsing** if `text` is user-controlled:
@@ -201,7 +201,9 @@ const app = express()
 app.get('/preview', (req, res) => {
   const text = String(req.query.text ?? '')
   const html = uEmojiParser.parseToHtml(escape(text))
-  res.send(`<html><head><style>img.emoji{height:1em;width:1em;vertical-align:-0.1em}</style></head><body>${html}</body></html>`)
+  res.send(
+    `<html><head><style>img.emoji{height:1em;width:1em;vertical-align:-0.1em}</style></head><body>${html}</body></html>`
+  )
 })
 
 app.listen(3000)
@@ -233,7 +235,7 @@ Bundle-size matters for browser consumers — the catalog adds ~543 KB. Lazy-loa
 let parserPromise: Promise<typeof import('universal-emoji-parser').default> | null = null
 
 async function lazyParse(text: string): Promise<string> {
-  parserPromise ??= import('universal-emoji-parser').then(m => m.default)
+  parserPromise ??= import('universal-emoji-parser').then((m) => m.default)
   return (await parserPromise).parse(text)
 }
 ```

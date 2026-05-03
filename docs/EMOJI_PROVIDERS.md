@@ -16,12 +16,12 @@ A single curated catalog (`src/lib/emoji-lib.json`) contains every emoji with:
 
 This is what lets all of these resolve to 😎:
 
-| Input | Why it works |
-|---|---|
-| `:smiling_face_with_sunglasses:` | Direct slug hit |
-| `:cool:` | In the `keywords` array |
-| `:sunglass:` | In the `keywords` array |
-| `:summer:` | In the `keywords` array |
+| Input                            | Why it works            |
+| -------------------------------- | ----------------------- |
+| `:smiling_face_with_sunglasses:` | Direct slug hit         |
+| `:cool:`                         | In the `keywords` array |
+| `:sunglass:`                     | In the `keywords` array |
+| `:summer:`                       | In the `keywords` array |
 
 If two emojis share a keyword (e.g., both ☕ and 🤎 had `coffee` upstream), the regenerator's deduplication loop assigns it to whichever emoji has it earliest in their keyword list. `EMOJIS_SPECIAL_CASES` overrides this when the algorithm picks wrong — see [Special-case overrides](#special-case-overrides).
 
@@ -34,24 +34,24 @@ The catalog merges keywords from two upstream sources during regeneration:
 
 This means the package supports — without per-platform configuration — shortcodes from:
 
-| Platform | Example aliases | How they resolve |
-|---|---|---|
-| **Twitter / Twemoji** | `:smiley:`, `:rocket:` | Aliases in `emojilib`'s curated keyword list |
-| **GitHub** | `:white_check_mark:`, `:thumbsup:`, `:tada:` | Keywords (some require `EMOJIS_SPECIAL_CASES` overrides) |
-| **Slack** | `:thumbsup:`, `:neckbeard:`, `:simple_smile:` | Keywords; `:neckbeard:` is a Slack-only emoji that has no Unicode equivalent and is left as text (see [Unsupported shortcodes](#unsupported-shortcodes)) |
-| **Discord** | `:smile:`, `:heart:`, `:fire:` | Same keyword pool |
-| **Google Chat** | `:thumbsup:`, `:sparkles:` | Same |
-| **Microsoft Teams** | Standard Unicode + a few Teams-only | Standard ones work; Teams-only are unsupported |
+| Platform              | Example aliases                               | How they resolve                                                                                                                                         |
+| --------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Twitter / Twemoji** | `:smiley:`, `:rocket:`                        | Aliases in `emojilib`'s curated keyword list                                                                                                             |
+| **GitHub**            | `:white_check_mark:`, `:thumbsup:`, `:tada:`  | Keywords (some require `EMOJIS_SPECIAL_CASES` overrides)                                                                                                 |
+| **Slack**             | `:thumbsup:`, `:neckbeard:`, `:simple_smile:` | Keywords; `:neckbeard:` is a Slack-only emoji that has no Unicode equivalent and is left as text (see [Unsupported shortcodes](#unsupported-shortcodes)) |
+| **Discord**           | `:smile:`, `:heart:`, `:fire:`                | Same keyword pool                                                                                                                                        |
+| **Google Chat**       | `:thumbsup:`, `:sparkles:`                    | Same                                                                                                                                                     |
+| **Microsoft Teams**   | Standard Unicode + a few Teams-only           | Standard ones work; Teams-only are unsupported                                                                                                           |
 
 ### Canonical slug vs alias
 
 The canonical slug is **what `parseToShortcode` outputs**. Aliases are **what `parseToUnicode` and `parse` accept as input**.
 
 ```ts
-uEmojiParser.parseToUnicode(':thumbsup:')   // '👍' — alias accepted
-uEmojiParser.parseToUnicode(':thumbs_up:')  // '👍' — slug also accepted
+uEmojiParser.parseToUnicode(':thumbsup:') // '👍' — alias accepted
+uEmojiParser.parseToUnicode(':thumbs_up:') // '👍' — slug also accepted
 
-uEmojiParser.parseToShortcode('👍')         // ':thumbs_up:' — always emits the canonical slug
+uEmojiParser.parseToShortcode('👍') // ':thumbs_up:' — always emits the canonical slug
 ```
 
 This asymmetry is intentional: input is permissive, output is normalized.
@@ -61,8 +61,8 @@ This asymmetry is intentional: input is permissive, output is normalized.
 Shortcodes that don't map to a Unicode emoji are **left as text**:
 
 ```ts
-uEmojiParser.parse(':neckbeard:')           // ':neckbeard:' (passes through unchanged)
-uEmojiParser.parse('hello :not_a_real_emoji:')  // 'hello :not_a_real_emoji:'
+uEmojiParser.parse(':neckbeard:') // ':neckbeard:' (passes through unchanged)
+uEmojiParser.parse('hello :not_a_real_emoji:') // 'hello :not_a_real_emoji:'
 ```
 
 Slack's `:neckbeard:` is the canonical example — it's a custom Slack emoji with no Unicode point. There's a test asserting this passes through (`main.test.ts` includes `:neckbeard:` in a long sentence and expects it unchanged).
@@ -183,7 +183,7 @@ When bumping `@twemoji/parser`:
 
 1. Read the release notes
 2. `npm test` — if snapshots break, the URL format changed (or a specific emoji was rerendered)
-3. Update test expectations and consider whether this is a major bump for *our* package
+3. Update test expectations and consider whether this is a major bump for _our_ package
 4. Per [Standards](STANDARDS.md#versioning), HTML output changes are major bumps
 
 See [`/bump-deps`](../.agents/commands/bump-deps.md) for the structured workflow.

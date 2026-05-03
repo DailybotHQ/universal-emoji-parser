@@ -26,19 +26,19 @@ Read the actual root cause, not just the surface error.
 
 ### 2. Classify the failure
 
-| Symptom | Likely cause | Section |
-|---|---|---|
-| `Cannot find module '@twemoji/parser'` (or similar) | Stale `node_modules` | A |
-| `TSError: ⨯ Unable to compile TypeScript` | TS source error | B |
-| `error TS####:` | TypeScript compiler error | B |
-| `Module parse failed` (Webpack) | TS file Webpack can't parse — usually `ts-loader` not picking up | C |
-| ESLint `Parsing error: Cannot read file 'tsconfig.json'` | Wrong working directory | D |
-| ESLint `'X' is not defined` (no-console, etc.) | Code violates a lint rule | E |
-| Prettier `Code style issues found` | Code violates Prettier formatting | F |
-| Mocha tests time out | Regenerator accidentally enabled | G |
-| Mocha tests fail with assertion mismatch | Real test failure — fix the code | H |
-| `npm publish` 401/403 | Auth or scope issue | I |
-| GitHub Actions fails on `npm install` | Lock file / cache issue in CI | J |
+| Symptom                                                  | Likely cause                                                     | Section |
+| -------------------------------------------------------- | ---------------------------------------------------------------- | ------- |
+| `Cannot find module '@twemoji/parser'` (or similar)      | Stale `node_modules`                                             | A       |
+| `TSError: ⨯ Unable to compile TypeScript`                | TS source error                                                  | B       |
+| `error TS####:`                                          | TypeScript compiler error                                        | B       |
+| `Module parse failed` (Webpack)                          | TS file Webpack can't parse — usually `ts-loader` not picking up | C       |
+| ESLint `Parsing error: Cannot read file 'tsconfig.json'` | Wrong working directory                                          | D       |
+| ESLint `'X' is not defined` (no-console, etc.)           | Code violates a lint rule                                        | E       |
+| Prettier `Code style issues found`                       | Code violates Prettier formatting                                | F       |
+| Mocha tests time out                                     | Regenerator accidentally enabled                                 | G       |
+| Mocha tests fail with assertion mismatch                 | Real test failure — fix the code                                 | H       |
+| `npm publish` 401/403                                    | Auth or scope issue                                              | I       |
+| GitHub Actions fails on `npm install`                    | Lock file / cache issue in CI                                    | J       |
 
 ### A. Stale `node_modules`
 
@@ -59,14 +59,14 @@ npm install
 
 Read the `error TS####:` line. Common patterns:
 
-| Code | Meaning | Fix |
-|---|---|---|
-| TS2304 | Cannot find name | Missing import |
-| TS2322 | Type X is not assignable to type Y | Adjust types or cast carefully |
-| TS2339 | Property does not exist on type | Property genuinely missing, or wrong type — check declaration |
-| TS6133 | Declared but never read | `noUnusedLocals: true`; remove the unused thing or use it |
-| TS6053 | File not found | Path typo or missing source file |
-| TS7006 | Parameter implicitly has 'any' type | `noImplicitAny: true`; annotate the parameter |
+| Code   | Meaning                             | Fix                                                           |
+| ------ | ----------------------------------- | ------------------------------------------------------------- |
+| TS2304 | Cannot find name                    | Missing import                                                |
+| TS2322 | Type X is not assignable to type Y  | Adjust types or cast carefully                                |
+| TS2339 | Property does not exist on type     | Property genuinely missing, or wrong type — check declaration |
+| TS6133 | Declared but never read             | `noUnusedLocals: true`; remove the unused thing or use it     |
+| TS6053 | File not found                      | Path typo or missing source file                              |
+| TS7006 | Parameter implicitly has 'any' type | `noImplicitAny: true`; annotate the parameter                 |
 
 Run `npm run build:tsc` for the cleanest TS error output (Webpack obscures TypeScript errors slightly).
 
@@ -92,7 +92,7 @@ ls node_modules/ts-loader
 ### D. ESLint can't find tsconfig
 
 ```
-.eslintrc » @typescript-eslint/eslint-recommended
+eslint.config.mjs » @typescript-eslint/...
 Parsing error: Cannot read file '/.../tsconfig.json'
 ```
 
@@ -107,12 +107,12 @@ npm run eslint:check
 
 Common violations and fixes:
 
-| Rule | Violation | Fix |
-|---|---|---|
-| `no-console` | `console.log(...)` in `src/` | Remove it. Tests are exempt |
-| `semi` | Stray semicolon | Run `npm run prettier:fix` |
-| `@typescript-eslint/no-unused-vars` | Declared but unused | Remove or prefix with `_` |
-| `@typescript-eslint/no-explicit-any` | `any` type | Use `unknown` and narrow, or suppress with `// eslint-disable-next-line` and a comment |
+| Rule                                 | Violation                    | Fix                                                                                    |
+| ------------------------------------ | ---------------------------- | -------------------------------------------------------------------------------------- |
+| `no-console`                         | `console.log(...)` in `src/` | Remove it. Tests are exempt                                                            |
+| `semi`                               | Stray semicolon              | Run `npm run prettier:fix`                                                             |
+| `@typescript-eslint/no-unused-vars`  | Declared but unused          | Remove or prefix with `_`                                                              |
+| `@typescript-eslint/no-explicit-any` | `any` type                   | Use `unknown` and narrow, or suppress with `// eslint-disable-next-line` and a comment |
 
 If the rule is genuinely wrong for the case, suppress with:
 
@@ -130,7 +130,7 @@ npm run prettier:fix
 git diff   # review what Prettier changed
 ```
 
-If Prettier and ESLint disagree (rare — `eslint-config-prettier` should prevent this), update `.eslintrc` to extend `prettier` last so it wins.
+If Prettier and ESLint disagree (rare — `eslint-config-prettier` should prevent this), ensure `eslint-plugin-prettier/recommended` stays **last** in `eslint.config.mjs` so it wins.
 
 ### G. Mocha timeout — regenerator accidentally enabled
 
@@ -158,12 +158,12 @@ If the failing test is a snapshot of HTML output and `@twemoji/parser` was bumpe
 
 ### I. `npm publish` auth
 
-| Error | Fix |
-|---|---|
+| Error              | Fix                                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------------------- |
 | `401 Unauthorized` | Token expired or wrong scope. Generate a new automation token in npm settings; update `secrets.NPM_TOKEN` |
-| `403 Forbidden` | Token doesn't have publish access for this package. Verify with `npm access list packages` |
-| `404 Not Found` | First publish — add `--access public` (for scoped packages) |
-| `EPUBLISHCONFLICT` | Version already exists. Bump and retry |
+| `403 Forbidden`    | Token doesn't have publish access for this package. Verify with `npm access list packages`                |
+| `404 Not Found`    | First publish — add `--access public` (for scoped packages)                                               |
+| `EPUBLISHCONFLICT` | Version already exists. Bump and retry                                                                    |
 
 ### J. CI cache / lock issues
 

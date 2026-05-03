@@ -21,7 +21,7 @@ By the end of this guide you will be able to:
 
 ### 1. Install Node.js
 
-The package requires **Node.js ≥ 20.16.0**. CI runs on **22.13.1**. Use the Active LTS or Current release.
+The package requires **Node.js ≥ 20.19.0**. CI runs on **Node 24**. Use Active LTS, Current, or the same major as CI.
 
 #### macOS / Linux (recommended: nvm)
 
@@ -30,9 +30,9 @@ The package requires **Node.js ≥ 20.16.0**. CI runs on **22.13.1**. Use the Ac
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 
 # Reload your shell, then:
-nvm install 22.13.1
-nvm use 22.13.1
-nvm alias default 22.13.1
+nvm install 24
+nvm use 24
+nvm alias default 24
 ```
 
 #### macOS (Homebrew)
@@ -49,7 +49,7 @@ Use [nvm-windows](https://github.com/coreybutler/nvm-windows) or download the in
 ### 2. Verify
 
 ```bash
-node --version       # should report v22.13.1 (or any v20.16+)
+node --version       # should report v24.x (or any v20.19+)
 npm --version        # comes with Node; should be 10.x+
 ```
 
@@ -69,7 +69,7 @@ npm install
 First install takes ~30 seconds and pulls in:
 
 - `@twemoji/parser` (runtime)
-- TypeScript, Mocha, Chai, ts-node (test/build)
+- TypeScript, Mocha, Chai, tsx (test runner), ts-node (ad-hoc scripts)
 - Webpack, ts-loader (build)
 - ESLint + Prettier + plugins (lint/format)
 - `emojilib`, `unicode-emoji-json`, `@types/*` (regenerator + types)
@@ -90,10 +90,10 @@ Expected: `dist/index.js` created (~600 KB).
 
 ### 6. Optional: editor integration
 
-The repo ships `.editorconfig`, `.eslintrc`, `.prettierrc`. Most editors auto-detect:
+The repo ships `.editorconfig`, `eslint.config.mjs`, `.prettierrc`. Most editors auto-detect:
 
 - **VS Code** — install the recommended extensions (see `.devcontainer/devcontainer.json` `customizations.vscode.extensions` for the list — same list applies to native VS Code)
-- **WebStorm / IntelliJ** — File → Settings → Languages → JavaScript → Code Quality Tools → ESLint and Prettier; point at the project's `.eslintrc` and `.prettierrc`
+- **WebStorm / IntelliJ** — File → Settings → Languages → JavaScript → Code Quality Tools → ESLint and Prettier; point at the project's `eslint.config.mjs` and `.prettierrc`
 - **Vim / Neovim** — `coc-eslint` + `coc-prettier`, or LSP equivalents
 
 ---
@@ -104,11 +104,11 @@ The repo ships a Dev Container at `.devcontainer/devcontainer.json` that builds 
 
 ### 1. Install prerequisites
 
-| Tool | Why |
-|---|---|
-| [Docker Desktop](https://www.docker.com/products/docker-desktop) (or Docker Engine + Compose on Linux) | Builds and runs the container |
-| [VS Code](https://code.visualstudio.com/) | Frontend |
-| [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) | Wires VS Code to Docker |
+| Tool                                                                                                               | Why                           |
+| ------------------------------------------------------------------------------------------------------------------ | ----------------------------- |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop) (or Docker Engine + Compose on Linux)             | Builds and runs the container |
+| [VS Code](https://code.visualstudio.com/)                                                                          | Frontend                      |
+| [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) | Wires VS Code to Docker       |
 
 ### 2. Open the repo in VS Code
 
@@ -118,7 +118,7 @@ cd universal-emoji-parser
 code .
 ```
 
-VS Code prompts: *Reopen in Container*. Click it.
+VS Code prompts: _Reopen in Container_. Click it.
 
 (Or: `View → Command Palette → "Dev Containers: Reopen in Container"`)
 
@@ -184,19 +184,24 @@ Each CLI's auth state lives in a Docker named volume (`claude_data`, `codex_data
 
 The container's `~/.bashrc` sources `docker/custom_commands.sh`, which provides:
 
-| Command | What it does |
-|---|---|
-| `help` | Reprint the welcome banner |
-| `test` | `npm test` |
-| `install` | `npm install` |
-| `claudex` | `claude --dangerously-skip-permissions` (full-permission Claude session) |
-| `claudex -c` | Continue last Claude session |
-| `claudex -r [<id>]` | Resume Claude session |
-| `codexx` | `codex --dangerously-bypass-approvals-and-sandbox` |
-| `codexx -l` / `-r` | Codex session controls |
-| `cursorx` | `agent --force` (full-permission Cursor agent) |
-| `cursorx -l` / `-r` | Cursor session controls |
-| `gs` / `ga` / `gc` / `gp` / `gpl` / `gl` / `gd` / `gb` / `gco` / `gcob` / `gbd` / `grc` | Git aliases |
+| Command                                                                                 | What it does                                                             |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `help`                                                                                  | Reprint the welcome banner                                               |
+| `check_devcontainer`                                                                    | Print whether you are running inside Docker / Dev Containers             |
+| `check`                                                                                 | `npm run eslint:check` + `npm run prettier:check`                        |
+| `fix`                                                                                   | `npm run eslint:fix` + `npm run prettier:fix`                            |
+| `test`                                                                                  | `npm test`                                                               |
+| `build`                                                                                 | `npm run build:tsc` + `npm run build`                                    |
+| `codecheck`                                                                             | `check`, then `test`, then `build` (full local gate)                     |
+| `install`                                                                               | `npm install`                                                            |
+| `claudex`                                                                               | `claude --dangerously-skip-permissions` (full-permission Claude session) |
+| `claudex -c`                                                                            | Continue last Claude session                                             |
+| `claudex -r [<id>]`                                                                     | Resume Claude session                                                    |
+| `codexx`                                                                                | `codex --dangerously-bypass-approvals-and-sandbox`                       |
+| `codexx -l` / `-r`                                                                      | Codex session controls                                                   |
+| `cursorx`                                                                               | `agent --force` (full-permission Cursor agent)                           |
+| `cursorx -l` / `-r`                                                                     | Cursor session controls                                                  |
+| `gs` / `ga` / `gc` / `gp` / `gpl` / `gl` / `gd` / `gb` / `gco` / `gcob` / `gbd` / `grc` | Git aliases                                                              |
 
 These exist only in the container. Native users use the underlying `npm` and `git` commands directly.
 

@@ -60,7 +60,7 @@ Includes PR number, title, body, size label, workflow URL.
 ```yaml
 - uses: actions/checkout@v4
 - uses: actions/setup-node@v4
-  with: { node-version: '22.13.1' }
+  with: { node-version: '24' }
 - uses: actions/cache@v4
   with:
     path: |
@@ -114,11 +114,11 @@ The actual release. Steps:
 ```yaml
 - uses: actions/checkout@v4
   with:
-    fetch-depth: '30'   # need history for release notes
+    fetch-depth: '30' # need history for release notes
     token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
 - uses: actions/setup-node@v4
   with:
-    node-version: '22.13.1'
+    node-version: '24'
     registry-url: https://registry.npmjs.org/
 - run: |
     git config user.name "🤖 DailyBot"
@@ -339,7 +339,7 @@ Excluded:
   package-lock.json
   tsconfig.json, webpack.config.js
   docker, .github
-  .eslintignore, .eslintrc
+  eslint.config.mjs (flat ESLint; `.eslintignore` removed — use `ignores` in config)
   get_github_release_log.sh
   git_logs.txt, git_logs_output.txt
   .editorconfig, .prettierrc

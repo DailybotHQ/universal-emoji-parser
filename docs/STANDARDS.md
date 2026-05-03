@@ -44,16 +44,16 @@ Reserve `type` for unions and mapped types: `type EmojiKey = keyof typeof emojiL
 
 ## Naming
 
-| Element | Convention | Example |
-|---|---|---|
-| Source file | `camelCase.ts` matching the dominant export | `emojiLibJson.test.ts`, `index.ts`, `type.ts` |
-| Test file | `<subject>.test.ts` | `main.test.ts`, `emojiLibJson.test.ts` |
-| Class / interface | `PascalCase` | `EmojiType`, `UEmojiParserType` |
-| Function (top-level) | `camelCase` | `parseToHtml`, `getEmojiObjectByShortcode` |
-| Internal "private" function | `__camelCase` (double underscore prefix) | `__parseEmojiToHtml` |
-| Constant (compile-time) | `SCREAMING_SNAKE_CASE` | `DEFAULT_EMOJI_CDN`, `EMOJIS_SPECIAL_CASES`, `TOTAL_EMOJIS` |
-| Local variable | `camelCase` | `entitiesFound`, `emojiUrl` |
-| Catalog slug | `snake_case` | `smiling_face_with_sunglasses` |
+| Element                     | Convention                                  | Example                                                     |
+| --------------------------- | ------------------------------------------- | ----------------------------------------------------------- |
+| Source file                 | `camelCase.ts` matching the dominant export | `emojiLibJson.test.ts`, `index.ts`, `type.ts`               |
+| Test file                   | `<subject>.test.ts`                         | `main.test.ts`, `emojiLibJson.test.ts`                      |
+| Class / interface           | `PascalCase`                                | `EmojiType`, `UEmojiParserType`                             |
+| Function (top-level)        | `camelCase`                                 | `parseToHtml`, `getEmojiObjectByShortcode`                  |
+| Internal "private" function | `__camelCase` (double underscore prefix)    | `__parseEmojiToHtml`                                        |
+| Constant (compile-time)     | `SCREAMING_SNAKE_CASE`                      | `DEFAULT_EMOJI_CDN`, `EMOJIS_SPECIAL_CASES`, `TOTAL_EMOJIS` |
+| Local variable              | `camelCase`                                 | `entitiesFound`, `emojiUrl`                                 |
+| Catalog slug                | `snake_case`                                | `smiling_face_with_sunglasses`                              |
 
 The `__` prefix on `__parseEmojiToHtml` is a JavaScript-era marker meaning "implementation detail, may change without notice". TypeScript's actual `private` modifier doesn't apply because we use a plain object literal, not a class.
 
@@ -120,12 +120,8 @@ const a = 'hello'
 const b = `hello, ${name}`
 
 // ✅ trailing comma in multi-line arrays/objects (es5: not in function calls)
-const arr = [
-  'a',
-  'b',
-  'c',
-]
-fn('a', 'b', 'c')   // ✅ no trailing comma in function call (es5)
+const arr = ['a', 'b', 'c']
+fn('a', 'b', 'c') // ✅ no trailing comma in function call (es5)
 ```
 
 Auto-fix with `npm run prettier:fix`. CI fails on `prettier:check`, so always run before committing.
@@ -136,22 +132,21 @@ Auto-fix with `npm run prettier:fix`. CI fails on `prettier:check`, so always ru
 
 ## Linting (ESLint)
 
-`.eslintrc` extends:
+`eslint.config.mjs` (flat config) composes:
 
-- `eslint:recommended`
-- `plugin:@typescript-eslint/eslint-recommended`
-- `plugin:@typescript-eslint/recommended`
-- `plugin:prettier/recommended`
+- `@eslint/js` `recommended`
+- `typescript-eslint` `recommended`
+- `eslint-plugin-prettier/recommended`
 
 Custom rules:
 
-| Rule | Setting | Reason |
-|---|---|---|
-| `no-console` | `2` (error) | This is a library — `console.*` in `src/` leaks into consumers. Tests are exempt via the `.eslintignore` strategy |
-| `@typescript-eslint/no-inferrable-types` | `off` | We sometimes annotate inferable types for clarity (e.g., `const emojiCDN: string = '...'`) |
-| `@typescript-eslint/no-non-null-assertion` | `off` | Allowed sparingly when the type system can't see the invariant (e.g., dedup loop in regenerator) |
-| `@typescript-eslint/ban-ts-comment` | `off` | `// @ts-ignore` allowed for unavoidable interop |
-| `semi` | `[2, 'never']` | Reinforces Prettier's `semi: false` |
+| Rule                                       | Setting        | Reason                                                                                           |
+| ------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
+| `no-console`                               | `2` (error)    | This is a library — `console.*` in `src/` leaks into consumers. Tests may log freely             |
+| `@typescript-eslint/no-inferrable-types`   | `off`          | We sometimes annotate inferable types for clarity (e.g., `const emojiCDN: string = '...'`)       |
+| `@typescript-eslint/no-non-null-assertion` | `off`          | Allowed sparingly when the type system can't see the invariant (e.g., dedup loop in regenerator) |
+| `@typescript-eslint/ban-ts-comment`        | `off`          | `// @ts-ignore` allowed for unavoidable interop                                                  |
+| `semi`                                     | `[2, 'never']` | Reinforces Prettier's `semi: false`                                                              |
 
 Run `npm run eslint:check` before committing; auto-fix is `npm run eslint:fix`.
 
@@ -162,7 +157,7 @@ Run `npm run eslint:check` before committing; auto-fix is `npm run eslint:fix`.
 - **Do JSDoc public methods** with at minimum a one-line description; consumers see this in their IDE hover. The current `src/index.ts` is light on JSDoc — adding more is welcome
 - **TODOs:** `// TODO(<owner>): <action>` — never bare `// TODO`. Even better, open an issue and reference it
 
-Examples that are *worth* keeping:
+Examples that are _worth_ keeping:
 
 ```ts
 // Track processed entities to avoid duplicate replacements when the same emoji
@@ -175,7 +170,7 @@ const entitiesFound: Array<string> = []
 regexText = regexText.replace(/\*️⃣/g, '\\*️⃣')
 ```
 
-Both explain a non-obvious *why*; without them, a reader would think the code was redundant or buggy.
+Both explain a non-obvious _why_; without them, a reader would think the code was redundant or buggy.
 
 ## Object option-merge pattern
 
@@ -192,7 +187,7 @@ parseToHtml: options && Object.getOwnPropertyDescriptor(options, 'parseToHtml')
 
 Why `Object.getOwnPropertyDescriptor` instead of `options.emojiCDN === undefined`?
 
-Because callers passing `{ emojiCDN: undefined }` should be treated as "explicitly clearing" — and a future signature might want to distinguish "unset" from "undefined". `getOwnPropertyDescriptor` returns `undefined` when the key doesn't exist; truthy when the key is set to *anything* (including undefined).
+Because callers passing `{ emojiCDN: undefined }` should be treated as "explicitly clearing" — and a future signature might want to distinguish "unset" from "undefined". `getOwnPropertyDescriptor` returns `undefined` when the key doesn't exist; truthy when the key is set to _anything_ (including undefined).
 
 For `parseToHtml`/`parseToUnicode`/`parseToShortcode`, the pattern is simpler — `Boolean(options?.parseToHtml)` defaults to `false`, but `parseToHtml`'s default is **true**, hence the `getOwnPropertyDescriptor` check. The other two booleans default to `false`, so `Boolean(options?.x)` is fine.
 
@@ -218,7 +213,7 @@ Rules:
 
 See [Testing Guide](TESTING_GUIDE.md). Summary:
 
-- Specs in `test/*.test.ts`, run by Mocha + Chai 4 + ts-node
+- Specs in `test/*.test.ts`, run by Mocha + Chai 6 + tsx
 - BDD style: `describe('Test emoji parser', () => { describe('Using default options', () => { it('should ...') })})`
 - One behavior per `it` — split if you'd write "and" in the name
 - `expect(result).to.be.equal(...)` for primitive equality; `.deep.equal` for objects/arrays
@@ -245,7 +240,7 @@ import { parse } from '@twemoji/parser'
 import emojiLibJson from './lib/emoji-lib.json'
 
 // ❌ namespace — only when truly needed
-import * as fs from 'fs'   // ✅ this case is fine — we use fs.writeFileSync, fs.existsSync
+import * as fs from 'fs' // ✅ this case is fine — we use fs.writeFileSync, fs.existsSync
 ```
 
 Don't insert blank lines between import groups; let the file flow naturally.
@@ -272,7 +267,7 @@ CI's `npm version patch` is the right default. If a change deserves minor or maj
 
 - Don't commit `dist/` (gitignored)
 - Don't commit `node_modules/` (gitignored)
-- Don't commit `package-lock.json` — gitignored intentionally; CI rebuilds from `package.json` + cached `node_modules`. *(If you have strong feelings, open an issue and discuss before changing.)*
+- Don't commit `package-lock.json` — gitignored intentionally; CI rebuilds from `package.json` + cached `node_modules`. _(If you have strong feelings, open an issue and discuss before changing.)_
 - Don't commit `.env` files — gitignored
 - Don't commit `git_logs.txt`, `git_logs_output.txt`, `packages_upgrades.txt`, `packages_upgrades_output.txt` — gitignored CI scratch
 - Don't commit `src/lib/emoji-lib-output.json` — gitignored

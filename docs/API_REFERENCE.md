@@ -52,6 +52,7 @@ interface UEmojiParserType {
 The primary entry point. Dispatches to one of the specialized methods based on `options`.
 
 **Parameters:**
+
 - `text: string` — the input text to transform. **Must** be a string; throws `Error('The text parameter should be a string.')` otherwise
 - `options?: EmojiParseOptionsType` — see [Options](#options-emojiparseoptionstype). Defaults: `parseToHtml: true`, `parseToUnicode: false`, `parseToShortcode: false`, `emojiCDN: undefined`
 
@@ -59,12 +60,12 @@ The primary entry point. Dispatches to one of the specialized methods based on `
 
 **Behavior:**
 
-| `parseToHtml` | `parseToUnicode` | `parseToShortcode` | What runs |
-|---|---|---|---|
-| `true` (default) | (any) | (any) | `parseToUnicode` (resolve `:smile:` → 🙂) → `__parseEmojiToHtml` → returns HTML |
-| `false` | `true` | (any) | `parseToUnicode` only — input shortcodes become unicodes; existing unicodes pass through |
-| `false` | `false` | `true` | `parseToShortcode` only — input unicodes become canonical `:slug:` |
-| `false` | `false` | `false` | Returns text unchanged (no-op) |
+| `parseToHtml`    | `parseToUnicode` | `parseToShortcode` | What runs                                                                                |
+| ---------------- | ---------------- | ------------------ | ---------------------------------------------------------------------------------------- |
+| `true` (default) | (any)            | (any)              | `parseToUnicode` (resolve `:smile:` → 🙂) → `__parseEmojiToHtml` → returns HTML          |
+| `false`          | `true`           | (any)              | `parseToUnicode` only — input shortcodes become unicodes; existing unicodes pass through |
+| `false`          | `false`          | `true`             | `parseToShortcode` only — input unicodes become canonical `:slug:`                       |
+| `false`          | `false`          | `false`            | Returns text unchanged (no-op)                                                           |
 
 **Examples:**
 
@@ -89,6 +90,7 @@ uEmojiParser.parse(undefined as any)
 Convert all emojis in `text` (both unicodes and shortcodes) to `<img>` tags.
 
 **Parameters:**
+
 - `text: string` — input
 - `emojiCDN?: string` — optional CDN URL prefix to use instead of `DEFAULT_EMOJI_CDN`. Must end with `/`
 
@@ -118,11 +120,13 @@ uEmojiParser.parseToHtml(':rocket:')
 Replace shortcodes (`:smile:`) in `text` with their unicode emoji characters. Existing unicode emojis pass through unchanged.
 
 **Parameters:**
+
 - `text: string` — input
 
 **Returns:** `string` — text with shortcodes replaced by unicode
 
 **Behavior:**
+
 - Matches `/:(\w+):/g` (any sequence of word characters between colons)
 - Looks up each match via `getEmojiObjectByShortcode`
 - Replaces hits with `emoji.char`; leaves misses as text
@@ -130,11 +134,11 @@ Replace shortcodes (`:smile:`) in `text` with their unicode emoji characters. Ex
 **Examples:**
 
 ```ts
-uEmojiParser.parseToUnicode(':thumbsup:')          // → '👍'  (alias)
-uEmojiParser.parseToUnicode(':thumbs_up:')         // → '👍'  (slug)
+uEmojiParser.parseToUnicode(':thumbsup:') // → '👍'  (alias)
+uEmojiParser.parseToUnicode(':thumbs_up:') // → '👍'  (slug)
 uEmojiParser.parseToUnicode(':smile: hi :rocket:') // → '🙂 hi 🚀'
-uEmojiParser.parseToUnicode(':not_an_emoji:')      // → ':not_an_emoji:' (unchanged)
-uEmojiParser.parseToUnicode('🚀 already unicode')  // → '🚀 already unicode'
+uEmojiParser.parseToUnicode(':not_an_emoji:') // → ':not_an_emoji:' (unchanged)
+uEmojiParser.parseToUnicode('🚀 already unicode') // → '🚀 already unicode'
 ```
 
 ---
@@ -144,11 +148,13 @@ uEmojiParser.parseToUnicode('🚀 already unicode')  // → '🚀 already unicod
 Replace unicode emojis in `text` with their canonical shortcode. Existing shortcodes pass through unchanged.
 
 **Parameters:**
+
 - `text: string` — input
 
 **Returns:** `string` — text with unicodes replaced by `:slug:`
 
 **Behavior:**
+
 - Builds an alternation regex from `Object.keys(emojiLibJsonData)` (every unicode emoji in the catalog)
 - Escapes `*️⃣` (the keycap asterisk has special regex semantics)
 - Runs `text.matchAll(regex)` and replaces each match with `:emoji.slug:`
@@ -158,10 +164,10 @@ Replace unicode emojis in `text` with their canonical shortcode. Existing shortc
 **Examples:**
 
 ```ts
-uEmojiParser.parseToShortcode('👍')                // → ':thumbs_up:'
-uEmojiParser.parseToShortcode('🚀 ⭐️')              // → ':rocket: :glowing_star:'
-uEmojiParser.parseToShortcode(':smile: text')      // → ':smile: text' (already shortcode-form)
-uEmojiParser.parseToShortcode('hello world')       // → 'hello world' (no emojis)
+uEmojiParser.parseToShortcode('👍') // → ':thumbs_up:'
+uEmojiParser.parseToShortcode('🚀 ⭐️') // → ':rocket: :glowing_star:'
+uEmojiParser.parseToShortcode(':smile: text') // → ':smile: text' (already shortcode-form)
+uEmojiParser.parseToShortcode('hello world') // → 'hello world' (no emojis)
 ```
 
 ---
@@ -171,11 +177,13 @@ uEmojiParser.parseToShortcode('hello world')       // → 'hello world' (no emoj
 Look up an emoji by shortcode. Returns the full catalog entry or `undefined` if not found.
 
 **Parameters:**
+
 - `shortcode: string` — with or without surrounding colons (`'smile'` and `':smile:'` both work; the function strips colons)
 
 **Returns:** `EmojiType | undefined`
 
 **Lookup order:**
+
 1. **Direct hit:** `emojiLibJsonData[shortcode]` — fast path for canonical slugs
 2. **Keyword scan:** searches every emoji's `keywords` array for a match — fallback for dialect aliases
 
@@ -199,11 +207,13 @@ uEmojiParser.getEmojiObjectByShortcode('not_a_real_emoji')
 Merge user options with defaults. Rarely called directly — `parse` uses it internally.
 
 **Parameters:**
+
 - `options?: EmojiParseOptionsType` — partial options
 
 **Returns:** `EmojiParseOptionsType` — fully populated options
 
 **Defaults:**
+
 - `parseToHtml: true`
 - `parseToUnicode: false`
 - `parseToShortcode: false`
@@ -255,15 +265,15 @@ Object.keys(emojiLibJsonData).length
 
 ```ts
 export interface EmojiType {
-  name: string                    // "smiling face with sunglasses"
-  slug: string                    // "smiling_face_with_sunglasses" — canonical shortcode
-  group: string                   // "Smileys & Emotion"
-  emoji_version: string           // "1.0"
-  unicode_version: string         // "1.0"
-  skin_tone_support: boolean      // false for most; true for emojis with U+1F3FB-U+1F3FF skin variants
-  char: string                    // "😎" — the unicode literal
-  keywords: Array<string>         // ["smiling_face_with_sunglasses", "cool", "summer", "sunglass", ...]
-  keyword_index_found?: number    // Used internally by the regenerator; ignore
+  name: string // "smiling face with sunglasses"
+  slug: string // "smiling_face_with_sunglasses" — canonical shortcode
+  group: string // "Smileys & Emotion"
+  emoji_version: string // "1.0"
+  unicode_version: string // "1.0"
+  skin_tone_support: boolean // false for most; true for emojis with U+1F3FB-U+1F3FF skin variants
+  char: string // "😎" — the unicode literal
+  keywords: Array<string> // ["smiling_face_with_sunglasses", "cool", "summer", "sunglass", ...]
+  keyword_index_found?: number // Used internally by the regenerator; ignore
 }
 ```
 
@@ -271,7 +281,7 @@ export interface EmojiType {
 
 ```ts
 export interface EmojiLibJsonType {
-  [key: string]: EmojiType        // keyed by emoji char (e.g., "😎"), not by slug
+  [key: string]: EmojiType // keyed by emoji char (e.g., "😎"), not by slug
 }
 ```
 
@@ -279,10 +289,10 @@ export interface EmojiLibJsonType {
 
 ```ts
 export interface EmojiParseOptionsType {
-  emojiCDN?: string               // CDN URL prefix; must end with "/"
-  parseToHtml?: boolean           // default: true
-  parseToUnicode?: boolean        // default: false
-  parseToShortcode?: boolean      // default: false
+  emojiCDN?: string // CDN URL prefix; must end with "/"
+  parseToHtml?: boolean // default: true
+  parseToUnicode?: boolean // default: false
+  parseToShortcode?: boolean // default: false
 }
 ```
 
@@ -294,10 +304,10 @@ The type of the default export — see [`uEmojiParser`](#uemojiparser-default-ex
 
 ```ts
 export interface TwemojiEntity {
-  url: string                     // e.g., "https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f60e.svg"
-  indices: Array<number>          // [start, end] in the input text
-  text: string                    // the unicode emoji literal
-  type: string                    // "emoji"
+  url: string // e.g., "https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f60e.svg"
+  indices: Array<number> // [start, end] in the input text
+  text: string // the unicode emoji literal
+  type: string // "emoji"
 }
 ```
 
@@ -310,15 +320,15 @@ Returned by `@twemoji/parser`'s `parse()` function. Rarely used by consumers dir
 Every emoji rendered to HTML by `parseToHtml` (or `parse` with `parseToHtml: true`) follows **this exact structure**:
 
 ```html
-<img class="emoji" alt="<unicode-emoji>" src="<cdn-url>"/>
+<img class="emoji" alt="<unicode-emoji>" src="<cdn-url>" />
 ```
 
-| Attribute | Value | Why |
-|---|---|---|
-| `class` | `"emoji"` (literal, exact) | Consumers style with `img.emoji { ... }` (see [README](../README.md#css-styles)) |
-| `alt` | The unicode emoji literal (e.g., `😎`) | Accessibility + copy-paste survives the rendering |
-| `src` | CDN URL (Twemoji default or `emojiCDN` override) | Asset URL |
-| Self-closing `/>` | Always | XHTML/JSX compatibility |
+| Attribute         | Value                                            | Why                                                                              |
+| ----------------- | ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `class`           | `"emoji"` (literal, exact)                       | Consumers style with `img.emoji { ... }` (see [README](../README.md#css-styles)) |
+| `alt`             | The unicode emoji literal (e.g., `😎`)           | Accessibility + copy-paste survives the rendering                                |
+| `src`             | CDN URL (Twemoji default or `emojiCDN` override) | Asset URL                                                                        |
+| Self-closing `/>` | Always                                           | XHTML/JSX compatibility                                                          |
 
 **No additional attributes are added.** Adding `loading="lazy"`, `decoding="async"`, `width`, `height`, etc. is a **breaking change** — consumers' snapshot tests rely on the exact output. Bump the major version if changing.
 
@@ -371,17 +381,17 @@ The error message string is **part of the API**. A test asserts the throw, and c
 
 ## Stability guarantees
 
-| Surface | Stability |
-|---|---|
-| Method names (`parse`, `parseToHtml`, …) | Stable across minor versions |
-| Method signatures | Adding optional parameters: minor bump. Reordering / renaming / required params: major bump |
-| Default option values | Changes are major bumps |
-| HTML output template | Changes are major bumps — **all consumers' snapshot tests would break** |
-| `DEFAULT_EMOJI_CDN` value | Changes are major bumps |
-| `EmojiType` shape | Adding optional fields: minor bump. Removing or renaming: major bump |
+| Surface                                      | Stability                                                                                         |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Method names (`parse`, `parseToHtml`, …)     | Stable across minor versions                                                                      |
+| Method signatures                            | Adding optional parameters: minor bump. Reordering / renaming / required params: major bump       |
+| Default option values                        | Changes are major bumps                                                                           |
+| HTML output template                         | Changes are major bumps — **all consumers' snapshot tests would break**                           |
+| `DEFAULT_EMOJI_CDN` value                    | Changes are major bumps                                                                           |
+| `EmojiType` shape                            | Adding optional fields: minor bump. Removing or renaming: major bump                              |
 | Catalog content (which slugs/keywords exist) | Adding new shortcode aliases: patch or minor (depending on intent). Removing slugs/aliases: major |
-| `__parseEmojiToHtml` | **Internal.** No stability guarantees. May change in patches |
-| `keyword_index_found` field | **Internal.** Consumers should not read it |
+| `__parseEmojiToHtml`                         | **Internal.** No stability guarantees. May change in patches                                      |
+| `keyword_index_found` field                  | **Internal.** Consumers should not read it                                                        |
 
 When in doubt about whether a change is breaking, **assume it is** and let a reviewer downgrade the bump.
 
@@ -397,7 +407,7 @@ To skip the auto-bump for a non-patch release, edit `package.json` `"version"` m
 
 ## Compatibility
 
-- **Node.js** ≥ 20.16.0 (`engines.node` constraint; CI runs on 22.13.1)
+- **Node.js** ≥ 20.19.0 (`engines.node` constraint; CI runs on Node 24)
 - **TypeScript** ≥ 4.0 for consumers (the `.d.ts` uses modern features but nothing 5.0-only)
 - **Bundlers** — webpack, rollup, vite, esbuild, parcel all handle `commonjs2` output. See [Runtimes](RUNTIMES.md)
 - **Browsers** — anything modern. The catalog inlines into the bundle; no runtime fetch

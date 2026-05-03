@@ -4,29 +4,29 @@ When and how to update the docs that live in this repo. The goal is to keep `AGE
 
 ## Documentation map
 
-| File | Purpose | Update when… |
-|---|---|---|
-| `AGENTS.md` (root) | Single source of truth for AI agents — non-negotiable rules, quick command reference | Mandatory rules change, commands change, new patterns become canonical |
-| `CLAUDE.md` | Symlink → `AGENTS.md` | Never edit directly |
-| `README.md` | Human-facing intro, install + usage | The primary value proposition or public API changes |
-| `docs/ARCHITECTURE.md` | Module layout, data flow, regenerator pipeline | New module, new data source, new pipeline stage |
-| `docs/TECHNOLOGIES.md` | Stack with versions and roles | A library is added, removed, or major-bumped |
-| `docs/STANDARDS.md` | Coding rules | A convention is decided or changes |
-| `docs/DEVELOPMENT_COMMANDS.md` | npm script reference | A new script is wired or a workflow changes |
-| `docs/TESTING_GUIDE.md` | Test framework, conventions, regenerator workflow | Test framework changes, new test scenario added |
-| `docs/RUNTIMES.md` | Per-runtime notes (Node, browsers, edge) | A new runtime is supported or a runtime-specific gotcha is found |
-| `docs/BUILD_DEPLOY.md` | Webpack output, npm publish, CI workflows | Build steps, signing, CI pipeline changes |
-| `docs/EMOJI_PROVIDERS.md` | Twemoji CDN, dialect support, special-case overrides | A dialect is added, a CDN is swapped, an override changes |
-| `docs/PERFORMANCE.md` | Hot paths, bundle size, profiling | A performance decision is made (caching, lazy-load, bundle split) |
-| `docs/API_REFERENCE.md` | Every export, method, type, option | The public API changes (additions, signatures, defaults) |
-| `docs/SECURITY.md` | XSS, supply chain, npm publish security | A security policy or threat-model item changes |
-| `docs/AI_AGENT_ONBOARDING.md` | First-run flow for any AI agent | The onboarding path changes |
-| `docs/AI_AGENT_COLLAB.md` | Multi-agent coordination | Agent roles or handoffs change |
-| `docs/FORK_CUSTOMIZATION.md` | Rebrand checklist for forks | A new fork-time concern is discovered |
-| `.agents/README.md` | Skills, commands, subagents catalog | A skill, command, or subagent is added/removed |
-| `.agents/skills/<name>.md` | Procedure / deep-dive for a skill | The procedure changes |
-| `.agents/commands/<name>.md` | Slash command spec | The procedure changes |
-| `.agents/agents/<name>.md` | Persona for a specialized subagent | The persona changes |
+| File                           | Purpose                                                                              | Update when…                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| `AGENTS.md` (root)             | Single source of truth for AI agents — non-negotiable rules, quick command reference | Mandatory rules change, commands change, new patterns become canonical |
+| `CLAUDE.md`                    | Symlink → `AGENTS.md`                                                                | Never edit directly                                                    |
+| `README.md`                    | Human-facing intro, install + usage                                                  | The primary value proposition or public API changes                    |
+| `docs/ARCHITECTURE.md`         | Module layout, data flow, regenerator pipeline                                       | New module, new data source, new pipeline stage                        |
+| `docs/TECHNOLOGIES.md`         | Stack with versions and roles                                                        | A library is added, removed, or major-bumped                           |
+| `docs/STANDARDS.md`            | Coding rules                                                                         | A convention is decided or changes                                     |
+| `docs/DEVELOPMENT_COMMANDS.md` | npm script reference                                                                 | A new script is wired or a workflow changes                            |
+| `docs/TESTING_GUIDE.md`        | Test framework, conventions, regenerator workflow                                    | Test framework changes, new test scenario added                        |
+| `docs/RUNTIMES.md`             | Per-runtime notes (Node, browsers, edge)                                             | A new runtime is supported or a runtime-specific gotcha is found       |
+| `docs/BUILD_DEPLOY.md`         | Webpack output, npm publish, CI workflows                                            | Build steps, signing, CI pipeline changes                              |
+| `docs/EMOJI_PROVIDERS.md`      | Twemoji CDN, dialect support, special-case overrides                                 | A dialect is added, a CDN is swapped, an override changes              |
+| `docs/PERFORMANCE.md`          | Hot paths, bundle size, profiling                                                    | A performance decision is made (caching, lazy-load, bundle split)      |
+| `docs/API_REFERENCE.md`        | Every export, method, type, option                                                   | The public API changes (additions, signatures, defaults)               |
+| `docs/SECURITY.md`             | XSS, supply chain, npm publish security                                              | A security policy or threat-model item changes                         |
+| `docs/AI_AGENT_ONBOARDING.md`  | First-run flow for any AI agent                                                      | The onboarding path changes                                            |
+| `docs/AI_AGENT_COLLAB.md`      | Multi-agent coordination                                                             | Agent roles or handoffs change                                         |
+| `docs/FORK_CUSTOMIZATION.md`   | Rebrand checklist for forks                                                          | A new fork-time concern is discovered                                  |
+| `.agents/README.md`            | Skills, commands, subagents catalog                                                  | A skill, command, or subagent is added/removed                         |
+| `.agents/skills/<name>.md`     | Procedure / deep-dive for a skill                                                    | The procedure changes                                                  |
+| `.agents/commands/<name>.md`   | Slash command spec                                                                   | The procedure changes                                                  |
+| `.agents/agents/<name>.md`     | Persona for a specialized subagent                                                   | The persona changes                                                    |
 
 ## Triggers for updating
 
@@ -61,7 +61,7 @@ When and how to update the docs that live in this repo. The goal is to keep `AGE
 
 1. **Lead with the rule.** "All output emojis use `class='emoji'`" — not "We typically use a class attribute…"
 2. **Show one canonical example.** A code snippet that's the answer, not three options
-3. **Explain *why* when it's non-obvious.** "The `__` prefix means internal — Webpack's `commonjs2` exposes everything, so this is a naming convention, not a hard private"
+3. **Explain _why_ when it's non-obvious.** "The `__` prefix means internal — Webpack's `commonjs2` exposes everything, so this is a naming convention, not a hard private"
 4. **Cross-link.** Mentioning a topic? Link to the dedicated doc instead of duplicating content. Repetition leads to drift
 5. **Date-tag exceptions.** "Until we adopt ESLint 9, we stay on 8.x" — easy to clean up later
 6. **Keep the file under 500 lines.** Past that, split

@@ -4,15 +4,15 @@ When multiple AI assistants share this codebase — sometimes in parallel, often
 
 ## Source of truth
 
-| Topic | File |
-|---|---|
-| Mandatory rules | [`AGENTS.md`](../AGENTS.md) |
-| Coding conventions | [`docs/STANDARDS.md`](STANDARDS.md) |
-| Public API contract | [`docs/API_REFERENCE.md`](API_REFERENCE.md) |
-| Skills | [`.agents/skills/`](../.agents/skills/) |
-| Slash commands | [`.agents/commands/`](../.agents/commands/) |
-| Subagents (specialized personas) | [`.agents/agents/`](../.agents/agents/) |
-| Per-skill catalog | [`.agents/README.md`](../.agents/README.md) |
+| Topic                            | File                                        |
+| -------------------------------- | ------------------------------------------- |
+| Mandatory rules                  | [`AGENTS.md`](../AGENTS.md)                 |
+| Coding conventions               | [`docs/STANDARDS.md`](STANDARDS.md)         |
+| Public API contract              | [`docs/API_REFERENCE.md`](API_REFERENCE.md) |
+| Skills                           | [`.agents/skills/`](../.agents/skills/)     |
+| Slash commands                   | [`.agents/commands/`](../.agents/commands/) |
+| Subagents (specialized personas) | [`.agents/agents/`](../.agents/agents/)     |
+| Per-skill catalog                | [`.agents/README.md`](../.agents/README.md) |
 
 Every agent reads `AGENTS.md` first. When `AGENTS.md` changes, **all** agents inherit the new rule on their next session — no per-tool config needed.
 
@@ -20,24 +20,24 @@ Every agent reads `AGENTS.md` first. When `AGENTS.md` changes, **all** agents in
 
 The repo defines specialized subagents (see [`.agents/agents/`](../.agents/agents/)). Use them when their domain matches:
 
-| Subagent | Owns | Don't use for |
-|---|---|---|
-| `parser-architect` | Public API shape, source-file placement, dual-export discipline | Routine bug fixes |
-| `emoji-data-curator` | The catalog, `EMOJIS_SPECIAL_CASES`, regeneration pipeline | Code that doesn't touch emoji data |
-| `test-author` | Mocha/Chai specs, regression tests, regenerator handling | Production code |
-| `dependency-auditor` | `package.json` changes, `.ncurc.json`, license/CVE checks | Application logic |
-| `release-engineer` | Webpack config, GitHub Actions, npm publish, GitHub releases | Day-to-day feature work |
-| `doc-writer` | Keeping `AGENTS.md`, `docs/`, and `README.md` synchronized | Code changes |
+| Subagent             | Owns                                                            | Don't use for                      |
+| -------------------- | --------------------------------------------------------------- | ---------------------------------- |
+| `parser-architect`   | Public API shape, source-file placement, dual-export discipline | Routine bug fixes                  |
+| `emoji-data-curator` | The catalog, `EMOJIS_SPECIAL_CASES`, regeneration pipeline      | Code that doesn't touch emoji data |
+| `test-author`        | Mocha/Chai specs, regression tests, regenerator handling        | Production code                    |
+| `dependency-auditor` | `package.json` changes, `.ncurc.json`, license/CVE checks       | Application logic                  |
+| `release-engineer`   | Webpack config, GitHub Actions, npm publish, GitHub releases    | Day-to-day feature work            |
+| `doc-writer`         | Keeping `AGENTS.md`, `docs/`, and `README.md` synchronized      | Code changes                       |
 
 ## Skill / command invocation
 
 Skills are reusable procedures. Same name, different prefix per host:
 
-| Host | Prefix | Example |
-|---|---|---|
-| Claude Code | `/` | `/regenerate-emoji-lib` |
-| Cursor / Codex / Gemini | `#` | `#regenerate-emoji-lib` |
-| Plain text fallback | none | "run regenerate-emoji-lib" |
+| Host                    | Prefix | Example                    |
+| ----------------------- | ------ | -------------------------- |
+| Claude Code             | `/`    | `/regenerate-emoji-lib`    |
+| Cursor / Codex / Gemini | `#`    | `#regenerate-emoji-lib`    |
+| Plain text fallback     | none   | "run regenerate-emoji-lib" |
 
 When a command is invoked, the agent **must**:
 
@@ -66,13 +66,13 @@ Avoid concurrent edits to the same file. If parallelism is needed:
 
 ## Common conflicts
 
-| Conflict | Resolution |
-|---|---|
-| Two agents bump the same dependency to different versions | Pick the higher version; rerun lint + test + build |
-| Two agents add unrelated entries to `EMOJIS_SPECIAL_CASES` | Both keep their work; the second to merge regenerates and updates `TOTAL_EMOJIS` if needed |
-| One agent edits `AGENTS.md`, another edits a doc that mirrors it | The `AGENTS.md` rule wins; update the doc to match |
-| Two agents disagree on whether a change is a major bump | Default to "yes, major" — `parser-architect` decides if in doubt. HTML output changes always major |
-| Two agents both add a public method | Architect reviews; consolidate into a single method if possible (the API surface should stay narrow) |
+| Conflict                                                         | Resolution                                                                                           |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Two agents bump the same dependency to different versions        | Pick the higher version; rerun lint + test + build                                                   |
+| Two agents add unrelated entries to `EMOJIS_SPECIAL_CASES`       | Both keep their work; the second to merge regenerates and updates `TOTAL_EMOJIS` if needed           |
+| One agent edits `AGENTS.md`, another edits a doc that mirrors it | The `AGENTS.md` rule wins; update the doc to match                                                   |
+| Two agents disagree on whether a change is a major bump          | Default to "yes, major" — `parser-architect` decides if in doubt. HTML output changes always major   |
+| Two agents both add a public method                              | Architect reviews; consolidate into a single method if possible (the API surface should stay narrow) |
 
 ## When in doubt
 

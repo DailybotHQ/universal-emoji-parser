@@ -30,14 +30,14 @@ For the prose version (rules + rationale), see [`docs/STANDARDS.md`](../../docs/
 
 Implications for new code:
 
-| Setting | What it forces |
-|---|---|
-| `strictNullChecks: true` | Every nullable union (`T \| undefined`) must be handled with `?.`, `??`, narrowing, or explicit type guard |
-| `noImplicitAny: true` | Every parameter/return must be annotated or inferable |
-| `noUnusedLocals` / `noUnusedParameters` | Dead code fails the build. Prefix unused params with `_` if you must keep them (rare) |
-| `declaration: true` | `tsc --build` emits `.d.ts` for every public export — keep return types stable |
-| `resolveJsonModule: true` | `import emojiLibJson from './lib/emoji-lib.json'` works |
-| `removeComments: true` | Comments in `dist/index.js` are stripped at build time. JSDoc still appears in `.d.ts` |
+| Setting                                 | What it forces                                                                                             |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `strictNullChecks: true`                | Every nullable union (`T \| undefined`) must be handled with `?.`, `??`, narrowing, or explicit type guard |
+| `noImplicitAny: true`                   | Every parameter/return must be annotated or inferable                                                      |
+| `noUnusedLocals` / `noUnusedParameters` | Dead code fails the build. Prefix unused params with `_` if you must keep them (rare)                      |
+| `declaration: true`                     | `tsc --build` emits `.d.ts` for every public export — keep return types stable                             |
+| `resolveJsonModule: true`               | `import emojiLibJson from './lib/emoji-lib.json'` works                                                    |
+| `removeComments: true`                  | Comments in `dist/index.js` are stripped at build time. JSDoc still appears in `.d.ts`                     |
 
 `strict` itself isn't on (would also enable `strictFunctionTypes`, `strictPropertyInitialization`, etc.). The granular settings above are the explicit subset.
 
@@ -176,8 +176,8 @@ Reasons:
 Reserve `type` for unions and mapped types:
 
 ```ts
-type EmojiKey = keyof EmojiLibJsonType            // mapped from another type
-type ParseResult = string | undefined             // union — no interface possible
+type EmojiKey = keyof EmojiLibJsonType // mapped from another type
+type ParseResult = string | undefined // union — no interface possible
 ```
 
 ### Index signatures on the catalog type
@@ -218,12 +218,7 @@ Use sparingly — every optional field is a value the consumer has to handle.
 
 ## ESLint rules in detail
 
-`.eslintrc` extends:
-
-- `eslint:recommended`
-- `plugin:@typescript-eslint/eslint-recommended`
-- `plugin:@typescript-eslint/recommended`
-- `plugin:prettier/recommended`
+`eslint.config.mjs` composes `@eslint/js` recommended + `typescript-eslint` recommended + `eslint-plugin-prettier/recommended`.
 
 Custom rules:
 
@@ -241,7 +236,7 @@ Custom rules:
 
 `console.*` is an error in `src/`. The package is a library — calling `console.log` from inside it leaks log lines into every consumer's output.
 
-Tests are **not** exempt at the lint config level, but the `.eslintignore` strategy uses `--ignore-path .gitignore`, which doesn't list `test/`. So tests do get linted... and they don't currently use `console.*`. If you need to debug a test, use `console.log` and remove it before committing. If you forget, ESLint will catch it on `npm run eslint:check`.
+`test/` is linted too. If you need to debug a test, use `console.log` temporarily and remove it before committing — ESLint enforces `no-console` there as well.
 
 ### `@typescript-eslint/no-inferrable-types: 'off'`
 
@@ -299,10 +294,10 @@ Prettier inserts the leading `;` automatically when needed (e.g., before a line 
 }
 ```
 
-| Rule | Effect |
-|---|---|
-| `semi: false` | No trailing semicolons |
-| `singleQuote: true` | `'...'` for strings, `\`...\`` for templates. Never `"..."` |
+| Rule                   | Effect                                                                     |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `semi: false`          | No trailing semicolons                                                     |
+| `singleQuote: true`    | `'...'` for strings, `\`...\``for templates. Never`"..."`                  |
 | `trailingComma: 'es5'` | Trailing comma in multi-line arrays/objects, but **not** in function calls |
 
 Examples:
@@ -311,15 +306,15 @@ Examples:
 const arr = [
   'a',
   'b',
-  'c',          // ✅ trailing comma in array
+  'c', // ✅ trailing comma in array
 ]
 
 const obj = {
   a: 1,
-  b: 2,         // ✅ trailing comma in object literal
+  b: 2, // ✅ trailing comma in object literal
 }
 
-fn('a', 'b', 'c')   // ✅ no trailing comma in function call (es5 rule)
+fn('a', 'b', 'c') // ✅ no trailing comma in function call (es5 rule)
 ```
 
 `.editorconfig` adds:

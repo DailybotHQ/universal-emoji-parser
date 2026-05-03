@@ -104,7 +104,7 @@ cp src/lib/emoji-lib-output.json src/lib/emoji-lib.json
 Open `test/emojiLibJson.test.ts`. If the count changed:
 
 ```ts
-const TOTAL_EMOJIS: number = 1906   // ← update this number to match
+const TOTAL_EMOJIS: number = 1906 // ← update this number to match
 ```
 
 ### 8. Re-skip the regenerator

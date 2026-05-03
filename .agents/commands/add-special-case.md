@@ -90,6 +90,7 @@ Follow [`/regenerate-emoji-lib`](regenerate-emoji-lib.md):
    ```
 
    Expected: `['rocket', 'rocketship', 'launch', ...]` (your includes appear, in unshifted order)
+
 5. `cp src/lib/emoji-lib-output.json src/lib/emoji-lib.json`
 6. Restore `it.skip` in `prepareEmojiLibJson.test.ts`
 
@@ -115,7 +116,7 @@ For an exclude case:
 ```ts
 it('should not resolve :heart: to 💘 (excluded keyword)', () => {
   const result: string = uEmojiParser.parseToUnicode(':heart:')
-  expect(result).to.be.equal('❤️')   // resolves to red heart, not heart-with-arrow
+  expect(result).to.be.equal('❤️') // resolves to red heart, not heart-with-arrow
 })
 ```
 
@@ -161,7 +162,7 @@ Conventional commit type:
 
 - ✅ Use lowercase + underscores for keyword spelling (matches the catalog convention)
 - ✅ Add a regression test that exercises both directions if they apply (`parseToUnicode` for resolution; `parseToShortcode` if you also want it to round-trip)
-- ✅ Note in the commit message *why* the alias was added (Slack support, common typo, etc.)
+- ✅ Note in the commit message _why_ the alias was added (Slack support, common typo, etc.)
 
 ## Verification checklist
 

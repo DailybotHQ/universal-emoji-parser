@@ -1,16 +1,16 @@
 # Testing Guide
 
-How to write and run tests in Universal Emoji Parser. The package uses **Mocha + Chai** with `ts-node/register` so specs run as `.ts` directly — no transpile step.
+How to write and run tests in Universal Emoji Parser. The package uses **Mocha + Chai 6** with **tsx** so specs run as `.ts` directly — no separate compile step (Chai 6 is ESM-first; the test script uses `tsx` + Mocha).
 
 ## Where tests live
 
 All specs live in `test/*.test.ts`:
 
-| File | Coverage |
-|---|---|
-| `test/main.test.ts` | The public API: `parse`, `parseToHtml`, `parseToUnicode`, `parseToShortcode`, plus error cases and option permutations |
-| `test/emojiLibJson.test.ts` | Catalog metadata: total count (`TOTAL_EMOJIS = 1906`), shape of `EmojiType` entries, presence of canonical emojis |
-| `test/prepareEmojiLibJson.test.ts` | The regenerator — `it.skip`-guarded; runs only when explicitly enabled to rebuild `src/lib/emoji-lib.json` |
+| File                               | Coverage                                                                                                               |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `test/main.test.ts`                | The public API: `parse`, `parseToHtml`, `parseToUnicode`, `parseToShortcode`, plus error cases and option permutations |
+| `test/emojiLibJson.test.ts`        | Catalog metadata: total count (`TOTAL_EMOJIS = 1906`), shape of `EmojiType` entries, presence of canonical emojis      |
+| `test/prepareEmojiLibJson.test.ts` | The regenerator — `it.skip`-guarded; runs only when explicitly enabled to rebuild `src/lib/emoji-lib.json`             |
 
 There is no separation by source-file ↔ test-file pairing — `main.test.ts` covers everything in `src/index.ts` because the API is small.
 
@@ -21,13 +21,13 @@ npm test                         # Everything
 npm run test:watch               # Re-runs on file change (TDD inner loop)
 
 # Single file
-npx mocha --require ts-node/register test/main.test.ts --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors
 
 # Filter by name
-npx mocha --require ts-node/register test/main.test.ts --grep "should parse" --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should parse" --colors
 
 # Single it()
-npx mocha --require ts-node/register test/main.test.ts --grep "should throw error with not string parameter" --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should throw error with not string parameter" --colors
 ```
 
 Mocha config is inline in the `test` script: `--timeout 25000 --colors`. The 25-second timeout exists for one slow path (the regenerator's O(n²) dedup loop); regular specs finish in milliseconds.
@@ -112,7 +112,7 @@ expect(() => { uEmojiParser.parse(text) }).to.throw(Error)
 expect(fs.existsSync(filePath)).to.be.true     // requires // eslint-disable-next-line @typescript-eslint/no-unused-expressions
 ```
 
-> **Note**: Chai 4's `expect(x).to.be.true` style is a "no-op expression" by ESLint rules. Suppress with `// eslint-disable-next-line @typescript-eslint/no-unused-expressions` immediately above the line.
+> **Note**: Chai's `expect(x).to.be.true` style is a "no-op expression" by ESLint rules. Suppress with `// eslint-disable-next-line @typescript-eslint/no-unused-expressions` immediately above the line.
 
 ## Catalog tests (`emojiLibJson.test.ts`)
 
@@ -165,7 +165,7 @@ Full walkthrough: [`/regenerate-emoji-lib`](../.agents/commands/regenerate-emoji
 
 **Rarely:**
 
-- Twemoji's own behavior — that's covered by the upstream package. Don't test that "🚀" → some-Twemoji-URL; just test that *our* code correctly hands off to `@twemoji/parser`
+- Twemoji's own behavior — that's covered by the upstream package. Don't test that "🚀" → some-Twemoji-URL; just test that _our_ code correctly hands off to `@twemoji/parser`
 - Performance regressions — we don't have benchmark infrastructure. If you add one, also add a doc page
 
 ## Adding a regression test
@@ -176,7 +176,7 @@ When fixing a parsing bug:
 2. **Stand it up as a failing test:**
    ```ts
    it('should parse :star: even with VS-16 (regression #123)', () => {
-     const text: string = ':star:️'   // note the trailing variation selector
+     const text: string = ':star:️' // note the trailing variation selector
      const result: string = uEmojiParser.parse(text)
      expect(result).to.contain('alt="⭐️"')
    })
@@ -208,7 +208,7 @@ Update `package.json`:
 ```json
 {
   "scripts": {
-    "test": "nyc mocha --require ts-node/register test/**.ts --timeout 25000 --colors",
+    "test": "nyc tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors",
     "coverage": "nyc report --reporter=text-summary"
   },
   "nyc": {

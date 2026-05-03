@@ -47,13 +47,14 @@ universal-emoji-parser/
 ├── CLAUDE.md → AGENTS.md              # Symlink (do not edit directly)
 ├── README.md                          # Human-facing intro and usage docs
 ├── LICENSE                            # MIT
-├── package.json                       # Scripts, deps, version, engines.node ≥ 20.16
-├── tsconfig.json                      # Strict TS config; emits .d.ts to dist/
-├── webpack.config.js                  # commonjs2 output, ts-loader
-├── .eslintrc                          # ESLint + Prettier integration
+├── package.json                       # Scripts, deps, version, engines.node ≥ 20.19
+├── tsconfig.json                      # Strict TS config; tests + src; emits .d.ts via `build:tsc`
+├── tsconfig.build.json                # `tsc`/ts-loader: compile `src/` only (`rootDir`)
+├── webpack.config.js                  # commonjs2 output, ts-loader → `tsconfig.build.json`
+├── eslint.config.mjs                  # ESLint flat config + Prettier integration
 ├── .prettierrc                        # semi:false, singleQuote:true, trailingComma:'es5'
 ├── .editorconfig                      # 2-space indent, LF, max 120 cols
-├── .ncurc.json                        # ncu rejects chai 5 / eslint 9 (intentional)
+├── .ncurc.json                        # npm-check-updates (optional `reject` list)
 ├── .babelrc                           # babel-preset-env + transform-runtime (legacy, kept for compat)
 ├── .npmignore                         # Trims source/test/config from npm tarball
 │
@@ -172,8 +173,8 @@ The dispatcher:
 if (typeof text !== 'string') throw new Error('The text parameter should be a string.')
 
 if (!opts.parseToHtml && opts.parseToShortcode) text = parseToShortcode(text)
-if (opts.parseToHtml || opts.parseToUnicode)    text = parseToUnicode(text)
-if (opts.parseToHtml)                           text = __parseEmojiToHtml(text, opts.emojiCDN)
+if (opts.parseToHtml || opts.parseToUnicode) text = parseToUnicode(text)
+if (opts.parseToHtml) text = __parseEmojiToHtml(text, opts.emojiCDN)
 ```
 
 Order matters: shortcode → unicode → HTML. Each stage is a no-op if its option is off.
@@ -192,19 +193,19 @@ Webpack's `libraryTarget: 'commonjs2'` exposes the default export as `module.exp
 
 ```ts
 export interface EmojiType {
-  name: string                    // "smiling face with sunglasses"
-  slug: string                    // "smiling_face_with_sunglasses" (canonical shortcode)
-  group: string                   // "Smileys & Emotion"
-  emoji_version: string           // "1.0"
-  unicode_version: string         // "1.0"
+  name: string // "smiling face with sunglasses"
+  slug: string // "smiling_face_with_sunglasses" (canonical shortcode)
+  group: string // "Smileys & Emotion"
+  emoji_version: string // "1.0"
+  unicode_version: string // "1.0"
   skin_tone_support: boolean
-  char: string                    // "😎" — the unicode literal
-  keywords: Array<string>         // ["smiling_face_with_sunglasses", "cool", "summer", ...]
-  keyword_index_found?: number    // Used by the regenerator only — don't rely on it
+  char: string // "😎" — the unicode literal
+  keywords: Array<string> // ["smiling_face_with_sunglasses", "cool", "summer", ...]
+  keyword_index_found?: number // Used by the regenerator only — don't rely on it
 }
 
 export interface EmojiLibJsonType {
-  [key: string]: EmojiType        // keyed by emoji char (the unicode literal)
+  [key: string]: EmojiType // keyed by emoji char (the unicode literal)
 }
 
 export interface EmojiParseOptionsType {
@@ -261,15 +262,15 @@ See [`/regenerate-emoji-lib`](../.agents/commands/regenerate-emoji-lib.md) for t
 
 The regenerator applies hand-curated keyword overrides for a handful of emojis where the upstream `emojilib` keywords are wrong, missing, or collide with another emoji. Current entries:
 
-| Emoji | Include | Exclude | Why |
-|---|---|---|---|
-| `☕` | `coffee` | — | `emojilib` has it, but the dedup loop would otherwise hand `coffee` to `🤎` first |
-| `🤎` | — | `coffee` | Brown heart should not match `:coffee:` |
-| `❤️` | `heart` | — | The plain red heart is the canonical `:heart:` |
-| `💘` | — | `heart` | Heart-with-arrow shouldn't steal `:heart:` |
-| `👮‍♀️` | `policewoman`, `female-police-officer` | `legal`, `arrest` | Common Slack aliases; remove ambiguous keywords |
-| `✅` | `white_check_mark` | — | GitHub-flavored alias |
-| `⏸️` | `double_vertical_bar` | — | Niche but supported |
+| Emoji | Include                                | Exclude           | Why                                                                               |
+| ----- | -------------------------------------- | ----------------- | --------------------------------------------------------------------------------- |
+| `☕`  | `coffee`                               | —                 | `emojilib` has it, but the dedup loop would otherwise hand `coffee` to `🤎` first |
+| `🤎`  | —                                      | `coffee`          | Brown heart should not match `:coffee:`                                           |
+| `❤️`  | `heart`                                | —                 | The plain red heart is the canonical `:heart:`                                    |
+| `💘`  | —                                      | `heart`           | Heart-with-arrow shouldn't steal `:heart:`                                        |
+| `👮‍♀️`  | `policewoman`, `female-police-officer` | `legal`, `arrest` | Common Slack aliases; remove ambiguous keywords                                   |
+| `✅`  | `white_check_mark`                     | —                 | GitHub-flavored alias                                                             |
+| `⏸️`  | `double_vertical_bar`                  | —                 | Niche but supported                                                               |
 
 Add new entries by editing `EMOJIS_SPECIAL_CASES` in `prepareEmojiLibJson.test.ts` and regenerating.
 
@@ -311,18 +312,18 @@ Highlights:
 
 ### npm scripts
 
-| Script | Runs | Purpose |
-|---|---|---|
-| `dev` | `nodemon src/index.ts` | Watch-run a smoke script |
-| `build` | `webpack --mode production --progress` | Production bundle |
-| `build:dev` | `webpack --mode development --progress` | Unminified bundle |
-| `build:tsc` | `tsc --build tsconfig.json` | Type-check + emit `.d.ts` |
-| `test` | `mocha --require ts-node/register test/**.ts --timeout 25000 --colors` | Run all specs |
-| `test:watch` | `mocha -w --watch-extensions ts ...` | TDD inner loop |
-| `eslint:check` / `eslint:fix` | ESLint over `*.ts` | Lint |
-| `prettier:check` / `prettier:fix` | Prettier over `*.{css,html,js,ts,json,md,yaml,yml}` | Format |
-| `release` | `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` | Bump version (CI-only) |
-| `ncu:check` / `ncu:upgrade` | `npm-check-updates` | Dep upgrade pipeline |
+| Script                            | Runs                                                                            | Purpose                   |
+| --------------------------------- | ------------------------------------------------------------------------------- | ------------------------- |
+| `dev`                             | `nodemon src/index.ts`                                                          | Watch-run a smoke script  |
+| `build`                           | `webpack --mode production --progress`                                          | Production bundle         |
+| `build:dev`                       | `webpack --mode development --progress`                                         | Unminified bundle         |
+| `build:tsc`                       | `tsc --build tsconfig.json`                                                     | Type-check + emit `.d.ts` |
+| `test`                            | `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors` | Run all specs             |
+| `test:watch`                      | `mocha -w --watch-extensions ts ...`                                            | TDD inner loop            |
+| `eslint:check` / `eslint:fix`     | ESLint over `*.ts`                                                              | Lint                      |
+| `prettier:check` / `prettier:fix` | Prettier over `*.{css,html,js,ts,json,md,yaml,yml}`                             | Format                    |
+| `release`                         | `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"`           | Bump version (CI-only)    |
+| `ncu:check` / `ncu:upgrade`       | `npm-check-updates`                                                             | Dep upgrade pipeline      |
 
 ## CI/CD pipeline
 
@@ -356,7 +357,7 @@ release_and_publish     (npm version patch + push tag + create GH release + npm 
 cleanup_caches  +  notify_on_channel_end
 ```
 
-Every job runs on `ubuntu-latest` with Node 22.13.1 and aggressive caching of `~/.npm` and `node_modules`. The release job uses `secrets.AUTOMATION_GITHUB_TOKEN` (push + tag) and `secrets.NPM_TOKEN` (npm publish). The DailyBot identity (`🤖 DailyBot <ops@dailybot.com>`) is hardcoded.
+Every job runs on `ubuntu-latest` with Node 24 and aggressive caching of `~/.npm` and `node_modules`. The release job uses `secrets.AUTOMATION_GITHUB_TOKEN` (push + tag) and `secrets.NPM_TOKEN` (npm publish). The DailyBot identity (`🤖 DailyBot <ops@dailybot.com>`) is hardcoded.
 
 Detailed walkthrough: **[Build & Deploy](BUILD_DEPLOY.md)**.
 

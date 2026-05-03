@@ -4,6 +4,7 @@
   "service": "uemojiparservscode",
   "workspaceFolder": "/app",
   "runServices": ["uemojiparservscode"],
+  "remoteUser": "node",
   "customizations": {
     "settings": {
       "terminal.integrated.shell.linux": "/bin/bash"

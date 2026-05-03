@@ -37,24 +37,24 @@ This directory contains **skills** (deep-dive procedures), **slash commands** (s
 
 Reusable procedures invoked by slash command (or `#` in non-Claude hosts).
 
-| Command | Purpose | File |
-|---|---|---|
+| Command                 | Purpose                                                                    | File                                                                 |
+| ----------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | `/regenerate-emoji-lib` | Regenerate `src/lib/emoji-lib.json` from `emojilib` + `unicode-emoji-json` | [commands/regenerate-emoji-lib.md](commands/regenerate-emoji-lib.md) |
-| `/add-special-case` | Add a keyword include/exclude override to `EMOJIS_SPECIAL_CASES` | [commands/add-special-case.md](commands/add-special-case.md) |
-| `/write-tests` | Author Mocha + Chai tests for a parsing bug or new feature | [commands/write-tests.md](commands/write-tests.md) |
-| `/fix-build` | Diagnose a failing TypeScript / Webpack / Mocha build | [commands/fix-build.md](commands/fix-build.md) |
-| `/bump-deps` | Update one or more npm dependencies safely (respects `.ncurc.json`) | [commands/bump-deps.md](commands/bump-deps.md) |
-| `/release-npm` | Walk through a manual release if CI is unavailable | [commands/release-npm.md](commands/release-npm.md) |
-| `/check-html-output` | Verify the HTML output contract for a given input | [commands/check-html-output.md](commands/check-html-output.md) |
+| `/add-special-case`     | Add a keyword include/exclude override to `EMOJIS_SPECIAL_CASES`           | [commands/add-special-case.md](commands/add-special-case.md)         |
+| `/write-tests`          | Author Mocha + Chai tests for a parsing bug or new feature                 | [commands/write-tests.md](commands/write-tests.md)                   |
+| `/fix-build`            | Diagnose a failing TypeScript / Webpack / Mocha build                      | [commands/fix-build.md](commands/fix-build.md)                       |
+| `/bump-deps`            | Update one or more npm dependencies safely (respects `.ncurc.json`)        | [commands/bump-deps.md](commands/bump-deps.md)                       |
+| `/release-npm`          | Walk through a manual release if CI is unavailable                         | [commands/release-npm.md](commands/release-npm.md)                   |
+| `/check-html-output`    | Verify the HTML output contract for a given input                          | [commands/check-html-output.md](commands/check-html-output.md)       |
 
 ### How to invoke
 
-| Host | Prefix | Example |
-|---|---|---|
-| Claude Code | `/` (native) | `/regenerate-emoji-lib` |
-| OpenAI Codex | `#` | `#regenerate-emoji-lib` |
-| Cursor AI | `#` | `#regenerate-emoji-lib` |
-| Gemini / others | `#` | `#regenerate-emoji-lib` |
+| Host            | Prefix       | Example                 |
+| --------------- | ------------ | ----------------------- |
+| Claude Code     | `/` (native) | `/regenerate-emoji-lib` |
+| OpenAI Codex    | `#`          | `#regenerate-emoji-lib` |
+| Cursor AI       | `#`          | `#regenerate-emoji-lib` |
+| Gemini / others | `#`          | `#regenerate-emoji-lib` |
 
 When invoked, the agent **must**:
 
@@ -67,12 +67,12 @@ When invoked, the agent **must**:
 
 Richer, longer procedures that explain conventions and pipelines. Use these when the user asks "how does the catalog work?" or "how do I publish?" rather than "run X".
 
-| Skill | Purpose | File |
-|---|---|---|
+| Skill                      | Purpose                                                           | File                                                                     |
+| -------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `emoji-parser-conventions` | Deep dive on the parse pipeline, regex caching, dual-export shape | [skills/emoji-parser-conventions.md](skills/emoji-parser-conventions.md) |
-| `emoji-data-pipeline` | Step-by-step regeneration of the catalog from upstream | [skills/emoji-data-pipeline.md](skills/emoji-data-pipeline.md) |
-| `npm-publish-walkthrough` | Full release flow including GitHub Actions internals | [skills/npm-publish-walkthrough.md](skills/npm-publish-walkthrough.md) |
-| `typescript-strict-style` | TS rules enforced by `tsconfig.json` + ESLint | [skills/typescript-strict-style.md](skills/typescript-strict-style.md) |
+| `emoji-data-pipeline`      | Step-by-step regeneration of the catalog from upstream            | [skills/emoji-data-pipeline.md](skills/emoji-data-pipeline.md)           |
+| `npm-publish-walkthrough`  | Full release flow including GitHub Actions internals              | [skills/npm-publish-walkthrough.md](skills/npm-publish-walkthrough.md)   |
+| `typescript-strict-style`  | TS rules enforced by `tsconfig.json` + ESLint                     | [skills/typescript-strict-style.md](skills/typescript-strict-style.md)   |
 
 Skills don't have a slash-command form. They're read by agents as reference material.
 
@@ -80,14 +80,14 @@ Skills don't have a slash-command form. They're read by agents as reference mate
 
 Adopt the persona described in the file when the task matches.
 
-| Subagent | Domain | File |
-|---|---|---|
-| `parser-architect` | Public API shape, source-file placement, dual-export discipline | [agents/parser-architect.md](agents/parser-architect.md) |
-| `emoji-data-curator` | The catalog, `EMOJIS_SPECIAL_CASES`, regeneration pipeline | [agents/emoji-data-curator.md](agents/emoji-data-curator.md) |
-| `test-author` | Mocha + Chai specs, regression tests, regenerator handling | [agents/test-author.md](agents/test-author.md) |
-| `dependency-auditor` | `package.json` changes, `.ncurc.json`, license/CVE checks | [agents/dependency-auditor.md](agents/dependency-auditor.md) |
-| `release-engineer` | Webpack config, GitHub Actions, npm publish, GitHub releases | [agents/release-engineer.md](agents/release-engineer.md) |
-| `doc-writer` | Keeping `AGENTS.md`, `docs/`, and `README.md` synchronized | [agents/doc-writer.md](agents/doc-writer.md) |
+| Subagent             | Domain                                                          | File                                                         |
+| -------------------- | --------------------------------------------------------------- | ------------------------------------------------------------ |
+| `parser-architect`   | Public API shape, source-file placement, dual-export discipline | [agents/parser-architect.md](agents/parser-architect.md)     |
+| `emoji-data-curator` | The catalog, `EMOJIS_SPECIAL_CASES`, regeneration pipeline      | [agents/emoji-data-curator.md](agents/emoji-data-curator.md) |
+| `test-author`        | Mocha + Chai specs, regression tests, regenerator handling      | [agents/test-author.md](agents/test-author.md)               |
+| `dependency-auditor` | `package.json` changes, `.ncurc.json`, license/CVE checks       | [agents/dependency-auditor.md](agents/dependency-auditor.md) |
+| `release-engineer`   | Webpack config, GitHub Actions, npm publish, GitHub releases    | [agents/release-engineer.md](agents/release-engineer.md)     |
+| `doc-writer`         | Keeping `AGENTS.md`, `docs/`, and `README.md` synchronized      | [agents/doc-writer.md](agents/doc-writer.md)                 |
 
 ## Adding a new skill, command, or subagent
 
@@ -100,7 +100,7 @@ Adopt the persona described in the file when the task matches.
 ## Conventions
 
 - **Commands** are **procedural** — numbered steps, exact commands, file paths, copy-pasteable code. Aim for under 200 lines
-- **Skills** are **deep-dives** — they explain *why*, not just *how*; richer than commands; reference docs/ files freely
+- **Skills** are **deep-dives** — they explain _why_, not just _how_; richer than commands; reference docs/ files freely
 - **Subagents** are **persona-based** — what they care about, what they don't, how they decide
 - All three must be **self-contained at the file level** — an agent reading only the file should be able to execute it
 - **Cross-link** to `docs/` rather than duplicating content

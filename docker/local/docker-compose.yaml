@@ -28,7 +28,7 @@ services:
         sleep infinity
 
 volumes:
-  claude_data: {}        # Claude CLI session/auth (symlinked to ~/.claude)
-  codex_data: {}         # Codex CLI session/auth (symlinked to ~/.codex)
-  cursor_data: {}        # Cursor CLI session/auth (symlinked to ~/.cursor)
-  gh_data: {}            # GitHub CLI session/auth (symlinked to ~/.config/gh)
+  claude_data: {} # Claude CLI session/auth (symlinked to ~/.claude)
+  codex_data: {} # Codex CLI session/auth (symlinked to ~/.codex)
+  cursor_data: {} # Cursor CLI session/auth (symlinked to ~/.cursor)
+  gh_data: {} # GitHub CLI session/auth (symlinked to ~/.config/gh)

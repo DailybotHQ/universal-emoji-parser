@@ -4,29 +4,29 @@ Reference for every npm script and shell command you'll run during day-to-day wo
 
 ## Inner-loop favorites
 
-| Goal | Command | Notes |
-|---|---|---|
-| TDD inner loop | `npm run test:watch` | Re-runs Mocha on every save in `src/` or `test/` |
-| One-off smoke run | `npm run dev` | Runs `nodemon src/index.ts` — useful when adding a `console.log` (test-only) for ad hoc inspection |
-| Type check | `npm run build:tsc` | `tsc --build`, emits `.d.ts` into `dist/` |
-| Lint check | `npm run eslint:check` | CI gate |
-| Format check | `npm run prettier:check` | CI gate |
-| Fix everything | `npm run eslint:fix && npm run prettier:fix` | Auto-fix lint + format |
+| Goal              | Command                                      | Notes                                                                                              |
+| ----------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| TDD inner loop    | `npm run test:watch`                         | Re-runs Mocha on every save in `src/` or `test/`                                                   |
+| One-off smoke run | `npm run dev`                                | Runs `nodemon src/index.ts` — useful when adding a `console.log` (test-only) for ad hoc inspection |
+| Type check        | `npm run build:tsc`                          | `tsc --build`, emits `.d.ts` into `dist/`                                                          |
+| Lint check        | `npm run eslint:check`                       | CI gate                                                                                            |
+| Format check      | `npm run prettier:check`                     | CI gate                                                                                            |
+| Fix everything    | `npm run eslint:fix && npm run prettier:fix` | Auto-fix lint + format                                                                             |
 
 ## Testing
 
 ```bash
-npm test                              # All Mocha specs, ts-node (no compile step)
+npm test                              # All Mocha specs, tsx (no compile step)
 npm run test:watch                    # Same, with --watch on src/ + test/
 
 # Run a single file
-npx mocha --require ts-node/register test/main.test.ts --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors
 
 # Run a single describe / it (Mocha grep)
-npx mocha --require ts-node/register test/main.test.ts --grep "should parse emojis from unicode" --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should parse emojis from unicode" --colors
 
 # Run with extra debug
-npx mocha --require ts-node/register test/main.test.ts --reporter spec --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --reporter spec --colors
 ```
 
 The default `mocha` config lives in the `test` script: `--timeout 25000 --colors`. Tests are slow only because of the Twemoji parse — the catalog ops are sub-millisecond.
@@ -173,7 +173,7 @@ These all assume `dist/index.js` exists; run `npm run build` first if not.
    '🚀': { include: ['rocket_ship', 'launch'] },
    ```
 3. Regenerate (see "Running the regenerator" above)
-4. Verify in tests: `npx mocha --require ts-node/register test/main.test.ts --grep "rocket_ship"`
+4. Verify in tests: `npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "rocket_ship"`
 5. Re-skip the regenerator test
 6. Commit `src/lib/emoji-lib.json` + `prepareEmojiLibJson.test.ts` together
 
@@ -187,7 +187,7 @@ Walkthrough: [`/add-special-case`](../.agents/commands/add-special-case.md).
    console.log(uEmojiParser.parse('the input that breaks'))
    ```
 2. `npx ts-node tmp/repro.ts`
-3. Once you've isolated it, add a test in `test/main.test.ts` that asserts the *expected* output, watch it fail
+3. Once you've isolated it, add a test in `test/main.test.ts` that asserts the _expected_ output, watch it fail
 4. Fix `src/index.ts`
 5. Test passes — commit fix + test together
 
@@ -221,9 +221,13 @@ When working inside the VS Code Dev Container (or `docker compose up uemojiparse
 
 ```bash
 help                # Reprint the welcome banner
+check               # → npm run eslint:check && npm run prettier:check
+fix                 # → npm run eslint:fix && npm run prettier:fix
 test                # → npm run test
+build               # → npm run build:tsc && npm run build
+codecheck           # → check + test + build (full local gate)
 install             # → npm install
-check               # → astro/biome (legacy; not wired here — falls back gracefully)
+check_devcontainer  # Verify you are inside the dev container
 
 # AI CLI shortcuts (full-permission wrappers)
 claudex             # claude --dangerously-skip-permissions
@@ -259,23 +263,23 @@ npm test
 npm run build
 ```
 
-If all four pass locally, the PR will pass CI (modulo Node version drift — CI uses 22.13.1; ensure your local Node is ≥ 20.16).
+If all four pass locally, the PR will pass CI (modulo Node version drift — CI uses Node 24; ensure your local Node satisfies `engines.node` ≥ 20.19).
 
 ## Reference: every npm script in `package.json`
 
-| Script | What it runs |
-|---|---|
-| `eslint:check` | `eslint --ext .ts --ignore-path .gitignore .` |
-| `eslint:fix` | Same with `--fix` |
-| `prettier:check` | `prettier -c --ignore-path .gitignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'` |
-| `prettier:fix` | Same with `--write` |
-| `test` | `mocha --require ts-node/register test/**.ts --timeout 25000 --colors` |
-| `test:watch` | `mocha -w --watch-extensions ts --require ts-node/register --watch-files src,test test/**.ts --timeout 25000 --colors` |
-| `release` | `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` |
-| `start` | `node dist/index.js` (rare — this package is a library, not an app) |
-| `dev` | `nodemon src/index.ts` |
-| `build` | `webpack --mode production --progress` |
-| `build:dev` | `webpack --mode development --progress` |
-| `build:tsc` | `tsc --build tsconfig.json` |
-| `ncu:check` | `ncu` |
-| `ncu:upgrade` | `ncu -u` |
+| Script           | What it runs                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `eslint:check`   | `eslint .`                                                                                                                      |
+| `eslint:fix`     | `eslint . --fix`                                                                                                                |
+| `prettier:check` | `prettier -c --ignore-path .gitignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'`                                 |
+| `prettier:fix`   | Same with `--write`                                                                                                             |
+| `test`           | `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors`                                                 |
+| `test:watch`     | `tsx ./node_modules/mocha/bin/mocha.js -w --watch-extensions ts --watch-files src,test 'test/**/*.ts' --timeout 25000 --colors` |
+| `release`        | `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"`                                                           |
+| `start`          | `node dist/index.js` (rare — this package is a library, not an app)                                                             |
+| `dev`            | `nodemon src/index.ts`                                                                                                          |
+| `build`          | `webpack --mode production --progress`                                                                                          |
+| `build:dev`      | `webpack --mode development --progress`                                                                                         |
+| `build:tsc`      | `tsc --build tsconfig.build.json`                                                                                               |
+| `ncu:check`      | `ncu`                                                                                                                           |
+| `ncu:upgrade`    | `ncu -u`                                                                                                                        |

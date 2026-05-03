@@ -1,6 +1,6 @@
 # Performance
 
-Performance characteristics of Universal Emoji Parser and the levers you have when something gets slow. The package is intentionally simple — most "performance" work here is about *not* introducing slow paths in new code.
+Performance characteristics of Universal Emoji Parser and the levers you have when something gets slow. The package is intentionally simple — most "performance" work here is about _not_ introducing slow paths in new code.
 
 ## Hot paths
 
@@ -36,23 +36,23 @@ For canonical slugs the fast path always wins. For dialect aliases (`:thumbsup:`
 
 ## Optimizations already in place
 
-| Optimization | Where | Why it matters |
-|---|---|---|
-| Catalog as static JSON import | `import emojiLibJson from './lib/emoji-lib.json'` | Bundlers inline it as a JS object literal — no JSON.parse at runtime |
-| Single Twemoji parse per HTML conversion | `__parseEmojiToHtml` | Twemoji is the slowest single op; calling it twice is wasted work |
-| `entitiesFound` dedup | `__parseEmojiToHtml` | Same emoji appearing 5× → 1 regex replace, not 5 |
-| Two-tier shortcode lookup | `getEmojiObjectByShortcode` | Slug path is O(1); keyword scan only when needed |
-| Frozen-by-convention catalog | `emojiLibJsonData` | Consumers can safely cache references; nothing mutates |
+| Optimization                             | Where                                             | Why it matters                                                       |
+| ---------------------------------------- | ------------------------------------------------- | -------------------------------------------------------------------- |
+| Catalog as static JSON import            | `import emojiLibJson from './lib/emoji-lib.json'` | Bundlers inline it as a JS object literal — no JSON.parse at runtime |
+| Single Twemoji parse per HTML conversion | `__parseEmojiToHtml`                              | Twemoji is the slowest single op; calling it twice is wasted work    |
+| `entitiesFound` dedup                    | `__parseEmojiToHtml`                              | Same emoji appearing 5× → 1 regex replace, not 5                     |
+| Two-tier shortcode lookup                | `getEmojiObjectByShortcode`                       | Slug path is O(1); keyword scan only when needed                     |
+| Frozen-by-convention catalog             | `emojiLibJsonData`                                | Consumers can safely cache references; nothing mutates               |
 
-## Optimizations *not* applied (and why)
+## Optimizations _not_ applied (and why)
 
-| Not done | Reason |
-|---|---|
-| RegExp caching for `parseToShortcode` | Adds stateful module-level cache; tests pass without it; speeds matter only in tight loops |
-| Inverted keyword index (`{ keyword: emoji }`) | Doubles memory of the catalog (~5 MB resident) for marginal speedup; current scan is fast enough |
-| Streaming/chunked parsing for very long inputs | Unrealistic input size for this package's domain (chat messages, blog posts) |
-| Web Worker offload | Not the package's job — consumers can `worker.postMessage(text)` themselves |
-| Async API | Adds complexity without benefit; everything is in-memory |
+| Not done                                       | Reason                                                                                           |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| RegExp caching for `parseToShortcode`          | Adds stateful module-level cache; tests pass without it; speeds matter only in tight loops       |
+| Inverted keyword index (`{ keyword: emoji }`)  | Doubles memory of the catalog (~5 MB resident) for marginal speedup; current scan is fast enough |
+| Streaming/chunked parsing for very long inputs | Unrealistic input size for this package's domain (chat messages, blog posts)                     |
+| Web Worker offload                             | Not the package's job — consumers can `worker.postMessage(text)` themselves                      |
+| Async API                                      | Adds complexity without benefit; everything is in-memory                                         |
 
 If a consumer benchmarks a real workload and finds these to be the bottleneck, file an issue with numbers and we'll reconsider.
 
@@ -88,7 +88,7 @@ A consumer worried about initial-load performance can lazy-import:
 let parserPromise: Promise<typeof import('universal-emoji-parser').default> | null = null
 
 async function parseLazy(text: string): Promise<string> {
-  parserPromise ??= import('universal-emoji-parser').then(m => m.default)
+  parserPromise ??= import('universal-emoji-parser').then((m) => m.default)
   return (await parserPromise).parse(text)
 }
 ```
@@ -117,14 +117,14 @@ In Node, the catalog is the biggest single string-heavy object in `process.memor
 
 We don't have a wired-up benchmark suite. Rough numbers from manual measurement (Node 22 on M1):
 
-| Operation | Input | Latency |
-|---|---|---|
-| `parse('hello')` | No emojis | < 0.1 ms |
-| `parse('hello :smile: 🚀')` | 2 emojis, 1 shortcode | ~0.3 ms |
-| `parse(<200 char chat message with 5 emojis>)` | Realistic chat | ~0.5 ms |
-| `parseToShortcode('🚀 ⭐️ ❤️ 😎 🔥')` | 5 unicodes | ~0.8 ms (regex construction dominates) |
-| `parseToShortcode(<1 KB text>)` | Same alternation regex, longer scan | ~1.5 ms |
-| `parseToHtml(<1 KB text with 20 emojis>)` | Full pipeline | ~2 ms |
+| Operation                                      | Input                               | Latency                                |
+| ---------------------------------------------- | ----------------------------------- | -------------------------------------- |
+| `parse('hello')`                               | No emojis                           | < 0.1 ms                               |
+| `parse('hello :smile: 🚀')`                    | 2 emojis, 1 shortcode               | ~0.3 ms                                |
+| `parse(<200 char chat message with 5 emojis>)` | Realistic chat                      | ~0.5 ms                                |
+| `parseToShortcode('🚀 ⭐️ ❤️ 😎 🔥')`           | 5 unicodes                          | ~0.8 ms (regex construction dominates) |
+| `parseToShortcode(<1 KB text>)`                | Same alternation regex, longer scan | ~1.5 ms                                |
+| `parseToHtml(<1 KB text with 20 emojis>)`      | Full pipeline                       | ~2 ms                                  |
 
 Twemoji's `parse()` is the dominant cost in `parseToHtml`. Catalog lookups are sub-microsecond.
 

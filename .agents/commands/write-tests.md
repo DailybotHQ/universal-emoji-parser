@@ -5,7 +5,7 @@ description: Author Mocha + Chai tests for a parsing bug or new feature
 
 # Command: `/write-tests`
 
-Add Mocha + Chai specs for code that just changed or that lacks coverage. The runner is `mocha --require ts-node/register test/**.ts` so specs run as `.ts` directly.
+Add Mocha + Chai specs for code that just changed or that lacks coverage. The runner is `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts'` so specs run as `.ts` directly (Chai 6 is ESM — `ts-node/register` alone is not used for the suite).
 
 ## When to use
 
@@ -22,11 +22,11 @@ Add Mocha + Chai specs for code that just changed or that lacks coverage. The ru
 
 ## Decide where the test lives
 
-| Code under test | Test file |
-|---|---|
-| Anything in `src/index.ts` (public methods) | `test/main.test.ts` |
-| Catalog content / shape | `test/emojiLibJson.test.ts` |
-| Regenerator pipeline | `test/prepareEmojiLibJson.test.ts` (rare — usually you don't test the regenerator itself) |
+| Code under test                             | Test file                                                                                 |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Anything in `src/index.ts` (public methods) | `test/main.test.ts`                                                                       |
+| Catalog content / shape                     | `test/emojiLibJson.test.ts`                                                               |
+| Regenerator pipeline                        | `test/prepareEmojiLibJson.test.ts` (rare — usually you don't test the regenerator itself) |
 
 Most tests go in `test/main.test.ts`.
 
@@ -105,7 +105,7 @@ For error paths:
 
 ```ts
 it('should throw when input is undefined', () => {
-  let text: any = undefined   // eslint-disable-line @typescript-eslint/no-explicit-any
+  let text: any = undefined // eslint-disable-line @typescript-eslint/no-explicit-any
   expect(() => {
     uEmojiParser.parse(text)
   }).to.throw(Error)

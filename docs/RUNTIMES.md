@@ -4,13 +4,13 @@ Per-environment reference for Universal Emoji Parser: where it runs, how it's lo
 
 ## Summary
 
-| Runtime | Loading | Notes |
-|---|---|---|
-| Node.js (≥ 20.16) | `require('universal-emoji-parser')` or `import` | Primary target; CI runs on 22.13.1 |
-| Browsers (modern) | Bundled via webpack/rollup/vite/esbuild by the consumer | Catalog adds ~543 KB raw to consumer bundles — see [Performance](PERFORMANCE.md#bundle-size) |
-| Deno | `npm:universal-emoji-parser` | Untested but expected to work — Deno 1.28+ supports `npm:` specifiers |
-| Bun | `bun add universal-emoji-parser` | Untested but expected to work — Bun is Node-compatible |
-| Edge runtimes (Cloudflare Workers, Vercel Edge) | Bundled by the framework | Catalog inlines fine; bundle size matters at the edge |
+| Runtime                                         | Loading                                                 | Notes                                                                                        |
+| ----------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Node.js (≥ 20.19)                               | `require('universal-emoji-parser')` or `import`         | Primary target; CI runs on Node 24                                                           |
+| Browsers (modern)                               | Bundled via webpack/rollup/vite/esbuild by the consumer | Catalog adds ~543 KB raw to consumer bundles — see [Performance](PERFORMANCE.md#bundle-size) |
+| Deno                                            | `npm:universal-emoji-parser`                            | Untested but expected to work — Deno 1.28+ supports `npm:` specifiers                        |
+| Bun                                             | `bun add universal-emoji-parser`                        | Untested but expected to work — Bun is Node-compatible                                       |
+| Edge runtimes (Cloudflare Workers, Vercel Edge) | Bundled by the framework                                | Catalog inlines fine; bundle size matters at the edge                                        |
 
 The package is **environment-agnostic**: no `process`, no `fs`, no `Buffer`, no DOM APIs. It's a pure string transformer with a JSON catalog and a single `@twemoji/parser` call.
 
@@ -59,9 +59,9 @@ This means **both** `require('universal-emoji-parser').parse(...)` and `import u
 
 ### Engines
 
-`package.json` sets `engines.node: ">=20.16.0"`. npm warns (does not error) when installing on older Node versions; the runtime will likely still work down to Node 18, but unsupported.
+`package.json` sets `engines.node: ">=20.19.0"`. npm warns (does not error) when installing on older Node versions; the runtime will likely still work down to Node 18, but unsupported.
 
-CI runs on **Node 22.13.1**. If a Node version-specific bug surfaces, that's the reference version to debug against.
+CI runs on **Node 24**. If a Node version-specific bug surfaces, that's the reference version to debug against.
 
 ### Memory
 
@@ -81,13 +81,13 @@ The package is synchronous and stateless — safe to call from worker threads (`
 
 This package is **not** publishable as a static `<script>` import — it relies on `require('@twemoji/parser')` to be resolved by a bundler. Consumers integrate it via:
 
-| Bundler | Integration |
-|---|---|
+| Bundler | Integration                                                                |
+| ------- | -------------------------------------------------------------------------- |
 | webpack | `import uEmojiParser from 'universal-emoji-parser'` (works out of the box) |
-| Rollup | Add `@rollup/plugin-commonjs` and `@rollup/plugin-node-resolve` |
-| Vite | Works out of the box (Vite uses esbuild + Rollup internally) |
-| esbuild | Works out of the box |
-| Parcel | Works out of the box |
+| Rollup  | Add `@rollup/plugin-commonjs` and `@rollup/plugin-node-resolve`            |
+| Vite    | Works out of the box (Vite uses esbuild + Rollup internally)               |
+| esbuild | Works out of the box                                                       |
+| Parcel  | Works out of the box                                                       |
 
 The package's own bundle (`dist/index.js`) is `commonjs2` — it expects `module.exports` to be writable. All modern bundlers handle this.
 
@@ -105,7 +105,7 @@ If a consumer cares deeply about bundle size, they have two options:
 The HTML the package emits assumes:
 
 ```html
-<img class="emoji" alt="😎" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f60e.svg"/>
+<img class="emoji" alt="😎" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f60e.svg" />
 ```
 
 Consumers typically style with:
@@ -126,10 +126,7 @@ img.emoji {
 The default CDN is `cdn.jsdelivr.net/gh/jdecked/twemoji@latest`. For production, consumers should pin to a specific Twemoji version to avoid surprise changes:
 
 ```ts
-uEmojiParser.parseToHtml(
-  'hello 🚀',
-  'https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.1/assets/svg/'
-)
+uEmojiParser.parseToHtml('hello 🚀', 'https://cdn.jsdelivr.net/gh/jdecked/twemoji@17.0.1/assets/svg/')
 ```
 
 See [Emoji Providers → CDN selection](EMOJI_PROVIDERS.md#cdn-selection).
@@ -251,12 +248,12 @@ Removing or renaming any of these is a breaking change.
 
 We don't currently target React Native, NativeScript, or any non-V8 runtime. If a consumer asks for one:
 
-| Need | Likely fix |
-|---|---|
-| React Native | Should work — RN's Metro bundler handles CommonJS. Catalog size matters; consider lazy-load |
-| NativeScript | Same as RN — works through their CommonJS shim |
-| Browser-direct `<script>` (no bundler) | Need to ship a UMD bundle. Currently we don't. Adding one means a second `webpack.config.js` mode and a second `dist/` artifact |
-| ESM-only consumers (`"type": "module"` strict) | Already works — `import` resolves through the `.d.ts` and Node's CommonJS interop |
+| Need                                           | Likely fix                                                                                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| React Native                                   | Should work — RN's Metro bundler handles CommonJS. Catalog size matters; consider lazy-load                                     |
+| NativeScript                                   | Same as RN — works through their CommonJS shim                                                                                  |
+| Browser-direct `<script>` (no bundler)         | Need to ship a UMD bundle. Currently we don't. Adding one means a second `webpack.config.js` mode and a second `dist/` artifact |
+| ESM-only consumers (`"type": "module"` strict) | Already works — `import` resolves through the `.d.ts` and Node's CommonJS interop                                               |
 
 For each, the path is: open an issue describing the use case, add CI coverage for the new runtime if possible, document here.
 

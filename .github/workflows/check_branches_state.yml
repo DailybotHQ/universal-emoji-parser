@@ -10,7 +10,7 @@ jobs:
     name: 'Check Branches State'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
           fetch-depth: 0

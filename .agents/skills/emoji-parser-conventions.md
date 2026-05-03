@@ -5,7 +5,7 @@ description: Deep dive on the parse pipeline, two-tier shortcode lookup, RegExp 
 
 # Skill: `emoji-parser-conventions`
 
-A reference for the conventions that make Universal Emoji Parser tick. Read this when you're about to make non-trivial changes to `src/index.ts` or when you want to understand *why* the code looks the way it does.
+A reference for the conventions that make Universal Emoji Parser tick. Read this when you're about to make non-trivial changes to `src/index.ts` or when you want to understand _why_ the code looks the way it does.
 
 For day-to-day docs, see [`docs/ARCHITECTURE.md`](../../docs/ARCHITECTURE.md). This skill explains the rationale behind the patterns, not the patterns themselves.
 
@@ -36,7 +36,7 @@ You can think of it as a pipeline where each stage is optional but the order is 
 
 ### Edge case: `parseToHtml: true, parseToShortcode: true`
 
-The condition `if (!parseToHtml && parseToShortcode)` means `parseToShortcode` is **skipped** when `parseToHtml` is true. This is intentional — you can't ask for "convert unicodes to shortcodes" *and* "render to HTML" at the same time; HTML always wants unicode-to-image.
+The condition `if (!parseToHtml && parseToShortcode)` means `parseToShortcode` is **skipped** when `parseToHtml` is true. This is intentional — you can't ask for "convert unicodes to shortcodes" _and_ "render to HTML" at the same time; HTML always wants unicode-to-image.
 
 If a user passes `{ parseToHtml: true, parseToShortcode: true }`, the `parseToShortcode` option is silently ignored. We don't error — we just respect `parseToHtml`'s precedence.
 
@@ -57,9 +57,7 @@ if (emojiLibJsonData[shortcode]?.char) {
 }
 
 // Tier 2: keyword scan
-const emojiUnicode = Object.keys(emojiLibJsonData).find(
-  k => emojiLibJsonData[k].keywords.includes(shortcode)
-)
+const emojiUnicode = Object.keys(emojiLibJsonData).find((k) => emojiLibJsonData[k].keywords.includes(shortcode))
 return emojiUnicode ? emojiLibJsonData[emojiUnicode] : undefined
 ```
 
@@ -76,8 +74,8 @@ It doesn't, normally. Tier 1 only hits if `shortcode` is itself a unicode emoji 
 This is non-obvious and worth understanding:
 
 ```ts
-emojiLibJsonData['😎']    // { name: 'smiling face with sunglasses', slug: 'smiling_face_with_sunglasses', ... }
-emojiLibJsonData['smiling_face_with_sunglasses']    // undefined
+emojiLibJsonData['😎'] // { name: 'smiling face with sunglasses', slug: 'smiling_face_with_sunglasses', ... }
+emojiLibJsonData['smiling_face_with_sunglasses'] // undefined
 ```
 
 The catalog is `{ [unicode_char]: EmojiType }`. To look up by slug, you scan the values.
@@ -194,7 +192,7 @@ Webpack's `libraryTarget: 'commonjs2'` exports the module as `module.exports = {
 ### What the reattachment does
 
 ```ts
-module.exports = uEmojiParser   // overwrites the {default, DEFAULT_EMOJI_CDN, ...} object with uEmojiParser itself
+module.exports = uEmojiParser // overwrites the {default, DEFAULT_EMOJI_CDN, ...} object with uEmojiParser itself
 ```
 
 Now `require('universal-emoji-parser')` returns `uEmojiParser` directly — `x.parse(...)` works.
@@ -260,7 +258,7 @@ The string `'The text parameter should be a string.'` is **part of the API**. A 
 ## CSS class name
 
 ```ts
-`<img class="emoji" alt="${entity.text}" src="${emojiUrl}"/>`
+;`<img class="emoji" alt="${entity.text}" src="${emojiUrl}"/>`
 ```
 
 `class="emoji"` is the contract. Consumers style with:

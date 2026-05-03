@@ -1,4 +1,4 @@
-FROM node:24.14.0-trixie-slim
+FROM node:24-trixie-slim
 LABEL maintainer="developers@dailybot.com"
 
 # System packages (apt requires root)

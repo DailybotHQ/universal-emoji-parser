@@ -69,3 +69,6 @@ git_logs_output.txt
 packages_upgrades.txt
 packages_upgrades_output.txt
 emoji-lib-output.json
+
+tmp/*
+!tmp/.gitkeep

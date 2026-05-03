@@ -12,18 +12,18 @@ Real problems hit while setting up and developing Universal Emoji Parser, with t
 
 ```
 npm error EBADENGINE Unsupported engine
-npm error EBADENGINE   required: { node: '>=20.16.0' }
+npm error EBADENGINE   required: { node: '>=20.19.0' }
 npm error EBADENGINE   current: { node: 'v18.x.x' }
 ```
 
-**Cause:** Node version is below the `engines.node: ">=20.16.0"` constraint in `package.json`.
+**Cause:** Node version is below the `engines.node: ">=20.19.0"` constraint in `package.json`.
 
 **Fix:**
 
 ```bash
-nvm install 22.13.1
-nvm use 22.13.1
-node --version    # confirm v22.13.1
+nvm install 24
+nvm use 24
+node --version    # confirm v24.x (or any v20.19+)
 npm install
 ```
 
@@ -111,7 +111,7 @@ new CleanWebPackPlugin.CleanWebpackPlugin()
 **Symptom:**
 
 ```
-.eslintrc » @typescript-eslint/eslint-recommended
+eslint.config.mjs » @typescript-eslint/...
 Parsing error: Cannot read file '/app/tsconfig.json'
 ```
 
@@ -156,7 +156,7 @@ Code style issues found in package.json
 
 **Common causes:**
 
-1. **Different Node version** — local Node ≠ CI Node 22.13.1. Match locally with `nvm use 22.13.1`
+1. **Different Node version** — local Node ≠ CI Node 24. Match locally with `nvm use 24` (or satisfy `engines.node` ≥ 20.19)
 2. **Different timezone / locale** — unlikely in this package (no date/locale handling) but possible if you've added time-sensitive logic
 3. **Race condition** — Mocha tests aren't supposed to interact, but if they share state, ordering can matter. Run `npm test` repeatedly locally; if it ever fails, you have a flake
 4. **Env-var dependency** — code that reads `process.env.X` may behave differently with/without the var. The package shouldn't read env vars; check recent changes if it does

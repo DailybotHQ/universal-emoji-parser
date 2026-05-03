@@ -116,7 +116,7 @@ The current ratio is **1 runtime dep** per ~50 lines of code. We've kept it that
 - A PR adds an `async` method (the API is sync; introducing async is a major change)
 - A PR introduces global state (module-level mutable variables)
 - A PR adds a new source file when extending `index.ts` would do
-- A PR removes the `// `__`-prefix on a previously-internal helper without checking call sites
+- A PR removes the `// `\_\_`-prefix on a previously-internal helper without checking call sites
 
 ## Heuristics
 

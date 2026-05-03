@@ -41,9 +41,12 @@ There's no separation by source-file ↔ test-file pairing — `main.test.ts` co
 Mocha's BDD style:
 
 ```ts
-describe('Test emoji parser', () => {                    // Top-level: subject
-  describe('Using default options', () => {              // Nested: scenario
-    it('should parse emojis from unicode', () => {       // Single behavior
+describe('Test emoji parser', () => {
+  // Top-level: subject
+  describe('Using default options', () => {
+    // Nested: scenario
+    it('should parse emojis from unicode', () => {
+      // Single behavior
       // ...
     })
   })
@@ -115,8 +118,8 @@ The original KMPStarter rule was about Kotlin Native runners; Mocha doesn't have
 import { expect } from 'chai'
 
 // Equality
-expect(result).to.be.equal('expected')          // primitive
-expect(obj).to.be.deep.equal({ a: 1 })          // structural
+expect(result).to.be.equal('expected') // primitive
+expect(obj).to.be.deep.equal({ a: 1 }) // structural
 
 // Type
 expect(result).to.be.a('string')
@@ -137,7 +140,7 @@ expect(() => uEmojiParser.parse(undefined as any)).to.throw(Error)
 expect(fs.existsSync(path)).to.be.true
 ```
 
-We use Chai 4. Don't try to use Chai 5 idioms (`expect.toBe(...)`) — they don't exist in 4.
+We use Chai 6. Prefer existing `expect(...).to.be.*` BDD style from the current specs.
 
 ## What you test
 
@@ -197,7 +200,7 @@ The package has no time-dependent logic. No `Date.now()`, no timers. Don't write
 ## Speed
 
 - `npm run test:watch` — your inner loop. Sub-second per re-run after the first compile
-- `npx mocha --require ts-node/register test/main.test.ts --grep "<pattern>"` — filter to a single test
+- `npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "<pattern>"` — filter to a single test
 - The full suite is ~5 seconds. Reserve `npm test` for pre-commit / pre-push
 
 ## Pre-push standard

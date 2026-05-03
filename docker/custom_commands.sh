@@ -13,72 +13,80 @@ function print.error {
 }
 
 function check() {
-  print.success "Running astro checks..."
-	npm run astro:check
+	print.success "Running ESLint..."
+	npm run eslint:check
 	if [ $? != 0 ]; then
-    echo ''
-		print.error "⚠️ Astro checks failed, skipping astro checks..."
+		echo ''
+		print.error "⚠️ ESLint failed."
 		return 1
 	fi
 
-	print.success "Running biome checks..."
-	npm run biome:check
+	print.success "Running Prettier check..."
+	npm run prettier:check
+	if [ $? != 0 ]; then
+		echo ''
+		print.error "⚠️ Prettier check failed."
+		return 1
+	fi
 }
 
 function fix() {
-  print.success "Running astro checks..."
-	npm run astro:check
+	print.success "Running ESLint with --fix..."
+	npm run eslint:fix
 	if [ $? != 0 ]; then
-    echo ''
-		print.error "⚠️ Astro checks failed, skipping astro checks..."
+		echo ''
+		print.error "⚠️ ESLint fix failed."
 		return 1
 	fi
 
-	print.success "Running biome checks && apply automatic fixes..."
-	npm run biome:fix
+	print.success "Running Prettier --write..."
+	npm run prettier:fix
+	if [ $? != 0 ]; then
+		echo ''
+		print.error "⚠️ Prettier fix failed."
+		return 1
+	fi
 }
 
 function test() {
-  print.success "Running tests..."
+	print.success "Running tests..."
 	npm run test
 }
 
-function lighthouse() {
-	print.success "Building site for Lighthouse audit..."
+function build() {
+	print.success "Running TypeScript build (tsc)..."
+	npm run build:tsc
+	if [ $? != 0 ]; then
+		print.error "⚠️ tsc build failed."
+		return 1
+	fi
+	print.success "Running Webpack production build..."
 	npm run build
 	if [ $? != 0 ]; then
-		print.error "⚠️ Build failed, skipping Lighthouse audit..."
+		print.error "⚠️ Webpack build failed."
 		return 1
 	fi
-	print.success "Running Lighthouse audit..."
-	npm run lighthouse
 }
 
+# Same gates as CI: code_check.yml (eslint + prettier + test) plus build:tsc + webpack (pre-merge / pre-publish)
 function codecheck() {
-	fix
+	check
 	if [ $? != 0 ]; then
-    echo ''
-		print.error "⚠️ Biome checks failed..."
-		return 1
-	fi
-	print.success "Checking Markdown parity (EN/ES)..."
-	npm run md:check
-	if [ $? != 0 ]; then
-		print.error "⚠️ Markdown parity check failed..."
-		return 1
-	fi
-	print.success "Generating WebP images (skips if up to date)..."
-	npm run images:webp
-	if [ $? != 0 ]; then
-		print.error "⚠️ WebP generation failed..."
+		echo ''
+		print.error "⚠️ Lint/format check failed."
 		return 1
 	fi
 	test
 	if [ $? != 0 ]; then
-		print.error "⚠️ Tests failed..."
+		print.error "⚠️ Tests failed."
 		return 1
 	fi
-	lighthouse
+	build
+	if [ $? != 0 ]; then
+		print.error "⚠️ Build failed."
+		return 1
+	fi
+	print.success "✅ codecheck passed (eslint + prettier + test + build:tsc + webpack)"
 }
 
 function install() {
@@ -202,7 +210,7 @@ function check_devcontainer() {
 		print.success "✅ Running inside Docker container"
 		echo ""
 		echo "All development commands are available:"
-		echo "  • check, fix, test, lighthouse, codecheck, install"
+		echo "  • check, fix, test, build, codecheck, install"
 		return 0
 	else
 		print.error "❌ NOT running inside Docker container"
@@ -212,9 +220,9 @@ function check_devcontainer() {
 		echo "   only work inside the Docker container."
 		echo ""
 		echo "   To work with this project:"
-		echo "   1. Start Docker services: cd docker/local && bash docker.sh up"
-		echo "   2. Access the container: bash docker.sh bash xergioalexcom"
-		echo "   3. Or use VS Code Dev Containers if configured"
+		echo "   1. From repo root: cd docker/local && docker compose up -d uemojiparservscode"
+		echo "   2. Shell into the container: docker exec -it uemojiparser bash"
+		echo "   3. Or open the folder in VS Code / Cursor and use Dev Containers (see .devcontainer_example/)"
 		return 1
 	fi
 }
@@ -311,12 +319,12 @@ function show_welcome() {
     echo "Useful commands:"
     echo "  • check_devcontainer  - Check if running inside Docker container (CRITICAL)"
     echo "  • help                 - Show this message"
-    echo "  • check                - Run astro and biome checks"
-    echo "  • fix                  - Run checks and apply automatic fixes"
-    echo "  • test                 - Run tests"
-    echo "  • lighthouse           - Build site + run Lighthouse audit"
-    echo "  • codecheck            - Run all checks (fix + md:check + images:webp + test + lighthouse)"
-    echo "  • install              - Run npm install"
+    echo "  • check                - npm run eslint:check + prettier:check (CI lint/format gate)"
+    echo "  • fix                  - npm run eslint:fix + prettier:fix"
+    echo "  • test                 - npm run test (Mocha + tsx)"
+    echo "  • build                - npm run build:tsc + npm run build (types + webpack)"
+    echo "  • codecheck            - check + test + build (full local gate before push)"
+    echo "  • install              - npm install"
     echo ""
     echo "AI Assistant commands:"
     echo "  • claude            - Claude Code CLI"

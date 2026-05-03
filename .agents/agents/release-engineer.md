@@ -67,7 +67,7 @@ Missing gates (worth considering):
 
 ### "Should I touch the legacy `.babelrc`?"
 
-The `.babelrc` predates the current Webpack + ts-loader setup. It defines `@babel/preset-env` + `transform-runtime` + `transform-modules-commonjs`. Babel is **not** invoked during `npm run build` or `npm test` — these use `ts-loader` and `ts-node` respectively, both of which use the TypeScript compiler.
+The `.babelrc` predates the current Webpack + ts-loader setup. It defines `@babel/preset-env` + `transform-runtime` + `transform-modules-commonjs`. Babel is **not** invoked during `npm run build` or `npm test` — those use `ts-loader` (build) and **tsx** + Mocha (tests), both backed by the TypeScript compiler.
 
 The `.babelrc` exists for downstream tools that may opt in (e.g., a consumer using Babel-based bundling that picks up our `.babelrc`). Removing it might break those consumers. Leaving it is harmless.
 

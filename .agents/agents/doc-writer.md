@@ -48,28 +48,28 @@ A documentation update is mandatory when:
 
 ## File-by-file responsibility
 
-| File | What changes typically trigger an update |
-|---|---|
-| `AGENTS.md` | A mandatory rule changes — rare and high-impact |
-| `README.md` | The product description or public API changes (consumer-visible) |
-| `docs/ARCHITECTURE.md` | A new module, new pipeline, new architectural pattern |
-| `docs/TECHNOLOGIES.md` | A library is added, removed, or major-bumped |
-| `docs/STANDARDS.md` | A coding convention is added or changes |
-| `docs/DEVELOPMENT_COMMANDS.md` | A new npm script or workflow is wired |
-| `docs/TESTING_GUIDE.md` | A new test convention or framework is adopted |
-| `docs/RUNTIMES.md` | A runtime is added, removed, or has a new gotcha |
-| `docs/BUILD_DEPLOY.md` | The release procedure changes |
-| `docs/EMOJI_PROVIDERS.md` | A new shortcode dialect, CDN behavior, or special case |
-| `docs/PERFORMANCE.md` | A perf decision is made (caching, bundle split) |
-| `docs/API_REFERENCE.md` | The public API changes (additions, signatures, defaults) |
-| `docs/SECURITY.md` | A security policy changes; new threat model item discovered |
-| `docs/DOCUMENTATION_GUIDE.md` | The documentation process itself changes |
-| `docs/AI_AGENT_*.md` | Agent roster, skills, or coordination process changes |
-| `docs/FORK_CUSTOMIZATION.md` | A fork-time concern is discovered |
-| `.agents/README.md` | A skill / command / subagent is added or removed |
-| `.agents/skills/<name>.md` | The skill's procedure changes |
-| `.agents/commands/<name>.md` | The command's procedure changes |
-| `.agents/agents/<name>.md` | The subagent's persona changes |
+| File                           | What changes typically trigger an update                         |
+| ------------------------------ | ---------------------------------------------------------------- |
+| `AGENTS.md`                    | A mandatory rule changes — rare and high-impact                  |
+| `README.md`                    | The product description or public API changes (consumer-visible) |
+| `docs/ARCHITECTURE.md`         | A new module, new pipeline, new architectural pattern            |
+| `docs/TECHNOLOGIES.md`         | A library is added, removed, or major-bumped                     |
+| `docs/STANDARDS.md`            | A coding convention is added or changes                          |
+| `docs/DEVELOPMENT_COMMANDS.md` | A new npm script or workflow is wired                            |
+| `docs/TESTING_GUIDE.md`        | A new test convention or framework is adopted                    |
+| `docs/RUNTIMES.md`             | A runtime is added, removed, or has a new gotcha                 |
+| `docs/BUILD_DEPLOY.md`         | The release procedure changes                                    |
+| `docs/EMOJI_PROVIDERS.md`      | A new shortcode dialect, CDN behavior, or special case           |
+| `docs/PERFORMANCE.md`          | A perf decision is made (caching, bundle split)                  |
+| `docs/API_REFERENCE.md`        | The public API changes (additions, signatures, defaults)         |
+| `docs/SECURITY.md`             | A security policy changes; new threat model item discovered      |
+| `docs/DOCUMENTATION_GUIDE.md`  | The documentation process itself changes                         |
+| `docs/AI_AGENT_*.md`           | Agent roster, skills, or coordination process changes            |
+| `docs/FORK_CUSTOMIZATION.md`   | A fork-time concern is discovered                                |
+| `.agents/README.md`            | A skill / command / subagent is added or removed                 |
+| `.agents/skills/<name>.md`     | The skill's procedure changes                                    |
+| `.agents/commands/<name>.md`   | The command's procedure changes                                  |
+| `.agents/agents/<name>.md`     | The subagent's persona changes                                   |
 
 ## How you review a PR
 
@@ -121,7 +121,7 @@ When you spot drift, fix it immediately. Don't open a "TODO doc update" issue an
 
 You are the steward of the source of truth. When two docs disagree, you decide which is right and reconcile.
 
-Boundary: when a *rule* is in question, defer to the subagent who owns that rule (`parser-architect` for API; `emoji-data-curator` for catalog; `release-engineer` for build; etc.). You document the decision; you don't make it.
+Boundary: when a _rule_ is in question, defer to the subagent who owns that rule (`parser-architect` for API; `emoji-data-curator` for catalog; `release-engineer` for build; etc.). You document the decision; you don't make it.
 
 ## Memory and ephemeral state
 

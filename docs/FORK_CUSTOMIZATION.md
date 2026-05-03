@@ -4,16 +4,16 @@ Step-by-step rebrand of Universal Emoji Parser into a new product or fork. This 
 
 The placeholders to replace, in summary:
 
-| Placeholder | Currently | Examples of new value |
-|---|---|---|
-| Package name | `universal-emoji-parser` | `@acme/emoji-parser`, `acme-emojis` |
-| GitHub repo | `DailyBotHQ/universal-emoji-parser` | `acme/emoji-parser` |
-| Maintainer block | `DailyBot <developers@dailybot.com>` | `Acme Inc <eng@acme.com>` |
-| Bug-tracker email | `developers@dailybot.com` | `eng@acme.com` |
-| Homepage URL | `https://github.com/DailyBotHQ/universal-emoji-parser#readme` | `https://github.com/acme/emoji-parser#readme` |
-| Release-bot identity | `🤖 DailyBot <ops@dailybot.com>` | `🤖 Acme-Bot <ops@acme.com>` |
-| Notification channel | DailyBot Slack-like | Your own Slack/Teams/Discord |
-| npm scope | unscoped (`universal-emoji-parser`) | `@acme/emoji-parser` |
+| Placeholder          | Currently                                                     | Examples of new value                         |
+| -------------------- | ------------------------------------------------------------- | --------------------------------------------- |
+| Package name         | `universal-emoji-parser`                                      | `@acme/emoji-parser`, `acme-emojis`           |
+| GitHub repo          | `DailyBotHQ/universal-emoji-parser`                           | `acme/emoji-parser`                           |
+| Maintainer block     | `DailyBot <developers@dailybot.com>`                          | `Acme Inc <eng@acme.com>`                     |
+| Bug-tracker email    | `developers@dailybot.com`                                     | `eng@acme.com`                                |
+| Homepage URL         | `https://github.com/DailyBotHQ/universal-emoji-parser#readme` | `https://github.com/acme/emoji-parser#readme` |
+| Release-bot identity | `🤖 DailyBot <ops@dailybot.com>`                              | `🤖 Acme-Bot <ops@acme.com>`                  |
+| Notification channel | DailyBot Slack-like                                           | Your own Slack/Teams/Discord                  |
+| npm scope            | unscoped (`universal-emoji-parser`)                           | `@acme/emoji-parser`                          |
 
 ## Step 1 — Package name
 

@@ -5,7 +5,7 @@ description: Step-by-step explanation of how src/lib/emoji-lib.json is regenerat
 
 # Skill: `emoji-data-pipeline`
 
-A reference for the data pipeline that produces `src/lib/emoji-lib.json` from upstream `emojilib` and `unicode-emoji-json`. Read this when you need to understand *why* the catalog has the shape it does, or before debugging a regeneration that produced unexpected output.
+A reference for the data pipeline that produces `src/lib/emoji-lib.json` from upstream `emojilib` and `unicode-emoji-json`. Read this when you need to understand _why_ the catalog has the shape it does, or before debugging a regeneration that produced unexpected output.
 
 For a procedural walkthrough of running the regeneration, see [`/regenerate-emoji-lib`](../commands/regenerate-emoji-lib.md). This skill explains the algorithm.
 
@@ -106,7 +106,7 @@ Applied during the merge:
 ```ts
 if (EMOJIS_SPECIAL_CASES[emoji]) {
   if (EMOJIS_SPECIAL_CASES[emoji].include) {
-    EMOJIS_SPECIAL_CASES[emoji].include.forEach(keyword => {
+    EMOJIS_SPECIAL_CASES[emoji].include.forEach((keyword) => {
       if (!unicodeEmojiJsonData[emoji].keywords.includes(keyword)) {
         unicodeEmojiJsonData[emoji].keywords.unshift(keyword)
       }
@@ -114,7 +114,7 @@ if (EMOJIS_SPECIAL_CASES[emoji]) {
   }
   if (EMOJIS_SPECIAL_CASES[emoji].exclude) {
     unicodeEmojiJsonData[emoji].keywords = unicodeEmojiJsonData[emoji].keywords.filter(
-      k => !EMOJIS_SPECIAL_CASES[emoji].exclude.includes(k)
+      (k) => !EMOJIS_SPECIAL_CASES[emoji].exclude.includes(k)
     )
   }
 }
@@ -217,7 +217,7 @@ After regeneration, the diff between `emoji-lib.json` (committed) and `emoji-lib
 
 The dedup algorithm is **sensitive to iteration order** — `Object.keys()` in JS is mostly insertion-order, but for non-integer string keys (which unicode emojis are), order is officially "implementation-defined." If `unicode-emoji-json` reorders its entries between versions, the dedup picks different winners.
 
-This usually means an upstream version bump rearranged things. Spot-check a few specific emojis to confirm the *meaningful* keywords are still correct, then accept.
+This usually means an upstream version bump rearranged things. Spot-check a few specific emojis to confirm the _meaningful_ keywords are still correct, then accept.
 
 ### "A specific emoji has a totally different keywords array"
 
@@ -277,7 +277,7 @@ To force a specific outcome, use `EMOJIS_SPECIAL_CASES.include` to push the keyw
 
 - **Doesn't validate slugs** — if `unicode-emoji-json` ships a malformed slug, it propagates. Sanity-check `slug.match(/^[a-z0-9_]+$/)` for any new entries
 - **Doesn't sort keywords alphabetically** — order matters for dedup, so we preserve `emojilib`'s curation
-- **Doesn't deduplicate keywords *within* a single emoji's array** — if `emojilib` has `["smile", "happy", "smile"]`, the duplicate stays. Hasn't been a problem yet
+- **Doesn't deduplicate keywords _within_ a single emoji's array** — if `emojilib` has `["smile", "happy", "smile"]`, the duplicate stays. Hasn't been a problem yet
 - **Doesn't enforce a maximum number of keywords per emoji** — if upstream bloats, the catalog bloats. Bundle size is the constraint
 
 ## Future improvements

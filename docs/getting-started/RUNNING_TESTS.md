@@ -35,7 +35,7 @@ Total: ~5 seconds for the full suite.
 npm test
 ```
 
-Internally: `mocha --require ts-node/register test/**.ts --timeout 25000 --colors`. ts-node compiles `.ts` on the fly — no separate build step.
+Internally: `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors`. **tsx** executes `.ts` on the fly — no separate compile step.
 
 Tests live in `test/*.test.ts`. There are three files:
 
@@ -60,7 +60,7 @@ To stop: `Ctrl+C`.
 ## 3. Run a single file
 
 ```bash
-npx mocha --require ts-node/register test/main.test.ts --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors
 ```
 
 Useful when iterating on `main.test.ts` and you don't care about catalog tests.
@@ -73,13 +73,13 @@ Mocha's `--grep` matches against the concatenated `describe` + `it` names:
 
 ```bash
 # Run only "should parse emojis from unicode"
-npx mocha --require ts-node/register test/main.test.ts --grep "should parse emojis from unicode" --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should parse emojis from unicode" --colors
 
 # Run all tests in the "Using default options" describe block
-npx mocha --require ts-node/register test/main.test.ts --grep "Using default options" --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "Using default options" --colors
 
 # Run anything mentioning "shortcode"
-npx mocha --require ts-node/register test/main.test.ts --grep "shortcode" --colors
+npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "shortcode" --colors
 ```
 
 ---
@@ -135,12 +135,12 @@ Full procedure: [`/regenerate-emoji-lib`](../../.agents/commands/regenerate-emoj
 
 ### Quick inspection — `console.log`
 
-Tests are exempt from the `no-console` ESLint rule (because `.eslintignore` excludes things via the gitignore strategy and the rule only fires on `src/`). Drop a `console.log` in the test, run `npm test`, look at the output.
+Tests are exempt from the `no-console` ESLint rule in `src/` (that rule targets library code). Drop a `console.log` in the test, run `npm test`, look at the output.
 
 ```ts
 it('should parse :smile:', () => {
   const result = uEmojiParser.parse(':smile:')
-  console.log('Result:', result)        // ← debugging
+  console.log('Result:', result) // ← debugging
   expect(result).to.contain('alt="🙂"')
 })
 ```
@@ -151,10 +151,10 @@ Don't commit the `console.log` — but during dev, no problem.
 
 ```bash
 # Run tests with the inspector enabled, paused at start
-node --inspect-brk node_modules/.bin/mocha --require ts-node/register test/main.test.ts
+node --import tsx --inspect-brk ./node_modules/mocha/bin/mocha.js test/main.test.ts --timeout 999999 --colors
 ```
 
-Then in Chrome: `chrome://inspect` → "Open dedicated DevTools for Node" → set breakpoints in `src/index.ts` (TypeScript with source maps via ts-node).
+Then in Chrome: `chrome://inspect` → "Open dedicated DevTools for Node" → set breakpoints in `src/index.ts` (TypeScript with source maps via **tsx**).
 
 VS Code users: configure a launch config:
 
@@ -163,13 +163,9 @@ VS Code users: configure a launch config:
   "type": "node",
   "request": "launch",
   "name": "Mocha tests",
-  "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/mocha",
-  "args": [
-    "--require", "ts-node/register",
-    "test/**.ts",
-    "--timeout", "999999",
-    "--colors"
-  ],
+  "runtimeExecutable": "node",
+  "runtimeArgs": ["--import", "tsx"],
+  "args": ["./node_modules/mocha/bin/mocha.js", "test/**/*.ts", "--timeout", "999999", "--colors"],
   "console": "integratedTerminal",
   "internalConsoleOptions": "neverOpen"
 }
@@ -242,14 +238,14 @@ Conventions in [`../TESTING_GUIDE.md`](../TESTING_GUIDE.md). Skill: [`/write-tes
 
 ## 9. Quick reference
 
-| Goal | Command |
-|---|---|
-| Run all tests | `npm test` |
-| Watch mode (TDD) | `npm run test:watch` |
-| Run a single file | `npx mocha --require ts-node/register test/main.test.ts --colors` |
-| Filter by name | `npx mocha --require ts-node/register test/**.ts --grep "<pattern>" --colors` |
-| Debug with inspector | `node --inspect-brk node_modules/.bin/mocha --require ts-node/register test/**.ts` |
-| Quick repro | `npx ts-node tmp/repro.ts` |
-| CI parity | `npm install && npm run eslint:check && npm run prettier:check && npm test && npm run build` |
+| Goal                 | Command                                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Run all tests        | `npm test`                                                                                                   |
+| Watch mode (TDD)     | `npm run test:watch`                                                                                         |
+| Run a single file    | `npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors`                                       |
+| Filter by name       | `npx tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --grep "<pattern>" --colors`                       |
+| Debug with inspector | `node --import tsx --inspect-brk ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 999999 --colors` |
+| Quick repro          | `npx ts-node tmp/repro.ts`                                                                                   |
+| CI parity            | `npm install && npm run eslint:check && npm run prettier:check && npm test && npm run build`                 |
 
 If a test doesn't run, check [Troubleshooting](TROUBLESHOOTING.md) — every issue we've actually hit is in there.

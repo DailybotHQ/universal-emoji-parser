@@ -96,7 +96,6 @@ describe('Prepare emoji parser assets', () => {
           }
         })
         if (emojisObjectsFoundPerKeyword.length) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           emojisObjectsFoundPerKeyword = emojisObjectsFoundPerKeyword.sort(
             (item1: EmojiType, item2: EmojiType) => item1.keyword_index_found! - item2.keyword_index_found!
           )
@@ -104,7 +103,6 @@ describe('Prepare emoji parser assets', () => {
           if (emojisObjectsFoundPerKeyword.length) {
             emojisObjectsFoundPerKeyword.forEach((emojiObjectFound: EmojiType) => {
               if (emojiObjectFound.keyword_index_found !== 0) {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 emojiLibJson[emojiObjectFound.char].keywords.splice(emojiObjectFound.keyword_index_found!, 1)
               }
             })

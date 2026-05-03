@@ -20,21 +20,16 @@ Bump one or more dependencies in `package.json`, then verify lint + tests + buil
 - **Target version** — exact version string, or "latest" / "patch" / "minor"
 - **Why** — feature, security, hygiene
 
-## Pre-flight: respect `.ncurc.json`
+## Pre-flight: optional `.ncurc.json` rejects
 
 ```json
 {
   "upgrade": true,
-  "reject": ["chai", "eslint"]
+  "reject": []
 }
 ```
 
-These are **deliberately frozen**:
-
-- **`chai` < 5.0** — Chai 5 is ESM-only; we use CommonJS via ts-node
-- **`eslint` < 9.0** — ESLint 9 dropped `.eslintrc` for flat config
-
-Don't bump either without an explicit migration plan. If the user asks to bump them anyway, explain the migration cost first and confirm.
+Add package names to `reject` only when an upgrade needs deliberate follow-up (breaking API, ecosystem lag). **`chai` and `eslint` are no longer repo-wide pins** — we ship Chai 6 + ESLint 10 (`eslint.config.mjs`) + **tsx** for the Mocha suite.
 
 For `@twemoji/parser` (the only runtime dep), read the release notes — URL format changes are breaking.
 
@@ -95,13 +90,13 @@ npm run build:tsc
 
 Read every error. Common failure modes:
 
-| Error | Likely cause |
-|---|---|
-| `Could not find <coord>` | Wrong package name or version doesn't exist on npm |
-| `error TS2###:` | API removed or renamed in the new version (check release notes) |
-| `Module not found: 'X'` | Package's exports map changed; consumer code needs an updated import path |
-| Test snapshot mismatch | HTML output format changed (Twemoji bump) |
-| Lint or format failure | New `@typescript-eslint` rule was activated |
+| Error                    | Likely cause                                                              |
+| ------------------------ | ------------------------------------------------------------------------- |
+| `Could not find <coord>` | Wrong package name or version doesn't exist on npm                        |
+| `error TS2###:`          | API removed or renamed in the new version (check release notes)           |
+| `Module not found: 'X'`  | Package's exports map changed; consumer code needs an updated import path |
+| Test snapshot mismatch   | HTML output format changed (Twemoji bump)                                 |
+| Lint or format failure   | New `@typescript-eslint` rule was activated                               |
 
 ### 4. Address breaking changes
 
@@ -213,7 +208,7 @@ If we bump `engines.node` in `package.json`, also bump the Node version in every
 ```yaml
 - uses: actions/setup-node@v4
   with:
-    node-version: '22.13.1'
+    node-version: '24'
 ```
 
 Don't drift CI Node from the package's stated minimum.

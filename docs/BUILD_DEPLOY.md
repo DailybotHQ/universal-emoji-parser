@@ -131,7 +131,7 @@ on:
                      cleanup_caches      notify_on_channel_end
 ```
 
-Every job runs on `ubuntu-latest` with Node `22.13.1` and aggressive caching of `~/.npm`, `node_modules`, and `dist/`.
+Every job runs on `ubuntu-latest` with Node **24** (latest `.x` available to `actions/setup-node`) and aggressive caching of `~/.npm`, `node_modules`, and `dist/`.
 
 ### Job-by-job
 
@@ -145,7 +145,7 @@ Posts a "deployment started" message to the DailyBot channel via `https://api.da
 
 #### 3. `deploy_setup`
 
-`actions/checkout@v4` + `actions/setup-node@v4` (Node 22.13.1) + cache `~/.npm` and `node_modules`. If cache miss, runs `npm install`.
+`actions/checkout@v6` + `actions/setup-node@v6` (Node 24) + `actions/cache@v5` for `~/.npm` and `node_modules`. If cache miss, runs `npm install`.
 
 #### 4. `deploy_validate_linters_and_code_format`
 
@@ -158,7 +158,7 @@ Hard gate. Fails the whole pipeline if either lint check fails.
 
 #### 5. `deploy_tests`
 
-`npm run test` — Mocha + Chai over `test/**.test.ts`. Hard gate.
+`npm run test` — Mocha + Chai over `test/**/*.ts` via **tsx**. Hard gate.
 
 #### 6. `build`
 
@@ -178,13 +178,13 @@ Webpack production build. Caches `dist/` so the next job can publish without reb
 #### 7. `release_and_publish`
 
 ```yaml
-- uses: actions/checkout@v4
+- uses: actions/checkout@v6
   with:
-    fetch-depth: '30'                 # need history for release notes
+    fetch-depth: '30' # need history for release notes
     token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v6
   with:
-    node-version: '22.13.1'
+    node-version: '24'
     registry-url: https://registry.npmjs.org/
 - run: |
     git config user.name "🤖 DailyBot"
@@ -236,13 +236,13 @@ Posts the final status (success/failure per job) to the DailyBot channel. Always
 
 `.npmignore` excludes everything except what consumers need:
 
-| Included in tarball | Excluded |
-|---|---|
-| `dist/` | `src/` |
-| `package.json` | `test/` |
-| `README.md` | `webpack.config.js`, `tsconfig.json`, `.babelrc`, `.eslintrc`, `.prettierrc`, `.editorconfig` |
-| `LICENSE` | `.github/`, `docker/`, `.vscode/`, `.devcontainer/`, `.agents/`, `.claude/`, `docs/` |
-| | `package-lock.json`, `git_logs*.txt`, `packages_upgrades*.txt`, `emoji-lib-output.json` |
+| Included in tarball | Excluded                                                                                              |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| `dist/`             | `src/`                                                                                                |
+| `package.json`      | `test/`                                                                                               |
+| `README.md`         | `webpack.config.js`, `tsconfig.json`, `.babelrc`, `eslint.config.mjs`, `.prettierrc`, `.editorconfig` |
+| `LICENSE`           | `.github/`, `docker/`, `.vscode/`, `.devcontainer/`, `.agents/`, `.claude/`, `docs/`                  |
+|                     | `package-lock.json`, `git_logs*.txt`, `packages_upgrades*.txt`, `emoji-lib-output.json`               |
 
 Verify what would publish without actually publishing:
 

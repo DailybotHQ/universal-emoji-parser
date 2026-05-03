@@ -68,7 +68,7 @@ Run the pre-commit checklist from `AGENTS.md`:
    console.log(uEmojiParser.parse('the input that breaks'))
    ```
 2. `npx ts-node tmp/repro.ts` — confirm the bug
-3. Add a failing test in `test/main.test.ts` that asserts the *expected* output. Paste the broken input verbatim
+3. Add a failing test in `test/main.test.ts` that asserts the _expected_ output. Paste the broken input verbatim
 4. `npm run test:watch` — watch it fail
 5. Fix `src/index.ts`
 6. Test passes — commit fix + test together with `fix: <description>`
@@ -131,12 +131,12 @@ What kind of change is it?
 
 ## Tools you have
 
-| Tool | Use |
-|---|---|
-| Read | Read code or docs to understand context |
-| Bash | Run `npm run *`, `git`, `find`, `grep` |
-| Edit / Write | Modify files |
-| Grep / Find | Locate code by pattern |
+| Tool         | Use                                     |
+| ------------ | --------------------------------------- |
+| Read         | Read code or docs to understand context |
+| Bash         | Run `npm run *`, `git`, `find`, `grep`  |
+| Edit / Write | Modify files                            |
+| Grep / Find  | Locate code by pattern                  |
 
 Before bulk changes, read the relevant section of `AGENTS.md` and the doc it links to. Don't optimize for fewest tool calls at the cost of correctness.
 
@@ -145,8 +145,7 @@ Before bulk changes, read the relevant section of `AGENTS.md` and the doc it lin
 - **Hand-editing `emoji-lib.json`** — feels faster but the next regeneration overwrites it. Always go through `EMOJIS_SPECIAL_CASES`
 - **Adding a runtime dependency** — every byte ships to consumer bundles. Justify with measurement
 - **Changing the HTML output template** — breaks every consumer's snapshot tests; major version
-- **Bumping `chai` to 5** — Chai 5 is ESM-only; we use CommonJS via ts-node. Migration is non-trivial
-- **Bumping `eslint` to 9** — ESLint 9 dropped `.eslintrc` for flat config. Migration is non-trivial
+- **Major bumps to test or lint tooling** — Chai 6 + ESLint 10 + tsx are the current baseline; still read release notes and run `npm test` + `npm run eslint:check` + `npm run build` before merging
 - **Skipping the `it.skip` on the regenerator test** — if you forget to re-skip it, the next CI run regenerates the catalog into `emoji-lib-output.json` (which is gitignored, so it's a wasted run, not a leak)
 
 ## Asking for clarification

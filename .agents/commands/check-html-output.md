@@ -25,15 +25,15 @@ Run a given input through `uEmojiParser.parseToHtml` (or `parse` with `parseToHt
 Every emoji in the output MUST match this template:
 
 ```html
-<img class="emoji" alt="<unicode-emoji>" src="<cdn-url>"/>
+<img class="emoji" alt="<unicode-emoji>" src="<cdn-url>" />
 ```
 
-| Attribute | Required value | Notes |
-|---|---|---|
-| `class` | `"emoji"` (literal) | Exact string; used by consumer CSS |
-| `alt` | The unicode emoji char | Not the shortcode |
-| `src` | A valid URL | Defaults to Twemoji CDN; `emojiCDN` overrides the prefix |
-| Tag | Self-closing `/>` | Required for XHTML/JSX compatibility |
+| Attribute | Required value         | Notes                                                    |
+| --------- | ---------------------- | -------------------------------------------------------- |
+| `class`   | `"emoji"` (literal)    | Exact string; used by consumer CSS                       |
+| `alt`     | The unicode emoji char | Not the shortcode                                        |
+| `src`     | A valid URL            | Defaults to Twemoji CDN; `emojiCDN` overrides the prefix |
+| Tag       | Self-closing `/>`      | Required for XHTML/JSX compatibility                     |
 
 **No additional attributes** (`loading`, `decoding`, `width`, `height`, `style`, etc.). Their absence is part of the contract.
 
@@ -65,7 +65,7 @@ npx ts-node tmp/check.ts 'hello 🚀' 'https://my-cdn.example.com/svg/'
 Inspect the HTML for each emoji `<img>`:
 
 ```html
-<img class="emoji" alt="🚀" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f680.svg"/>
+<img class="emoji" alt="🚀" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f680.svg" />
 ```
 
 Check:
@@ -129,14 +129,14 @@ Expected: `Error: The text parameter should be a string.`
 
 ### 7. Verify edge cases
 
-| Input | Expected behavior |
-|---|---|
-| `''` (empty string) | Returns `''` |
-| `'no emojis here'` | Returns the text unchanged |
-| `':not_a_real_emoji:'` | Returns the text unchanged (unmatched shortcodes pass through) |
-| Long input (10 KB) | Runs in well under 25-second test timeout; HTML output dominates length |
-| Variation selector emoji (`'⭐️'`) | Resolves; alt contains the VS-16 modifier |
-| ZWJ sequence (`'👨‍👩‍👧'`) | Resolves to the family emoji as one entity |
+| Input                             | Expected behavior                                                       |
+| --------------------------------- | ----------------------------------------------------------------------- |
+| `''` (empty string)               | Returns `''`                                                            |
+| `'no emojis here'`                | Returns the text unchanged                                              |
+| `':not_a_real_emoji:'`            | Returns the text unchanged (unmatched shortcodes pass through)          |
+| Long input (10 KB)                | Runs in well under 25-second test timeout; HTML output dominates length |
+| Variation selector emoji (`'⭐️'`) | Resolves; alt contains the VS-16 modifier                               |
+| ZWJ sequence (`'👨‍👩‍👧'`)             | Resolves to the family emoji as one entity                              |
 
 If any of these behave wrongly, that's a bug — file a regression test (see [`/write-tests`](write-tests.md)).
 

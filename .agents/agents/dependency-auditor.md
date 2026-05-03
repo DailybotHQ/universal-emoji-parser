@@ -55,23 +55,9 @@ Lower bar — devDeps don't ship to consumers. Still:
 - Avoid devDeps that overlap with existing tools (don't add `vitest` if Mocha works)
 - Document non-obvious devDeps in `docs/TECHNOLOGIES.md`
 
-### "Should we lift the `.ncurc.json` pin on chai/eslint?"
+### "Should we add `.ncurc.json` reject entries?"
 
-```
-chai 4 → 5:
-  - Chai 5 is ESM-only
-  - Our test runner uses ts-node CommonJS loader
-  - Migration: switch test setup to ESM (or to a different runner like vitest)
-  - Effort: ~1 day; not urgent
-
-eslint 8 → 9:
-  - ESLint 9 dropped .eslintrc for flat config (eslint.config.js)
-  - All plugins must be flat-config-compatible (most are)
-  - Migration: rewrite ESLint config + verify all rules transfer
-  - Effort: ~2 hours; not urgent
-```
-
-**Don't lift either pin** without a migration plan in the same PR. If a dependency or security advisory forces it, plan the migration as its own PR with all related work.
+Add packages to `reject` only when an available upgrade needs deliberate follow-up (breaking API, ecosystem lag). Document the intent in the PR. There is **no** standing repo-wide freeze on `chai` or `eslint` — we ship **Chai 6**, **ESLint 10** (`eslint.config.mjs`), and **tsx** for the Mocha suite.
 
 ### "Should we let Renovate / Dependabot auto-merge?"
 
@@ -98,14 +84,14 @@ We don't currently do any of these. Document the gap.
 1. What feature in the new Node version do we need?
      Nothing? → Don't bump.
 2. Are CI runners on the new version?
-     CI is on Node 22.13.1. Bumping engines.node above 22 means bumping CI too.
+     CI is on Node 24. Bumping `engines.node` should stay aligned with `.github/workflows/*.yml` and the dev container base image.
 3. Are common consumer environments on the new version?
      Lambdas, Cloudflare Workers, Vercel — check their min versions.
 4. Will bumping shut out a meaningful consumer base?
      Node LTS releases stay in support for 30 months. Don't drop 18 LTS while it's in maintenance.
 ```
 
-We're currently on `engines.node: ">=20.16.0"`. Bumping to `>=22.0.0` would be a major bump for our package (consumers need to update). Not currently necessary.
+We're currently on `engines.node: ">=20.19.0"`. Raising the floor further (e.g. to `>=22`) is a semver decision for library consumers — coordinate with `docs/RUNTIMES.md` and release notes.
 
 ## Review checklist for a dep PR
 
