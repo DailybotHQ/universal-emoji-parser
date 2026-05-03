@@ -132,3 +132,4 @@ export default uEmojiParser
 // Exporting for CommonJS modules (require)
 module.exports = uEmojiParser
 module.exports.emojiLibJsonData = emojiLibJsonData
+module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
