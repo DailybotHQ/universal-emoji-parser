@@ -37,12 +37,31 @@ describe('Prepare emoji parser assets', () => {
    * Note: By default this test is disabled, reactivate it only if you need to regenerate the file.
    ***/
   it.skip('create emojis lib json file', () => {
+    // Whitelist the EmojiType fields we expose at runtime. Anything else upstream ships
+    // (e.g. skin_tone_support_unicode_version added in unicode-emoji-json@0.9.0) is
+    // dropped here so the catalog stays minimal for browser consumers.
+    const ALLOWED_EMOJI_FIELDS: ReadonlyArray<keyof EmojiType> = [
+      'name',
+      'slug',
+      'group',
+      'emoji_version',
+      'unicode_version',
+      'skin_tone_support',
+      'char',
+      'keywords',
+    ]
     // Initialize the data structure for storing emoji data from unicodeEmojiJson
     const unicodeEmojiJsonData: ObjectType = unicodeEmojiJson
     // Retrieve the set of keywords from emojilib
     const keywordSet: ObjectType = emojilib
     // Iterate over each emoji in the unicodeEmojiJsonData
     for (const emoji in unicodeEmojiJsonData) {
+      // Drop any upstream fields that are not part of EmojiType
+      for (const field of Object.keys(unicodeEmojiJsonData[emoji])) {
+        if (!ALLOWED_EMOJI_FIELDS.includes(field as keyof EmojiType)) {
+          delete unicodeEmojiJsonData[emoji][field]
+        }
+      }
       // Assign the emoji character itself to the 'char' property
       unicodeEmojiJsonData[emoji].char = emoji
       // If the emoji has predefined keywords in emojilib, use them
