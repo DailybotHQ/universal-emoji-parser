@@ -72,3 +72,4 @@ emoji-lib-output.json
 
 tmp/*
 !tmp/.gitkeep
+*.tsbuildinfo
