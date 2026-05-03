@@ -13,12 +13,12 @@ jobs:
     name: 'Check Packages Versions'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22.13.1'
+          node-version: '24'
           registry-url: https://registry.npmjs.org/
       - name: Step 1 - ⚙️ Setup GitHub Config
         run: |

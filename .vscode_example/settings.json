@@ -1,7 +1,7 @@
 {
   "mocha.files.glob": "./test/**/*.ts",
   "mochaExplorer.files": "test/**/*.ts",
-  "mochaExplorer.require": "ts-node/register",
+  "mochaExplorer.nodeArgv": ["--import", "tsx"],
   "mochaExplorer.timeout": 60000,
   "mochaExplorer.logpanel": true,
   "files.trimTrailingWhitespace": true,

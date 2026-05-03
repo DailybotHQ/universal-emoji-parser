@@ -71,7 +71,7 @@ const uEmojiParser: UEmojiParserType = {
     const emojisShortcodesList: RegExpMatchArray | null = text.match(emojisRegExp)
     if (emojisShortcodesList) {
       emojisShortcodesList.forEach((shortcode: string) => {
-        const emoji: EmojiType = this.getEmojiObjectByShortcode(shortcode)
+        const emoji = this.getEmojiObjectByShortcode(shortcode)
         if (emoji) {
           const regEx = new RegExp(shortcode)
           text = text.replace(regEx, emoji.char)

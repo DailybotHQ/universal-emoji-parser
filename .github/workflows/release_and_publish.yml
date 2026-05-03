@@ -108,12 +108,12 @@ jobs:
     name: 'Deploy - Setup Application'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22.13.1'
+          node-version: '24'
       - name: Step 0 - 📁 Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-npm
         env:
           cache-name: cache-node-modules
@@ -133,12 +133,12 @@ jobs:
     name: 'Deploy - Validate Linters and Code Format'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22.13.1'
+          node-version: '24'
       - name: Step 0 - 📁 Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-npm
         env:
           cache-name: cache-node-modules
@@ -159,12 +159,12 @@ jobs:
     name: 'Run tests'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22.13.1'
+          node-version: '24'
       - name: Step 0 - 📁 Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-npm
         env:
           cache-name: cache-node-modules
@@ -183,12 +183,12 @@ jobs:
     name: 'Build application bundle'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22.13.1'
+          node-version: '24'
       - name: Step 0 - 📁 Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-npm
         env:
           cache-name: cache-node-modules
@@ -200,7 +200,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
       - name: Step 1 - 📁 Cache build dist
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         env:
           cache-name: cache-build-dist
         with:
@@ -221,16 +221,16 @@ jobs:
     name: 'Release and Publish'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: '30'
           token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: '22.13.1'
+          node-version: '24'
           registry-url: https://registry.npmjs.org/
       - name: Step 0 - 📁 Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-npm
         env:
           cache-name: cache-node-modules
@@ -243,7 +243,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
       - name: Step 1 - 📁 Cache build dist
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         env:
           cache-name: cache-build-dist
         with:

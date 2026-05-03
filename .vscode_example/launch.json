@@ -5,8 +5,10 @@
       "type": "node",
       "request": "launch",
       "name": "Mocha Tests",
-      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": ["--require", "ts-node/register", "--timeout", "2000", "--colors", "${workspaceFolder}/test/**/*.ts"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--import", "tsx"],
+      "program": "${workspaceFolder}/node_modules/mocha/bin/mocha.js",
+      "args": ["${workspaceFolder}/test/**/*.ts", "--timeout", "2000", "--colors"],
       "internalConsoleOptions": "openOnSessionStart"
     }
   ]

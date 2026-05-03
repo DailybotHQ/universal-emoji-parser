@@ -416,7 +416,7 @@ describe('Test emoji parser', () => {
 
       // (5) Test with method options
       text = 'Hello world! :smiling_face_with_sunglasses: :rocket:'
-      result = uEmojiParser.parse('Hello world! :smiling_face_with_sunglasses: :rocket:', {
+      result = uEmojiParser.parse(text, {
         parseToHtml: false,
         parseToUnicode: true,
       })
@@ -424,7 +424,7 @@ describe('Test emoji parser', () => {
 
       // (6) Test with method options
       text = 'Hello world! :smiling_face_with_sunglasses: :rocket:'
-      result = uEmojiParser.parseToUnicode('Hello world! :smiling_face_with_sunglasses: :rocket:')
+      result = uEmojiParser.parseToUnicode(text)
       expect(result).to.be.equal('Hello world! 😎 🚀')
 
       // (7) Test with method options

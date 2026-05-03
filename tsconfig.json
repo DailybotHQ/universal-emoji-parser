@@ -17,9 +17,11 @@
     "resolveJsonModule": true,
     "downlevelIteration": true,
     "skipLibCheck": true,
-    "removeComments": true
+    "removeComments": true,
+    "types": ["node", "mocha"],
+    "ignoreDeprecations": "6.0"
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "test/**/*"],
   "compileOnSave": false
 }
