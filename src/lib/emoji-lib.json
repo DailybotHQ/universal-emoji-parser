@@ -516,7 +516,7 @@
     "unicode_version": "1.0",
     "skin_tone_support": false,
     "char": "😬",
-    "keywords": ["grimacing_face", "grimace", "#1 best", "awkward", "eek", "mutual"]
+    "keywords": ["grimacing_face", "grimace", "awkward", "eek"]
   },
   "😮‍💨": {
     "name": "face exhaling",
@@ -626,7 +626,7 @@
     "unicode_version": "16.0",
     "skin_tone_support": false,
     "char": "🫩",
-    "keywords": ["face_with_bags_under_eyes"]
+    "keywords": ["face_with_bags_under_eyes", "face with bags under eyes", "exhausted"]
   },
   "😷": {
     "name": "face with medical mask",
@@ -794,7 +794,7 @@
     "unicode_version": "1.0",
     "skin_tone_support": false,
     "char": "😎",
-    "keywords": ["smiling_face_with_sunglasses", "cool", "summer", "sunglass", "best", "friends"]
+    "keywords": ["smiling_face_with_sunglasses", "cool", "summer", "sunglass", "best", "friends", "mutual"]
   },
   "🤓": {
     "name": "nerd face",
@@ -905,6 +905,16 @@
     "skin_tone_support": false,
     "char": "😳",
     "keywords": ["flushed_face", "shy", "flattered", "dazed", "shame", "wide"]
+  },
+  "🫪": {
+    "name": "distorted face",
+    "slug": "distorted_face",
+    "group": "Smileys & Emotion",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
+    "skin_tone_support": false,
+    "char": "🫪",
+    "keywords": ["distorted_face", "distorted face", "fluttered", "wide-eyed"]
   },
   "🥺": {
     "name": "pleading face",
@@ -1064,7 +1074,7 @@
     "unicode_version": "0.6",
     "skin_tone_support": false,
     "char": "😫",
-    "keywords": ["tired_face", "whine", "exhausted"]
+    "keywords": ["tired_face", "whine"]
   },
   "🥱": {
     "name": "yawning face",
@@ -1669,6 +1679,16 @@
     "char": "💢",
     "keywords": ["anger_symbol", "angry", "comic", "pop", "vein"]
   },
+  "🫯": {
+    "name": "fight cloud",
+    "slug": "fight_cloud",
+    "group": "Smileys & Emotion",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
+    "skin_tone_support": false,
+    "char": "🫯",
+    "keywords": ["fight_cloud", "fight cloud", "brawl", "conflict"]
+  },
   "💥": {
     "name": "collision",
     "slug": "collision",
@@ -1786,7 +1806,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👋",
     "keywords": ["waving_hand", "wave", "goodbye", "solong", "farewell", "hi"]
   },
@@ -1797,7 +1816,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤚",
     "keywords": ["raised_back_of_hand", "fingers", "raised", "backhand"]
   },
@@ -1808,7 +1826,6 @@
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🖐️",
     "keywords": ["hand_with_fingers_splayed", "hand", "five"]
   },
@@ -1819,7 +1836,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "✋",
     "keywords": ["raised_hand", "stop", "highfive", "ban"]
   },
@@ -1830,7 +1846,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🖖",
     "keywords": ["vulcan_salute", "spock", "star trek", "between", "part", "prosper"]
   },
@@ -1841,7 +1856,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫱",
     "keywords": ["rightwards_hand", "rightwards hand", "palm", "rightward"]
   },
@@ -1852,7 +1866,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫲",
     "keywords": ["leftwards_hand", "leftwards hand", "offer", "leftward"]
   },
@@ -1863,7 +1876,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫳",
     "keywords": ["palm_down_hand", "palm down hand", "drop", "dismiss"]
   },
@@ -1874,7 +1886,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫴",
     "keywords": ["palm_up_hand", "palm up hand", "demand", "beckon", "come"]
   },
@@ -1885,7 +1896,6 @@
     "emoji_version": "15.0",
     "unicode_version": "15.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.0",
     "char": "🫷",
     "keywords": ["leftwards_pushing_hand", "leftwards pushing hand", "pressing"]
   },
@@ -1896,7 +1906,6 @@
     "emoji_version": "15.0",
     "unicode_version": "15.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.0",
     "char": "🫸",
     "keywords": ["rightwards_pushing_hand", "rightwards pushing hand"]
   },
@@ -1907,7 +1916,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👌",
     "keywords": ["ok_hand", "limbs", "okay"]
   },
@@ -1918,7 +1926,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "🤌",
     "keywords": ["pinched_fingers", "pinched fingers", "size", "che", "interrogation", "sarcastic", "vuoi"]
   },
@@ -1929,7 +1936,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🤏",
     "keywords": ["pinching_hand", "tiny", "amount", "little"]
   },
@@ -1940,7 +1946,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "✌️",
     "keywords": ["victory_hand", "ohyeah", "peace", "victory", "quotes", "v"]
   },
@@ -1951,7 +1956,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤞",
     "keywords": ["crossed_fingers", "good", "lucky", "hopeful", "index"]
   },
@@ -1962,7 +1966,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫰",
     "keywords": [
       "hand_with_index_finger_and_thumb_crossed",
@@ -1978,7 +1981,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🤟",
     "keywords": ["love_you_gesture", "ily"]
   },
@@ -1989,7 +1991,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🤘",
     "keywords": ["sign_of_the_horns", "evil_eye", "sign_of_horns", "rock_on"]
   },
@@ -2000,7 +2001,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤙",
     "keywords": ["call_me_hand", "hands", "shaka"]
   },
@@ -2011,7 +2011,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👈",
     "keywords": ["backhand_index_pointing_left", "direction"]
   },
@@ -2022,7 +2021,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👉",
     "keywords": ["backhand_index_pointing_right", "right"]
   },
@@ -2033,7 +2031,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👆",
     "keywords": ["backhand_index_pointing_up", "middle"]
   },
@@ -2044,7 +2041,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🖕",
     "keywords": ["middle_finger", "rude", "flipping", "dito", "extended", "fu", "medio", "middle finger", "reversed"]
   },
@@ -2055,7 +2051,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👇",
     "keywords": ["backhand_index_pointing_down", "point"]
   },
@@ -2066,7 +2061,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "☝️",
     "keywords": ["index_pointing_up"]
   },
@@ -2077,7 +2071,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫵",
     "keywords": ["index_pointing_at_the_viewer", "index pointing at the viewer", "you", "recruit"]
   },
@@ -2088,7 +2081,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👍",
     "keywords": ["thumbs_up", "thumbsup", "yes", "accept", "+1", "approve"]
   },
@@ -2099,7 +2091,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👎",
     "keywords": ["thumbs_down", "thumbsdown", "dislike", "-1", "bury"]
   },
@@ -2110,7 +2101,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "✊",
     "keywords": ["raised_fist", "grasp", "clenched", "pump", "punch"]
   },
@@ -2121,7 +2111,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👊",
     "keywords": ["oncoming_fist", "violence", "fist", "hit", "attack", "bro", "brofist", "facepunch", "fisted"]
   },
@@ -2132,7 +2121,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤛",
     "keywords": ["left_facing_fist", "fistbump", "bump"]
   },
@@ -2143,7 +2131,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤜",
     "keywords": ["right_facing_fist", "rightwards", "right fist"]
   },
@@ -2154,7 +2141,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👏",
     "keywords": ["clapping_hands", "praise", "applause", "congrats", "yay", "clap"]
   },
@@ -2165,7 +2151,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙌",
     "keywords": ["raising_hands", "gesture", "hooray", "yea", "banzai", "both", "festivus", "hallelujah", "miracle"]
   },
@@ -2176,7 +2161,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫶",
     "keywords": ["heart_hands", "heart hands", "appreciation", "support"]
   },
@@ -2187,7 +2171,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👐",
     "keywords": ["open_hands", "jazz"]
   },
@@ -2198,7 +2181,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🤲",
     "keywords": ["palms_up_together", "cupped", "prayer", "dua", "facing"]
   },
@@ -2209,7 +2191,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🤝",
     "keywords": ["handshake", "agreement", "shake", "deal", "meeting", "shaking"]
   },
@@ -2220,7 +2201,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙏",
     "keywords": [
       "folded_hands",
@@ -2242,7 +2222,6 @@
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "✍️",
     "keywords": ["writing_hand", "lower_left_ballpoint_pen", "compose"]
   },
@@ -2253,7 +2232,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "💅",
     "keywords": ["nail_polish", "nail_care", "beauty", "manicure", "nail", "slay", "nonchalant"]
   },
@@ -2264,7 +2242,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤳",
     "keywords": ["selfie", "phone"]
   },
@@ -2275,7 +2252,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "💪",
     "keywords": [
       "flexed_biceps",
@@ -2318,7 +2294,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦵",
     "keywords": ["leg", "kick", "limb"]
   },
@@ -2329,7 +2304,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦶",
     "keywords": ["foot", "stomp"]
   },
@@ -2340,7 +2314,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👂",
     "keywords": ["ear", "hear", "listen", "hearing", "listening"]
   },
@@ -2351,7 +2324,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🦻",
     "keywords": ["ear_with_hearing_aid"]
   },
@@ -2362,7 +2334,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👃",
     "keywords": ["nose", "smell", "sniff", "smelling", "sniffing", "stinky"]
   },
@@ -2473,7 +2444,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👶",
     "keywords": ["baby", "toddler", "newborn"]
   },
@@ -2484,7 +2454,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧒",
     "keywords": ["child", "gender-neutral", "young", "gender", "unspecified"]
   },
@@ -2495,7 +2464,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👦",
     "keywords": ["boy", "male", "guy", "teenager"]
   },
@@ -2506,7 +2474,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👧",
     "keywords": ["girl", "female", "maiden"]
   },
@@ -2517,7 +2484,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧑",
     "keywords": ["person", "adult", "inclusive"]
   },
@@ -2528,7 +2494,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👱",
     "keywords": ["person_blond_hair", "hairstyle"]
   },
@@ -2539,7 +2504,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👨",
     "keywords": ["man", "mustache", "dad", "sir"]
   },
@@ -2550,7 +2514,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧔",
     "keywords": ["person_beard", "bewhiskered", "bearded"]
   },
@@ -2561,7 +2524,6 @@
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "🧔‍♂️",
     "keywords": ["man_beard", "man beard", "facial hair"]
   },
@@ -2572,7 +2534,6 @@
     "emoji_version": "13.1",
     "unicode_version": "13.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "🧔‍♀️",
     "keywords": ["woman_beard", "woman beard"]
   },
@@ -2583,7 +2544,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👨‍🦰",
     "keywords": ["man_red_hair", "ginger"]
   },
@@ -2594,7 +2554,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👨‍🦱",
     "keywords": ["man_curly_hair", "haired"]
   },
@@ -2605,7 +2564,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👨‍🦳",
     "keywords": ["man_white_hair", "old"]
   },
@@ -2616,7 +2574,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👨‍🦲",
     "keywords": ["man_bald", "hairless"]
   },
@@ -2627,7 +2584,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👩",
     "keywords": ["woman", "girls"]
   },
@@ -2638,7 +2594,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👩‍🦰",
     "keywords": ["woman_red_hair", "redhead"]
   },
@@ -2649,7 +2604,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🦰",
     "keywords": ["person_red_hair"]
   },
@@ -2660,7 +2614,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👩‍🦱",
     "keywords": ["woman_curly_hair"]
   },
@@ -2671,7 +2624,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🦱",
     "keywords": ["person_curly_hair"]
   },
@@ -2682,7 +2634,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👩‍🦳",
     "keywords": ["woman_white_hair", "elder"]
   },
@@ -2693,7 +2644,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🦳",
     "keywords": ["person_white_hair"]
   },
@@ -2704,7 +2654,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "👩‍🦲",
     "keywords": ["woman_bald", "hair"]
   },
@@ -2715,7 +2664,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🦲",
     "keywords": ["person_bald"]
   },
@@ -2726,7 +2674,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👱‍♀️",
     "keywords": ["woman_blond_hair", "blonde"]
   },
@@ -2737,7 +2684,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👱‍♂️",
     "keywords": ["man_blond_hair"]
   },
@@ -2748,7 +2694,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧓",
     "keywords": ["older_person", "human"]
   },
@@ -2759,7 +2704,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👴",
     "keywords": ["old_man", "senior", "grandpa", "older"]
   },
@@ -2770,7 +2714,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👵",
     "keywords": ["old_woman", "elderly", "grandma", "nanna"]
   },
@@ -2781,7 +2724,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙍",
     "keywords": ["person_frowning", "worried"]
   },
@@ -2792,7 +2734,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙍‍♂️",
     "keywords": ["man_frowning", "discouraged"]
   },
@@ -2803,7 +2744,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙍‍♀️",
     "keywords": ["woman_frowning"]
   },
@@ -2814,7 +2754,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙎",
     "keywords": ["person_pouting", "fed"]
   },
@@ -2825,7 +2764,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙎‍♂️",
     "keywords": ["man_pouting", "men"]
   },
@@ -2836,7 +2774,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙎‍♀️",
     "keywords": ["woman_pouting", "women"]
   },
@@ -2847,7 +2784,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙅",
     "keywords": ["person_gesturing_no", "decline", "arms"]
   },
@@ -2858,7 +2794,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙅‍♂️",
     "keywords": ["man_gesturing_no", "nope", "denied"]
   },
@@ -2869,7 +2804,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙅‍♀️",
     "keywords": ["woman_gesturing_no", "halt", "ng"]
   },
@@ -2880,7 +2814,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙆",
     "keywords": ["person_gesturing_ok", "agree", "ballerina"]
   },
@@ -2891,7 +2824,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙆‍♂️",
     "keywords": ["man_gesturing_ok"]
   },
@@ -2902,7 +2834,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙆‍♀️",
     "keywords": ["woman_gesturing_ok"]
   },
@@ -2913,7 +2844,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "💁",
     "keywords": ["person_tipping_hand", "attendant", "bellhop", "concierge", "flick"]
   },
@@ -2924,7 +2854,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💁‍♂️",
     "keywords": ["man_tipping_hand", "desk", "sassy"]
   },
@@ -2935,7 +2864,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💁‍♀️",
     "keywords": ["woman_tipping_hand", "help"]
   },
@@ -2946,7 +2874,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙋",
     "keywords": ["person_raising_hand", "question", "answering"]
   },
@@ -2957,7 +2884,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙋‍♂️",
     "keywords": ["man_raising_hand"]
   },
@@ -2968,7 +2894,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙋‍♀️",
     "keywords": ["woman_raising_hand"]
   },
@@ -2979,7 +2904,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧏",
     "keywords": ["deaf_person"]
   },
@@ -2990,7 +2914,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧏‍♂️",
     "keywords": ["deaf_man"]
   },
@@ -3001,7 +2924,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧏‍♀️",
     "keywords": ["deaf_woman"]
   },
@@ -3012,7 +2934,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🙇",
     "keywords": ["person_bowing", "respectiful", "bow", "cute", "dogeza"]
   },
@@ -3023,7 +2944,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙇‍♂️",
     "keywords": ["man_bowing", "apology", "favor"]
   },
@@ -3034,7 +2954,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🙇‍♀️",
     "keywords": ["woman_bowing", "deeply"]
   },
@@ -3045,7 +2964,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤦",
     "keywords": ["person_facepalming", "disappointed", "disbelief", "hitting", "picard", "smh"]
   },
@@ -3056,7 +2974,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤦‍♂️",
     "keywords": ["man_facepalming", "exasperation"]
   },
@@ -3067,7 +2984,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤦‍♀️",
     "keywords": ["woman_facepalming", "facepalm"]
   },
@@ -3078,7 +2994,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤷",
     "keywords": ["person_shrugging", "regardless", "shrug", "shruggie", "¯\\"]
   },
@@ -3089,7 +3004,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤷‍♂️",
     "keywords": ["man_shrugging", "doubt"]
   },
@@ -3100,7 +3014,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤷‍♀️",
     "keywords": ["woman_shrugging", "ignorance"]
   },
@@ -3111,7 +3024,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍⚕️",
     "keywords": ["health_worker", "healthcare", "md", "physician"]
   },
@@ -3122,7 +3034,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍⚕️",
     "keywords": ["man_health_worker", "doctor", "therapist", "professional"]
   },
@@ -3133,7 +3044,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍⚕️",
     "keywords": ["woman_health_worker", "nurse"]
   },
@@ -3144,7 +3054,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🎓",
     "keywords": ["student", "learn", "pupil"]
   },
@@ -3155,7 +3064,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🎓",
     "keywords": ["man_student", "graduate"]
   },
@@ -3166,7 +3074,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🎓",
     "keywords": ["woman_student", "graduation"]
   },
@@ -3177,7 +3084,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🏫",
     "keywords": ["teacher", "professor", "educator"]
   },
@@ -3188,7 +3094,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🏫",
     "keywords": ["man_teacher", "instructor"]
   },
@@ -3199,7 +3104,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🏫",
     "keywords": ["woman_teacher"]
   },
@@ -3210,7 +3114,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍⚖️",
     "keywords": ["judge", "law", "court"]
   },
@@ -3221,7 +3124,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍⚖️",
     "keywords": ["man_judge", "justice"]
   },
@@ -3232,7 +3134,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍⚖️",
     "keywords": ["woman_judge", "scales"]
   },
@@ -3243,7 +3144,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🌾",
     "keywords": ["farmer", "crops", "farm"]
   },
@@ -3254,7 +3154,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🌾",
     "keywords": ["man_farmer", "rancher", "gardener"]
   },
@@ -3265,7 +3164,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🌾",
     "keywords": ["woman_farmer", "worker"]
   },
@@ -3276,7 +3174,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🍳",
     "keywords": ["cook", "food", "kitchen", "culinary"]
   },
@@ -3287,7 +3184,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🍳",
     "keywords": ["man_cook", "chef"]
   },
@@ -3298,7 +3194,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🍳",
     "keywords": ["woman_cook", "service"]
   },
@@ -3309,7 +3204,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🔧",
     "keywords": ["mechanic", "technician", "electrician", "tradesperson"]
   },
@@ -3320,7 +3214,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🔧",
     "keywords": ["man_mechanic", "plumber"]
   },
@@ -3331,7 +3224,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🔧",
     "keywords": ["woman_mechanic", "repair"]
   },
@@ -3342,7 +3234,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🏭",
     "keywords": ["factory_worker", "labor", "welder"]
   },
@@ -3353,7 +3244,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🏭",
     "keywords": ["man_factory_worker", "assembly"]
   },
@@ -3364,7 +3254,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🏭",
     "keywords": ["woman_factory_worker", "industrial"]
   },
@@ -3375,7 +3264,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍💼",
     "keywords": ["office_worker", "business", "accountant", "banker", "clerk"]
   },
@@ -3386,7 +3274,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍💼",
     "keywords": ["man_office_worker", "manager", "adviser", "businessman"]
   },
@@ -3397,7 +3284,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍💼",
     "keywords": ["woman_office_worker", "analyst", "businesswoman", "ceo"]
   },
@@ -3408,7 +3294,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🔬",
     "keywords": ["scientist", "chemistry", "engineer", "mathematician"]
   },
@@ -3419,7 +3304,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🔬",
     "keywords": ["man_scientist", "biologist", "physicist"]
   },
@@ -3430,7 +3314,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🔬",
     "keywords": ["woman_scientist", "chemist", "research"]
   },
@@ -3441,7 +3324,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍💻",
     "keywords": ["technologist", "coder", "software"]
   },
@@ -3452,7 +3334,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍💻",
     "keywords": ["man_technologist", "developer", "blogger"]
   },
@@ -3463,7 +3344,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍💻",
     "keywords": ["woman_technologist", "programmer"]
   },
@@ -3474,7 +3354,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🎤",
     "keywords": ["singer", "song", "performer", "actor"]
   },
@@ -3485,7 +3364,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🎤",
     "keywords": ["man_singer", "rockstar", "entertainer", "aladdin", "bowie", "sane"]
   },
@@ -3496,7 +3374,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🎤",
     "keywords": ["woman_singer", "musician", "rocker"]
   },
@@ -3507,7 +3384,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🎨",
     "keywords": ["artist", "painting", "creativity"]
   },
@@ -3518,7 +3394,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🎨",
     "keywords": ["man_artist", "painter", "paint"]
   },
@@ -3529,7 +3404,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🎨",
     "keywords": ["woman_artist", "palette"]
   },
@@ -3540,7 +3414,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍✈️",
     "keywords": ["pilot", "plane", "aviation"]
   },
@@ -3551,7 +3424,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍✈️",
     "keywords": ["man_pilot", "aviator"]
   },
@@ -3562,7 +3434,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍✈️",
     "keywords": ["woman_pilot"]
   },
@@ -3573,7 +3444,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🚀",
     "keywords": ["astronaut", "outerspace", "moon"]
   },
@@ -3584,7 +3454,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🚀",
     "keywords": ["man_astronaut", "space"]
   },
@@ -3595,7 +3464,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🚀",
     "keywords": ["woman_astronaut", "cosmonaut"]
   },
@@ -3606,7 +3474,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🚒",
     "keywords": ["firefighter", "firetruck"]
   },
@@ -3617,7 +3484,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👨‍🚒",
     "keywords": ["man_firefighter", "fireman"]
   },
@@ -3628,7 +3494,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👩‍🚒",
     "keywords": ["woman_firefighter"]
   },
@@ -3639,7 +3504,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👮",
     "keywords": ["police_officer", "cop", "policeman", "policewoman"]
   },
@@ -3650,7 +3514,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👮‍♂️",
     "keywords": ["man_police_officer", "police", "legal"]
   },
@@ -3661,7 +3524,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👮‍♀️",
     "keywords": ["female-police-officer", "woman_police_officer", "enforcement"]
   },
@@ -3672,7 +3534,6 @@
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "2.0",
     "char": "🕵️",
     "keywords": ["detective", "spy", "or", "private"]
   },
@@ -3683,7 +3544,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🕵️‍♂️",
     "keywords": ["man_detective", "crime"]
   },
@@ -3694,7 +3554,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🕵️‍♀️",
     "keywords": ["woman_detective", "sleuth"]
   },
@@ -3705,7 +3564,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "💂",
     "keywords": ["guard", "protect", "guardsman"]
   },
@@ -3716,7 +3574,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💂‍♂️",
     "keywords": ["man_guard", "uk", "royal"]
   },
@@ -3727,7 +3584,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💂‍♀️",
     "keywords": ["woman_guard", "gb", "guardswoman"]
   },
@@ -3738,7 +3594,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "🥷",
     "keywords": ["ninja", "ninjutsu", "skills", "fighter", "hidden", "stealth"]
   },
@@ -3749,7 +3604,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👷",
     "keywords": ["construction_worker", "build", "builder", "helmet", "add_ci", "update_ci"]
   },
@@ -3760,7 +3614,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👷‍♂️",
     "keywords": ["man_construction_worker", "wip"]
   },
@@ -3771,7 +3624,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👷‍♀️",
     "keywords": ["woman_construction_worker"]
   },
@@ -3782,7 +3634,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫅",
     "keywords": ["person_with_crown", "person with crown", "royalty", "monarch", "noble", "regal"]
   },
@@ -3793,7 +3644,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤴",
     "keywords": ["prince", "king"]
   },
@@ -3804,7 +3654,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👸",
     "keywords": ["princess", "blond", "queen", "tiara"]
   },
@@ -3815,7 +3664,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👳",
     "keywords": ["person_wearing_turban", "headdress", "arab", "sikh"]
   },
@@ -3826,7 +3674,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👳‍♂️",
     "keywords": ["man_wearing_turban", "indian", "arabs"]
   },
@@ -3837,7 +3684,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "👳‍♀️",
     "keywords": ["woman_wearing_turban", "hinduism"]
   },
@@ -3848,7 +3694,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👲",
     "keywords": ["person_with_skullcap", "man_with_skullcap", "gua", "mao", "pi"]
   },
@@ -3859,7 +3704,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧕",
     "keywords": ["woman_with_headscarf", "hijab", "mantilla", "tichel"]
   },
@@ -3870,7 +3714,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤵",
     "keywords": ["person_in_tuxedo", "couple", "groom"]
   },
@@ -3881,7 +3724,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "🤵‍♂️",
     "keywords": ["man_in_tuxedo", "man in tuxedo", "formal"]
   },
@@ -3892,7 +3734,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "🤵‍♀️",
     "keywords": ["woman_in_tuxedo", "woman in tuxedo"]
   },
@@ -3903,7 +3744,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👰",
     "keywords": ["person_with_veil", "bride_with_veil", "bride"]
   },
@@ -3914,7 +3754,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "👰‍♂️",
     "keywords": ["man_with_veil", "man with veil"]
   },
@@ -3925,7 +3764,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "👰‍♀️",
     "keywords": ["woman_with_veil", "woman with veil"]
   },
@@ -3936,7 +3774,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤰",
     "keywords": ["pregnant_woman", "pregnancy", "pregnant lady"]
   },
@@ -3947,7 +3784,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫃",
     "keywords": ["pregnant_man", "pregnant man", "belly"]
   },
@@ -3958,7 +3794,6 @@
     "emoji_version": "14.0",
     "unicode_version": "14.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "14.0",
     "char": "🫄",
     "keywords": ["pregnant_person", "pregnant person", "bloated"]
   },
@@ -3969,7 +3804,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🤱",
     "keywords": ["breast_feeding", "nursing", "breastfeeding", "infant"]
   },
@@ -3980,7 +3814,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "👩‍🍼",
     "keywords": ["woman_feeding_baby", "woman feeding baby", "birth"]
   },
@@ -3991,7 +3824,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "👨‍🍼",
     "keywords": ["man_feeding_baby", "man feeding baby", "bottle"]
   },
@@ -4002,7 +3834,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "🧑‍🍼",
     "keywords": ["person_feeding_baby", "person feeding baby"]
   },
@@ -4013,7 +3844,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "👼",
     "keywords": ["baby_angel", "heaven", "cherub", "putto"]
   },
@@ -4024,7 +3854,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🎅",
     "keywords": ["santa_claus", "festival", "father christmas", "nicholas", "sinterklaas"]
   },
@@ -4035,7 +3864,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤶",
     "keywords": ["mrs_claus", "xmas", "mother christmas", "mrs.", "santa"]
   },
@@ -4046,7 +3874,6 @@
     "emoji_version": "13.0",
     "unicode_version": "13.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.0",
     "char": "🧑‍🎄",
     "keywords": ["mx_claus", "mx claus", "mx."]
   },
@@ -4057,7 +3884,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦸",
     "keywords": ["superhero", "marvel", "fantasy", "superpower"]
   },
@@ -4068,7 +3894,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦸‍♂️",
     "keywords": ["man_superhero", "hero", "superpowers"]
   },
@@ -4079,7 +3904,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦸‍♀️",
     "keywords": ["woman_superhero", "heroine"]
   },
@@ -4090,7 +3914,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦹",
     "keywords": ["supervillain", "bad"]
   },
@@ -4101,7 +3924,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦹‍♂️",
     "keywords": ["man_supervillain", "criminal"]
   },
@@ -4112,7 +3934,6 @@
     "emoji_version": "11.0",
     "unicode_version": "11.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "11.0",
     "char": "🦹‍♀️",
     "keywords": ["woman_supervillain", "villain"]
   },
@@ -4123,7 +3944,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧙",
     "keywords": ["mage", "magic", "sorceress"]
   },
@@ -4134,7 +3954,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧙‍♂️",
     "keywords": ["man_mage", "sorcerer", "wizard"]
   },
@@ -4145,7 +3964,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧙‍♀️",
     "keywords": ["woman_mage", "witch"]
   },
@@ -4156,7 +3974,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧚",
     "keywords": ["fairy", "wings", "puck"]
   },
@@ -4167,7 +3984,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧚‍♂️",
     "keywords": ["man_fairy", "oberon"]
   },
@@ -4178,7 +3994,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧚‍♀️",
     "keywords": ["woman_fairy", "titania"]
   },
@@ -4189,7 +4004,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧛",
     "keywords": ["vampire", "blood"]
   },
@@ -4200,7 +4014,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧛‍♂️",
     "keywords": ["man_vampire", "dracula"]
   },
@@ -4211,7 +4024,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧛‍♀️",
     "keywords": ["woman_vampire", "undead", "unded"]
   },
@@ -4222,7 +4034,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧜",
     "keywords": ["merperson", "sea", "merboy", "mergirl"]
   },
@@ -4233,7 +4044,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧜‍♂️",
     "keywords": ["merman", "triton"]
   },
@@ -4244,7 +4054,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧜‍♀️",
     "keywords": ["mermaid", "merwoman", "ariel"]
   },
@@ -4255,7 +4064,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧝",
     "keywords": ["elf", "magical", "legolas"]
   },
@@ -4266,7 +4074,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧝‍♂️",
     "keywords": ["man_elf", "pointed"]
   },
@@ -4277,7 +4084,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧝‍♀️",
     "keywords": ["woman_elf"]
   },
@@ -4349,7 +4155,17 @@
     "unicode_version": "14.0",
     "skin_tone_support": false,
     "char": "🧌",
-    "keywords": ["troll", "mystical", "tale"]
+    "keywords": ["troll", "mystical", "tale", "shrek"]
+  },
+  "🫈": {
+    "name": "hairy creature",
+    "slug": "hairy_creature",
+    "group": "People & Body",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
+    "skin_tone_support": false,
+    "char": "🫈",
+    "keywords": ["hairy_creature", "hairy creature", "sasquatch", "bigfoot", "treeman"]
   },
   "💆": {
     "name": "person getting massage",
@@ -4358,7 +4174,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "💆",
     "keywords": ["person_getting_massage", "relax", "head", "massaging"]
   },
@@ -4369,7 +4184,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💆‍♂️",
     "keywords": ["man_getting_massage", "salon"]
   },
@@ -4380,7 +4194,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💆‍♀️",
     "keywords": ["woman_getting_massage", "spa"]
   },
@@ -4391,7 +4204,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "💇",
     "keywords": ["person_getting_haircut", "barber", "cutting", "hairdresser"]
   },
@@ -4402,7 +4214,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💇‍♂️",
     "keywords": ["man_getting_haircut", "parlor"]
   },
@@ -4413,7 +4224,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "💇‍♀️",
     "keywords": ["woman_getting_haircut"]
   },
@@ -4424,7 +4234,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🚶",
     "keywords": ["person_walking", "move", "hike", "pedestrian", "walker"]
   },
@@ -4435,7 +4244,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚶‍♂️",
     "keywords": ["man_walking", "feet"]
   },
@@ -4446,7 +4254,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚶‍♀️",
     "keywords": ["woman_walking", "steps"]
   },
@@ -4457,7 +4264,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🚶‍➡️",
     "keywords": ["person_walking_facing_right", "person walking facing right", "peerson"]
   },
@@ -4468,7 +4274,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🚶‍♀️‍➡️",
     "keywords": ["woman_walking_facing_right", "woman walking facing right"]
   },
@@ -4479,7 +4284,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🚶‍♂️‍➡️",
     "keywords": ["man_walking_facing_right", "man walking facing right"]
   },
@@ -4490,7 +4294,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧍",
     "keywords": ["person_standing", "still"]
   },
@@ -4501,7 +4304,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧍‍♂️",
     "keywords": ["man_standing", "stand"]
   },
@@ -4512,7 +4314,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧍‍♀️",
     "keywords": ["woman_standing"]
   },
@@ -4523,7 +4324,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧎",
     "keywords": ["person_kneeling", "pray"]
   },
@@ -4534,7 +4334,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧎‍♂️",
     "keywords": ["man_kneeling", "respectful"]
   },
@@ -4545,7 +4344,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧎‍♀️",
     "keywords": ["woman_kneeling", "kneel"]
   },
@@ -4556,7 +4354,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🧎‍➡️",
     "keywords": ["person_kneeling_facing_right", "person kneeling facing right"]
   },
@@ -4567,7 +4364,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🧎‍♀️‍➡️",
     "keywords": ["woman_kneeling_facing_right", "woman kneeling facing right", "worship"]
   },
@@ -4578,7 +4374,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🧎‍♂️‍➡️",
     "keywords": ["man_kneeling_facing_right", "man kneeling facing right"]
   },
@@ -4589,7 +4384,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🦯",
     "keywords": ["person_with_white_cane", "person_with_probing_cane"]
   },
@@ -4600,7 +4394,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🧑‍🦯‍➡️",
     "keywords": ["person_with_white_cane_facing_right", "person with white cane facing right", "walk", "walk"]
   },
@@ -4611,7 +4404,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👨‍🦯",
     "keywords": ["man_with_white_cane", "man_with_probing_cane"]
   },
@@ -4622,7 +4414,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "👨‍🦯‍➡️",
     "keywords": ["man_with_white_cane_facing_right", "man with white cane facing right", "visually impaired"]
   },
@@ -4633,7 +4424,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👩‍🦯",
     "keywords": ["woman_with_white_cane", "woman_with_probing_cane"]
   },
@@ -4644,7 +4434,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "👩‍🦯‍➡️",
     "keywords": ["woman_with_white_cane_facing_right", "woman with white cane facing right", "stick"]
   },
@@ -4655,7 +4444,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🦼",
     "keywords": ["person_in_motorized_wheelchair", "disability"]
   },
@@ -4666,7 +4454,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🧑‍🦼‍➡️",
     "keywords": ["person_in_motorized_wheelchair_facing_right", "person in motorized wheelchair facing right"]
   },
@@ -4677,7 +4464,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👨‍🦼",
     "keywords": ["man_in_motorized_wheelchair"]
   },
@@ -4688,7 +4474,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "👨‍🦼‍➡️",
     "keywords": ["man_in_motorized_wheelchair_facing_right", "man in motorized wheelchair facing right", "mobility"]
   },
@@ -4699,7 +4484,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👩‍🦼",
     "keywords": ["woman_in_motorized_wheelchair"]
   },
@@ -4710,7 +4494,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "👩‍🦼‍➡️",
     "keywords": ["woman_in_motorized_wheelchair_facing_right", "woman in motorized wheelchair facing right"]
   },
@@ -4721,7 +4504,6 @@
     "emoji_version": "12.1",
     "unicode_version": "12.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.1",
     "char": "🧑‍🦽",
     "keywords": ["person_in_manual_wheelchair"]
   },
@@ -4732,7 +4514,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🧑‍🦽‍➡️",
     "keywords": ["person_in_manual_wheelchair_facing_right", "person in manual wheelchair facing right"]
   },
@@ -4743,7 +4524,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👨‍🦽",
     "keywords": ["man_in_manual_wheelchair"]
   },
@@ -4754,7 +4534,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "👨‍🦽‍➡️",
     "keywords": ["man_in_manual_wheelchair_facing_right", "man in manual wheelchair facing right"]
   },
@@ -4765,7 +4544,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👩‍🦽",
     "keywords": ["woman_in_manual_wheelchair"]
   },
@@ -4776,7 +4554,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "👩‍🦽‍➡️",
     "keywords": ["woman_in_manual_wheelchair_facing_right", "woman in manual wheelchair facing right"]
   },
@@ -4787,7 +4564,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🏃",
     "keywords": ["person_running", "exercise", "jogging", "run", "runner"]
   },
@@ -4798,7 +4574,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏃‍♂️",
     "keywords": ["man_running", "race", "running"]
   },
@@ -4809,7 +4584,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏃‍♀️",
     "keywords": ["woman_running", "marathon", "racing"]
   },
@@ -4820,7 +4594,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🏃‍➡️",
     "keywords": ["person_running_facing_right", "person running facing right", "jog"]
   },
@@ -4831,7 +4604,6 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🏃‍♀️‍➡️",
     "keywords": ["woman_running_facing_right", "woman running facing right"]
   },
@@ -4842,9 +4614,18 @@
     "emoji_version": "15.1",
     "unicode_version": "15.1",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "15.1",
     "char": "🏃‍♂️‍➡️",
     "keywords": ["man_running_facing_right", "man running facing right"]
+  },
+  "🧑‍🩰": {
+    "name": "ballet dancer",
+    "slug": "ballet_dancer",
+    "group": "People & Body",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
+    "skin_tone_support": true,
+    "char": "🧑‍🩰",
+    "keywords": ["ballet_dancer", "ballet dancer"]
   },
   "💃": {
     "name": "woman dancing",
@@ -4853,7 +4634,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "💃",
     "keywords": ["woman_dancing", "fun", "salsa"]
   },
@@ -4864,7 +4644,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🕺",
     "keywords": ["man_dancing", "dancer"]
   },
@@ -4875,7 +4654,6 @@
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🕴️",
     "keywords": [
       "person_in_suit_levitating",
@@ -4895,7 +4673,7 @@
     "group": "People & Body",
     "emoji_version": "0.6",
     "unicode_version": "0.6",
-    "skin_tone_support": false,
+    "skin_tone_support": true,
     "char": "👯",
     "keywords": ["people_with_bunny_ears", "perform", "costume", "partying"]
   },
@@ -4905,7 +4683,7 @@
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
-    "skin_tone_support": false,
+    "skin_tone_support": true,
     "char": "👯‍♂️",
     "keywords": ["men_with_bunny_ears", "bunny", "boys", "wearing"]
   },
@@ -4915,7 +4693,7 @@
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
-    "skin_tone_support": false,
+    "skin_tone_support": true,
     "char": "👯‍♀️",
     "keywords": ["women_with_bunny_ears", "dancing", "people"]
   },
@@ -4926,7 +4704,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧖",
     "keywords": ["person_in_steamy_room", "hamam", "sauna"]
   },
@@ -4937,7 +4714,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧖‍♂️",
     "keywords": ["man_in_steamy_room", "steamroom", "steambath"]
   },
@@ -4948,7 +4724,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧖‍♀️",
     "keywords": ["woman_in_steamy_room"]
   },
@@ -4959,7 +4734,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧗",
     "keywords": ["person_climbing", "sport", "bouldering", "climber"]
   },
@@ -4970,7 +4744,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧗‍♂️",
     "keywords": ["man_climbing", "sports"]
   },
@@ -4981,7 +4754,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧗‍♀️",
     "keywords": ["woman_climbing", "hobby"]
   },
@@ -5002,7 +4774,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🏇",
     "keywords": ["horse_racing", "betting", "competition", "gambling", "jockey", "racehorse"]
   },
@@ -5023,7 +4794,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🏂",
     "keywords": ["snowboarder", "ski", "snowboard", "snowboarding"]
   },
@@ -5034,7 +4804,6 @@
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏌️",
     "keywords": ["person_golfing", "ball", "club"]
   },
@@ -5045,7 +4814,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏌️‍♂️",
     "keywords": ["man_golfing", "golf"]
   },
@@ -5056,7 +4824,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏌️‍♀️",
     "keywords": ["woman_golfing", "golfer"]
   },
@@ -5067,7 +4834,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🏄",
     "keywords": ["person_surfing", "surf", "surfer"]
   },
@@ -5078,7 +4844,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏄‍♂️",
     "keywords": ["man_surfing", "ocean"]
   },
@@ -5089,7 +4854,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏄‍♀️",
     "keywords": ["woman_surfing"]
   },
@@ -5100,7 +4864,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🚣",
     "keywords": ["person_rowing_boat", "paddles", "rowboat"]
   },
@@ -5111,7 +4874,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚣‍♂️",
     "keywords": ["man_rowing_boat"]
   },
@@ -5122,7 +4884,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚣‍♀️",
     "keywords": ["woman_rowing_boat"]
   },
@@ -5133,7 +4894,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🏊",
     "keywords": ["person_swimming", "pool", "swimmer"]
   },
@@ -5144,7 +4904,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏊‍♂️",
     "keywords": ["man_swimming", "athlete"]
   },
@@ -5155,7 +4914,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏊‍♀️",
     "keywords": ["woman_swimming"]
   },
@@ -5166,7 +4924,6 @@
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "2.0",
     "char": "⛹️",
     "keywords": ["person_bouncing_ball", "player"]
   },
@@ -5177,7 +4934,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "⛹️‍♂️",
     "keywords": ["man_bouncing_ball"]
   },
@@ -5188,7 +4944,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "⛹️‍♀️",
     "keywords": ["woman_bouncing_ball"]
   },
@@ -5199,7 +4954,6 @@
     "emoji_version": "0.7",
     "unicode_version": "0.7",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "2.0",
     "char": "🏋️",
     "keywords": ["person_lifting_weights", "training", "bodybuilder"]
   },
@@ -5210,7 +4964,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏋️‍♂️",
     "keywords": ["man_lifting_weights", "gym", "weight"]
   },
@@ -5221,7 +4974,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🏋️‍♀️",
     "keywords": ["woman_lifting_weights", "lifter", "weightlifter"]
   },
@@ -5232,7 +4984,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🚴",
     "keywords": ["person_biking", "bike"]
   },
@@ -5243,7 +4994,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚴‍♂️",
     "keywords": ["man_biking", "cyclist"]
   },
@@ -5254,7 +5004,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚴‍♀️",
     "keywords": ["woman_biking", "hipster"]
   },
@@ -5265,7 +5014,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🚵",
     "keywords": ["person_mountain_biking", "bicyclist", "biker"]
   },
@@ -5276,7 +5024,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚵‍♂️",
     "keywords": ["man_mountain_biking", "transportation"]
   },
@@ -5287,7 +5034,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🚵‍♀️",
     "keywords": ["woman_mountain_biking"]
   },
@@ -5298,7 +5044,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤸",
     "keywords": ["person_cartwheeling", "gymnastic", "cartwheel", "gymnast"]
   },
@@ -5309,7 +5054,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤸‍♂️",
     "keywords": ["man_cartwheeling", "gymnastics", "doing"]
   },
@@ -5320,7 +5064,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤸‍♀️",
     "keywords": ["woman_cartwheeling"]
   },
@@ -5330,7 +5073,7 @@
     "group": "People & Body",
     "emoji_version": "3.0",
     "unicode_version": "3.0",
-    "skin_tone_support": false,
+    "skin_tone_support": true,
     "char": "🤼",
     "keywords": ["people_wrestling", "wrestle", "wrestler"]
   },
@@ -5340,7 +5083,7 @@
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
-    "skin_tone_support": false,
+    "skin_tone_support": true,
     "char": "🤼‍♂️",
     "keywords": ["men_wrestling", "wrestlers"]
   },
@@ -5350,7 +5093,7 @@
     "group": "People & Body",
     "emoji_version": "4.0",
     "unicode_version": "4.0",
-    "skin_tone_support": false,
+    "skin_tone_support": true,
     "char": "🤼‍♀️",
     "keywords": ["women_wrestling"]
   },
@@ -5361,7 +5104,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤽",
     "keywords": ["person_playing_water_polo"]
   },
@@ -5372,7 +5114,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤽‍♂️",
     "keywords": ["man_playing_water_polo"]
   },
@@ -5383,7 +5124,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤽‍♀️",
     "keywords": ["woman_playing_water_polo"]
   },
@@ -5394,7 +5134,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤾",
     "keywords": ["person_playing_handball"]
   },
@@ -5405,7 +5144,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤾‍♂️",
     "keywords": ["man_playing_handball"]
   },
@@ -5416,7 +5154,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤾‍♀️",
     "keywords": ["woman_playing_handball"]
   },
@@ -5427,7 +5164,6 @@
     "emoji_version": "3.0",
     "unicode_version": "3.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "3.0",
     "char": "🤹",
     "keywords": ["person_juggling", "performance", "juggler"]
   },
@@ -5438,7 +5174,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤹‍♂️",
     "keywords": ["man_juggling", "juggle"]
   },
@@ -5449,7 +5184,6 @@
     "emoji_version": "4.0",
     "unicode_version": "4.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🤹‍♀️",
     "keywords": ["woman_juggling", "skill", "multitask"]
   },
@@ -5460,7 +5194,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧘",
     "keywords": ["person_in_lotus_position", "meditate", "serenity"]
   },
@@ -5471,7 +5204,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧘‍♂️",
     "keywords": ["man_in_lotus_position", "meditation", "zen"]
   },
@@ -5482,7 +5214,6 @@
     "emoji_version": "5.0",
     "unicode_version": "5.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "5.0",
     "char": "🧘‍♀️",
     "keywords": ["woman_in_lotus_position", "yoga", "mindfulness"]
   },
@@ -5493,7 +5224,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "1.0",
     "char": "🛀",
     "keywords": ["person_taking_bath", "clean"]
   },
@@ -5504,7 +5234,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "4.0",
     "char": "🛌",
     "keywords": ["person_in_bed", "accommodation"]
   },
@@ -5515,7 +5244,6 @@
     "emoji_version": "12.0",
     "unicode_version": "12.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "🧑‍🤝‍🧑",
     "keywords": ["people_holding_hands", "friendship", "hold", "nonconforming"]
   },
@@ -5526,7 +5254,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👭",
     "keywords": ["women_holding_hands", "pair", "lesbian"]
   },
@@ -5537,7 +5264,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👫",
     "keywords": ["woman_and_man_holding_hands", "dating", "heterosexual"]
   },
@@ -5548,7 +5274,6 @@
     "emoji_version": "1.0",
     "unicode_version": "1.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "12.0",
     "char": "👬",
     "keywords": ["men_holding_hands", "bromance"]
   },
@@ -5559,7 +5284,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "💏",
     "keywords": ["kiss", "couplekiss"]
   },
@@ -5570,7 +5294,6 @@
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "👩‍❤️‍💋‍👨",
     "keywords": ["kiss_woman_man"]
   },
@@ -5581,7 +5304,6 @@
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "👨‍❤️‍💋‍👨",
     "keywords": ["kiss_man_man"]
   },
@@ -5592,7 +5314,6 @@
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "👩‍❤️‍💋‍👩",
     "keywords": ["kiss_woman_woman"]
   },
@@ -5603,7 +5324,6 @@
     "emoji_version": "0.6",
     "unicode_version": "0.6",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "💑",
     "keywords": ["couple_with_heart", "loving"]
   },
@@ -5614,7 +5334,6 @@
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "👩‍❤️‍👨",
     "keywords": ["couple_with_heart_woman_man"]
   },
@@ -5625,7 +5344,6 @@
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "👨‍❤️‍👨",
     "keywords": ["couple_with_heart_man_man", "gay"]
   },
@@ -5636,7 +5354,6 @@
     "emoji_version": "2.0",
     "unicode_version": "2.0",
     "skin_tone_support": true,
-    "skin_tone_support_unicode_version": "13.1",
     "char": "👩‍❤️‍👩",
     "keywords": ["couple_with_heart_woman_woman", "lgbt"]
   },
@@ -6208,7 +5925,7 @@
     "unicode_version": "15.0",
     "skin_tone_support": false,
     "char": "🫎",
-    "keywords": ["moose", "shrek", "canada", "sweden", "sven"]
+    "keywords": ["moose", "canada", "sweden", "sven"]
   },
   "🫏": {
     "name": "donkey",
@@ -7000,6 +6717,16 @@
     "char": "🐬",
     "keywords": ["dolphin", "flipper", "fins"]
   },
+  "🫍": {
+    "name": "orca",
+    "slug": "orca",
+    "group": "Animals & Nature",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
+    "skin_tone_support": false,
+    "char": "🫍",
+    "keywords": ["orca"]
+  },
   "🦭": {
     "name": "seal",
     "slug": "seal",
@@ -7588,7 +7315,7 @@
     "unicode_version": "16.0",
     "skin_tone_support": false,
     "char": "🪾",
-    "keywords": ["leafless_tree"]
+    "keywords": ["leafless_tree", "leafless tree"]
   },
   "🍇": {
     "name": "grapes",
@@ -7978,7 +7705,7 @@
     "unicode_version": "16.0",
     "skin_tone_support": false,
     "char": "🫜",
-    "keywords": ["root_vegetable"]
+    "keywords": ["root_vegetable", "root vegetable", "radish"]
   },
   "🍞": {
     "name": "bread",
@@ -9001,6 +8728,16 @@
     "char": "⛰️",
     "keywords": ["mountain", "environment"]
   },
+  "🛘": {
+    "name": "landslide",
+    "slug": "landslide",
+    "group": "Travel & Places",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
+    "skin_tone_support": false,
+    "char": "🛘",
+    "keywords": ["landslide", "disaster", "accident"]
+  },
   "🌋": {
     "name": "volcano",
     "slug": "volcano",
@@ -9009,7 +8746,7 @@
     "unicode_version": "0.6",
     "skin_tone_support": false,
     "char": "🌋",
-    "keywords": ["volcano", "disaster", "eruption"]
+    "keywords": ["volcano", "eruption"]
   },
   "🗻": {
     "name": "mount fuji",
@@ -12623,6 +12360,26 @@
     "char": "🎷",
     "keywords": ["saxophone", "blues", "sax"]
   },
+  "🎺": {
+    "name": "trumpet",
+    "slug": "trumpet",
+    "group": "Objects",
+    "emoji_version": "0.6",
+    "unicode_version": "0.6",
+    "skin_tone_support": false,
+    "char": "🎺",
+    "keywords": ["trumpet", "brass"]
+  },
+  "🪊": {
+    "name": "trombone",
+    "slug": "trombone",
+    "group": "Objects",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
+    "skin_tone_support": false,
+    "char": "🪊",
+    "keywords": ["trombone"]
+  },
   "🪗": {
     "name": "accordion",
     "slug": "accordion",
@@ -12652,16 +12409,6 @@
     "skin_tone_support": false,
     "char": "🎹",
     "keywords": ["musical_keyboard", "piano"]
-  },
-  "🎺": {
-    "name": "trumpet",
-    "slug": "trumpet",
-    "group": "Objects",
-    "emoji_version": "0.6",
-    "unicode_version": "0.6",
-    "skin_tone_support": false,
-    "char": "🎺",
-    "keywords": ["trumpet", "brass"]
   },
   "🎻": {
     "name": "violin",
@@ -13263,6 +13010,16 @@
     "char": "🏷️",
     "keywords": ["label", "sale"]
   },
+  "🪙": {
+    "name": "coin",
+    "slug": "coin",
+    "group": "Objects",
+    "emoji_version": "13.0",
+    "unicode_version": "13.0",
+    "skin_tone_support": false,
+    "char": "🪙",
+    "keywords": ["coin", "money", "metal", "treasure"]
+  },
   "💰": {
     "name": "money bag",
     "slug": "money_bag",
@@ -13273,15 +13030,15 @@
     "char": "💰",
     "keywords": ["money_bag", "dollar", "coins", "moneybag", "moneybags"]
   },
-  "🪙": {
-    "name": "coin",
-    "slug": "coin",
+  "🪎": {
+    "name": "treasure chest",
+    "slug": "treasure_chest",
     "group": "Objects",
-    "emoji_version": "13.0",
-    "unicode_version": "13.0",
+    "emoji_version": "17.0",
+    "unicode_version": "17.0",
     "skin_tone_support": false,
-    "char": "🪙",
-    "keywords": ["coin", "money", "metal", "treasure"]
+    "char": "🪎",
+    "keywords": ["treasure_chest", "treasure chest", "haul", "mimic", "crate", "riches"]
   },
   "💴": {
     "name": "yen banknote",
@@ -17449,7 +17206,7 @@
     "unicode_version": "16.0",
     "skin_tone_support": false,
     "char": "🇨🇶",
-    "keywords": ["flag_sark"]
+    "keywords": ["flag_sark", "cq"]
   },
   "🇨🇷": {
     "name": "flag Costa Rica",
