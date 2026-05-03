@@ -1,9 +1,9 @@
 {
   "name": "Universal Emoji Parser",
   "dockerComposeFile": "../docker/local/docker-compose.yaml",
-  "service": "uemojiparser",
+  "service": "uemojiparservscode",
   "workspaceFolder": "/app",
-  "runServices": ["uemojiparser"],
+  "runServices": ["uemojiparservscode"],
   "customizations": {
     "settings": {
       "terminal.integrated.shell.linux": "/bin/bash"
