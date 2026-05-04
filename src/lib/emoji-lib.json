@@ -1667,7 +1667,7 @@
     "unicode_version": "0.6",
     "skin_tone_support": false,
     "char": "💯",
-    "keywords": ["hundred_points", "score", "perfect", "century", "exam", "quiz", "hundred", "keep"]
+    "keywords": ["hundred_points", "score", "perfect", "century", "exam", "quiz", "hundred", "100", "keep"]
   },
   "💢": {
     "name": "anger symbol",
@@ -10158,7 +10158,7 @@
     "unicode_version": "0.6",
     "skin_tone_support": false,
     "char": "🕐",
-    "keywords": ["one_o_clock", "1", "1:00", "100", "13:00", "1300", "clock1", "o’clock"]
+    "keywords": ["one_o_clock", "1", "1:00", "13:00", "1300", "early", "clock1", "o’clock"]
   },
   "🕜": {
     "name": "one-thirty",
@@ -10168,7 +10168,7 @@
     "unicode_version": "0.7",
     "skin_tone_support": false,
     "char": "🕜",
-    "keywords": ["one_thirty", "1:30", "130", "13:30", "1330", "early", "clock130"]
+    "keywords": ["one_thirty", "1:30", "130", "13:30", "1330", "clock130"]
   },
   "🕑": {
     "name": "two o’clock",
