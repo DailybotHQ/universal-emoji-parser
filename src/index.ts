@@ -67,14 +67,15 @@ const uEmojiParser: UEmojiParserType = {
     return this.__parseEmojiToHtml(text, emojiCDN)
   },
   parseToUnicode(text: string): string {
-    const emojisRegExp: RegExp = /:(\w+):/g
+    // Allow `+` and `-` so GitHub-style aliases like :+1: and :-1: parse.
+    const emojisRegExp: RegExp = /:([\w+-]+):/g
     const emojisShortcodesList: RegExpMatchArray | null = text.match(emojisRegExp)
     if (emojisShortcodesList) {
       emojisShortcodesList.forEach((shortcode: string) => {
         const emoji = this.getEmojiObjectByShortcode(shortcode)
         if (emoji) {
-          const regEx = new RegExp(shortcode)
-          text = text.replace(regEx, emoji.char)
+          // split/join replaces literal occurrences without regex metachar pitfalls (e.g. `+` in `:+1:`).
+          text = text.split(shortcode).join(emoji.char)
         }
       })
     }

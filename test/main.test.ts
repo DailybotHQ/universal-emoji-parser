@@ -468,4 +468,28 @@ describe('Test emoji parser', () => {
       )
     })
   })
+
+  describe('GitHub-style aliases', () => {
+    it('should parse :+1: and :-1: shortcodes', () => {
+      // Regression for issue #231: the previous /:(\w+):/ regex did not match `+` or `-`,
+      // so common GitHub aliases were silently left as-is.
+      expect(uEmojiParser.parseToUnicode(':+1:')).to.be.equal('👍')
+      expect(uEmojiParser.parseToUnicode(':-1:')).to.be.equal('👎')
+      expect(uEmojiParser.parseToUnicode('lgtm :+1:')).to.be.equal('lgtm 👍')
+      expect(uEmojiParser.parseToUnicode(':+1: :+1:')).to.be.equal('👍 👍')
+    })
+
+    it('should resolve :100: to 💯', () => {
+      // Regression for issue #231: :100: previously fell back to 🕐 (one o'clock = 1:00)
+      // because "100" was a keyword on that emoji. Special-case override moves it to 💯.
+      expect(uEmojiParser.parseToUnicode(':100:')).to.be.equal('💯')
+    })
+
+    it('should render GitHub aliases through parse()', () => {
+      const result: string = uEmojiParser.parse('lgtm :+1: :100:')
+      expect(result).to.be.equal(
+        'lgtm <img class="emoji" alt="👍" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f44d.svg"/> <img class="emoji" alt="💯" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f4af.svg"/>'
+      )
+    })
+  })
 })

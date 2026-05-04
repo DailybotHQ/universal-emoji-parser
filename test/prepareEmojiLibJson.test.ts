@@ -28,6 +28,13 @@ describe('Prepare emoji parser assets', () => {
     '⏸️': {
       include: ['double_vertical_bar'],
     },
+    // GitHub/Slack/Discord render :100: as 💯; the upstream catalog associates "100" with 🕐 (1:00).
+    '💯': {
+      include: ['100'],
+    },
+    '🕐': {
+      exclude: ['100'],
+    },
   }
 
   /**
