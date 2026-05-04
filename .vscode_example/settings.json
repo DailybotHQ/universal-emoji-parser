@@ -1,4 +1,13 @@
 {
+  "workbench.colorCustomizations": {
+    "titleBar.activeBackground": "#9d9700",
+    "titleBar.activeForeground": "#e2e8f0",
+    "activityBar.background": "#9d9700",
+    "statusBar.background": "#9d9700",
+    "statusBar.foreground": "#e2e8f0",
+    "sideBar.background": "#4a4700",
+    "sideBar.foreground": "#e2e8f0"
+  },
   "mocha.files.glob": "./test/**/*.ts",
   "mochaExplorer.files": "test/**/*.ts",
   "mochaExplorer.nodeArgv": ["--import", "tsx"],
