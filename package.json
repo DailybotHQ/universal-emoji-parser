@@ -27,8 +27,8 @@
   "scripts": {
     "eslint:check": "eslint .",
     "eslint:fix": "eslint . --fix",
-    "prettier:check": "prettier -c --ignore-path .gitignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'",
-    "prettier:fix": "prettier --write --ignore-path .gitignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'",
+    "prettier:check": "prettier -c --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'",
+    "prettier:fix": "prettier --write --ignore-path .gitignore --ignore-path .prettierignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'",
     "test": "tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors",
     "test:watch": "tsx ./node_modules/mocha/bin/mocha.js -w --watch-extensions ts --watch-files src,test 'test/**/*.ts' --timeout 25000 --colors",
     "release": "npm version patch -m \"[🤖 DailyBot] New release to v%s launched 🚀\"",
