@@ -73,3 +73,6 @@ emoji-lib-output.json
 tmp/*
 !tmp/.gitkeep
 *.tsbuildinfo
+
+# Deep Work Plan output (plans + drafts) — working artifacts, not tracked source
+.dwp/
