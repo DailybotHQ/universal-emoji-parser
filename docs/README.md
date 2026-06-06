@@ -9,6 +9,12 @@ shortcodes in text and converts them to Twemoji-backed HTML `<img>` tags, or
 between unicode and shortcode forms. It ships dual CommonJS + ESM entry points
 and targets Node ≥ 20.19 and bundled browser environments.
 
+## Product
+
+| Guide                              | Purpose                                                                            |
+| ---------------------------------- | ---------------------------------------------------------------------------------- |
+| [PRODUCT_SPEC.md](PRODUCT_SPEC.md) | The non-technical "why" and "for whom": problem, audience, capabilities, non-goals |
+
 ## Core guides
 
 | Guide                                              | Purpose                                                                        |

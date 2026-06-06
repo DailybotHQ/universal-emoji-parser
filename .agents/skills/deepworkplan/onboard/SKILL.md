@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-onboard
 description: Make a repository AI-first by reasoning about its stack and archetype, then generating adapted AGENTS.md, docs/, per-module docs, .agents/, and the .claude to .agents symlink. Offers opt-in addons. Use when the developer wants to onboard or AI-enable a repo.
-version: "2.4.0"
+version: "2.5.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
@@ -70,8 +70,9 @@ When this flow finishes, the target repo contains:
    repo's **real, runnable** commands; plus `CLAUDE.md → AGENTS.md`.
 2. **`docs/`** — the standard categories, each filled with **real**
    repo-specific content (real commands, real module names, real test pattern):
-   `ARCHITECTURE.md`, `STANDARDS.md`, `TESTING_GUIDE.md`,
-   `DEVELOPMENT_COMMANDS.md`, `SECURITY.md`, `PERFORMANCE.md`,
+   `PRODUCT_SPEC.md` (the non-technical product/why doc — **required for every
+   repo, libraries included**), `ARCHITECTURE.md`, `STANDARDS.md`,
+   `TESTING_GUIDE.md`, `DEVELOPMENT_COMMANDS.md`, `SECURITY.md`, `PERFORMANCE.md`,
    `AI_AGENT_ONBOARDING.md`, `AI_AGENT_COLLAB.md`, optional
    `PR_REVIEW_WORKFLOW.md` / `ECOSYSTEM_CONTEXT.md`, and a `docs/README.md`
    index.
@@ -237,7 +238,7 @@ Never duplicate `AGENTS.md` content into `CLAUDE.md`.
 
 Produce the standard categories, **each adapted** from recon — an empty or
 generic doc is a failure. The conformance floor (all **MUST**):
-`ARCHITECTURE.md`, `STANDARDS.md`, `TESTING_GUIDE.md`,
+`PRODUCT_SPEC.md`, `ARCHITECTURE.md`, `STANDARDS.md`, `TESTING_GUIDE.md`,
 `DEVELOPMENT_COMMANDS.md`, `SECURITY.md`, `AI_AGENT_ONBOARDING.md`,
 `AI_AGENT_COLLAB.md`. **SHOULD**: `PERFORMANCE.md`, plus optional
 `PR_REVIEW_WORKFLOW.md` and `ECOSYSTEM_CONTEXT.md`. Always add a
@@ -245,6 +246,16 @@ generic doc is a failure. The conformance floor (all **MUST**):
 
 Each doc must contain **real** content:
 
+- `PRODUCT_SPEC.md` — the non-technical product/why doc: the problem the repo
+  solves, who it is for, its key capabilities/features, success criteria, and
+  explicit non-goals. It **MUST read plainly enough that anyone — a person or an
+  agent, technical or not — can understand what this repository is and why it
+  exists at a glance**; that is the whole point of the document. Reason it from
+  the README, package description, public API, and any roadmap/issues — never a
+  generic stub. **Required for every repo, including libraries, CLIs, and
+  internal tools**: if there are no end users, frame the product as its
+  consumers (who calls this API, and why they choose it). This is the *why*; the
+  docs below are the *how*.
 - `ARCHITECTURE.md` — the real components, data flow, and deployment shape from
   recon; an annotated diagram of the actual module layout.
 - `STANDARDS.md` — the repo's real coding conventions, naming, import order,
@@ -437,7 +448,8 @@ After generating, run this checklist in the target repo. On any failure,
 2. **`CLAUDE.md` resolves to `AGENTS.md`** — the symlink points at `AGENTS.md`,
    or `CLAUDE.md` contains exactly `@AGENTS.md`.
 3. **`docs/` has the standard categories**, each non-empty and repo-specific
-   (the seven MUST files at minimum, plus `docs/README.md`). Grep for leftover
+   (the eight MUST files at minimum — `PRODUCT_SPEC` included — plus
+   `docs/README.md`). Grep for leftover
    placeholder markers (`<...>`, "TODO", "your command here") and fix any.
 4. **Every major source module has a `README.md`** (and complex modules have a
    `docs/`).

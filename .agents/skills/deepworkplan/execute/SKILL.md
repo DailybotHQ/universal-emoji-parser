@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-execute
 description: Execute an existing Deep Work Plan task-by-task, run each task's validation, and log progress. Use when the developer wants to run or continue executing a plan in .dwp/plans/.
-version: "2.4.0"
+version: "2.5.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
