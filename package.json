@@ -1,6 +1,6 @@
 {
   "name": "universal-emoji-parser",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "This tool allow parse unicode and emoji codes to html images using emojilib && Twemoji CDN",
   "keywords": [
     "emoji",
