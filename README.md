@@ -60,7 +60,7 @@ or
 
 ```
 → uEmojiParser.parse(':rocket:')
-<img class="emoji" alt="🚀" src="https://twemoji.maxcdn.com/v/12.1.2/72x72/1f680.svg"/>
+<img class="emoji" alt="🚀" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f680.svg"/>
 ```
 
 ```
