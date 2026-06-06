@@ -24,6 +24,9 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "eslint:check": "eslint .",
     "eslint:fix": "eslint . --fix",
