@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-resume
 description: Resume an interrupted Deep Work Plan from its recorded progress state. Use when the developer wants to continue a plan in .dwp/plans/ that was paused or interrupted mid-execution.
-version: "2.4.0"
+version: "2.5.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write

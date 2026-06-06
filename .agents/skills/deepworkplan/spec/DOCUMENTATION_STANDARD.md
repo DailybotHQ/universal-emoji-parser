@@ -140,12 +140,14 @@ commands are repo-specific (§7).
 
 A conformant repository **MUST** maintain a root-level `docs/` folder holding
 categorized markdown guides. Guides **SHOULD NOT** carry YAML frontmatter (they are
-evergreen reference, not lifecycle documents). The audit found the following
-**10 categories** common across the 6 repos; this set is the normative `docs/`
+evergreen reference, not lifecycle documents). The audit found 10 categories
+common across the 6 repos; this standard adds an 11th — **`PRODUCT_SPEC.md`**,
+the product/"why" layer — for **11 categories** total as the normative `docs/`
 standard:
 
 | # | Category file | Requirement | Purpose |
 |---|---------------|-------------|---------|
+| 0 | `PRODUCT_SPEC.md` | **MUST** | The product spec: the problem the repo solves, who it is for, its key capabilities/features, success criteria, and explicit non-goals — the **why** and **for whom**, not the **how**. Deliberately **non-technical**, high-value context. **Every repository is a product** — even a library, CLI, or internal tool: its consumers and their use cases are its product, and they deserve a non-technical spec. A library that omits this hides the very thing a new agent (or human) most needs to understand first. |
 | 1 | `ARCHITECTURE.md` | **MUST** | System design, components, data flow, key decisions. |
 | 2 | `STANDARDS.md` | **MUST** | Coding conventions, naming, import order, error/logging patterns, forbidden anti-patterns. |
 | 3 | `TESTING_GUIDE.md` | **MUST** | Test framework, file-naming pattern, how to run/scope tests, coverage expectation. |
@@ -157,8 +159,9 @@ standard:
 | 9 | `PR_REVIEW_WORKFLOW.md` | **SHOULD** | How PRs are opened, reviewed, and merged in this repo. |
 | 10 | `ECOSYSTEM_CONTEXT.md` | **SHOULD** (individual) / **MUST** (orchestrator hub & multi-repo members) | How this repo relates to sibling repos and the wider product. |
 
-- The five **MUST** categories (`ARCHITECTURE`, `STANDARDS`, `TESTING_GUIDE`, `DEVELOPMENT_COMMANDS`, `SECURITY`) plus `AI_AGENT_ONBOARDING` and `AI_AGENT_COLLAB` constitute the conformance floor for an AI-first repo.
-- A repository **MAY** add domain-specific guides beyond these 10 (e.g. `API_REFERENCE.md`, `DATABASE_SCHEMA.md`, `LOGGING_BEST_PRACTICES.md`, `REDIS_CACHING_BEST_PRACTICES.md`) when the stack warrants. Whether a given domain guide is warranted is part of the **repo-specific 10%** (§7). (All four examples observed live in `api-services/docs/`.)
+- The **MUST** categories (`PRODUCT_SPEC`, `ARCHITECTURE`, `STANDARDS`, `TESTING_GUIDE`, `DEVELOPMENT_COMMANDS`, `SECURITY`) plus `AI_AGENT_ONBOARDING` and `AI_AGENT_COLLAB` constitute the conformance floor for an AI-first repo.
+- `PRODUCT_SPEC.md` is **non-technical by design** and **MUST NOT** be skipped on the grounds that "this repo is just a library/tool." If the repo genuinely has no end users, frame the product as its API/consumers: what it offers, to whom, and why they would choose it. Reason the content from the real repo (README, package description, public API, issues/roadmap) — never a generic stub.
+- A repository **MAY** add domain-specific guides beyond these 11 (e.g. `API_REFERENCE.md`, `DATABASE_SCHEMA.md`, `LOGGING_BEST_PRACTICES.md`, `REDIS_CACHING_BEST_PRACTICES.md`) when the stack warrants. Whether a given domain guide is warranted is part of the **repo-specific 10%** (§7). (All four examples observed live in `api-services/docs/`.)
 - A guide that would fall below ~30 lines **SHOULD** be merged into a sibling; a guide above ~700 lines **SHOULD** be split into a subfolder.
 
 > **Divergence from v1.** v1 required only 5 `docs/` files at "Silver"
@@ -168,6 +171,15 @@ standard:
 > **MUST**, and renames `SETUP.md`→`DEVELOPMENT_COMMANDS.md` to match observed
 > practice (`RECONCILIATION.md` §"Specs"). `SETUP`/`TROUBLESHOOTING` content is
 > not lost: it folds into `DEVELOPMENT_COMMANDS.md` and `AI_AGENT_ONBOARDING.md`.
+>
+> **Added: `PRODUCT_SPEC.md` (category 0, MUST).** The audited 10-category set was
+> entirely engineering/process documentation — it captured the *how* but never the
+> *why*. This standard adds `PRODUCT_SPEC.md` as a required, deliberately
+> **non-technical** product/purpose document so an agent (or human) learns what the
+> repo is *for* and *for whom* before diving into its mechanics. It is a **MUST for
+> every archetype, including libraries, CLIs, and internal tools** — every
+> repository is a product; the spec frames its users/consumers and the value it
+> delivers.
 
 ### 3.2. `docs/README.md` Master Index
 
@@ -316,7 +328,9 @@ the classification heuristic and the full onboarding-difference matrix.
 The v1 Bronze/Silver/Gold/Platinum badge ladder is retained as an **informative**
 self-assessment aid, not a normative requirement. A repository is **AI-first
 conformant** when it satisfies every **MUST** in §§2–7. The optional ladder maps,
-roughly: Bronze = §2 only; Silver = §2 + the five MUST `docs/` categories; Gold =
+roughly: Bronze = §2 only; Silver = §2 + the six MUST `docs/` categories
+(`PRODUCT_SPEC`, `ARCHITECTURE`, `STANDARDS`, `TESTING_GUIDE`,
+`DEVELOPMENT_COMMANDS`, `SECURITY`); Gold =
 + remaining MUST categories + `.agents/` + symlinks; Platinum = + per-module docs
 for all complex modules (§4).
 

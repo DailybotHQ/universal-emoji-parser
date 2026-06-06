@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-author
 description: Author or update reusable skills, agents, and commands in the current repo — reason about the repo's .agents/ layout, follow the Open Agent Skills frontmatter contract, and keep the .agents/docs/ catalog in sync. Use when a developer wants to create or evolve the repo's agent kit (skills, agents, commands), or runs /skill-create or /agent-create.
-version: "2.4.0"
+version: "2.5.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write

@@ -11,6 +11,7 @@
 
 | Category        | Guide                                                                                           | Purpose                                                                        |
 | --------------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Product         | [Product Spec](docs/PRODUCT_SPEC.md)                                                            | Non-technical "why" and "for whom": problem, audience, capabilities, non-goals |
 | Architecture    | [Architecture](docs/ARCHITECTURE.md)                                                            | Module layout, data flow, parse pipeline, emoji catalog                        |
 | Technologies    | [Technologies](docs/TECHNOLOGIES.md)                                                            | Stack overview with versions and roles                                         |
 | Standards       | [Standards](docs/STANDARDS.md)                                                                  | TypeScript / lint / Prettier conventions, naming, exports                      |
