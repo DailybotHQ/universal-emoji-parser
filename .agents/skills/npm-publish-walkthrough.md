@@ -60,7 +60,7 @@ Includes PR number, title, body, size label, workflow URL.
 ```yaml
 - uses: actions/checkout@v4
 - uses: actions/setup-node@v4
-  with: { node-version: '24' }
+  with: { node-version: '24.16.0' }
 - uses: actions/cache@v4
   with:
     path: |
@@ -117,7 +117,7 @@ The actual release. Steps:
     token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
 - uses: actions/setup-node@v4
   with:
-    node-version: '24'
+    node-version: '24.16.0'
     registry-url: https://registry.npmjs.org/
 - run: |
     git config user.name "🤖 DailyBot"

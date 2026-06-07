@@ -134,7 +134,7 @@ Notifications go to a DailyBot Slack-like channel via `https://api.dailybot.com/
 
 `.devcontainer/devcontainer.json` points at `docker/local/docker-compose.yaml`, which builds `docker/local/uemojiparser/Dockerfile`:
 
-- Base: **`node:24-trixie-slim`** (floating patch on Node 24 LTS)
+- Base: **`node:24.16.0-trixie-slim`** (pinned patch on Node 24 LTS — CI uses the same exact version for deterministic builds)
 - System packages: `git`, `curl`, `gh` (GitHub CLI), `chromium` (for Lighthouse audits — declared, not wired)
 - AI CLIs pre-installed for `node` user: **Claude Code**, **Codex**, **Cursor**
 - Persistent volumes for each AI CLI's auth/data so re-builds don't lose sessions

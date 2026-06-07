@@ -210,7 +210,7 @@ If we bump `engines.node` in `package.json`, also bump the Node version in every
 ```yaml
 - uses: actions/setup-node@v4
   with:
-    node-version: '24'
+    node-version: '24.16.0'
 ```
 
 Don't drift CI Node from the package's stated minimum.

@@ -185,7 +185,7 @@ Vite library build **plus** the `tsc` declaration emit (`npm run build` chains `
     token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
 - uses: actions/setup-node@v6
   with:
-    node-version: '24'
+    node-version: '24.16.0'
     registry-url: https://registry.npmjs.org/
 - run: |
     git config user.name "🤖 DailyBot"
