@@ -299,7 +299,7 @@ jobs:
           # written by setup-node). --no-git-checks: CI's tree is post-build, so pnpm's
           # default clean-tree/tag-match guard must be bypassed.
           corepack pnpm publish --no-git-checks
-          # Set npm version as output for next steps
+          # Set package version as output for next steps
           echo "package_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
