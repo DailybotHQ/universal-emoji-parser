@@ -14,9 +14,11 @@ You own the build-time and release-time concerns of Universal Emoji Parser. You 
 - `vite.config.ts` — production bundler config (library mode, CJS output, esbuild minify)
 - `tsconfig.json` / `tsconfig.build.json` — TypeScript compiler config (only the build-relevant parts; types/strictness are `parser-architect`'s domain). `build:types` emits `dist/index.d.ts` via `tsc -p tsconfig.build.json --emitDeclarationOnly`
 - `.npmignore` — what gets published to npm
-- `package.json` `scripts` — npm script definitions
+- `package.json` `scripts` — pnpm/npm script definitions, and `"packageManager": "pnpm@11.1.2"` (Corepack pin)
+- `pnpm-workspace.yaml` — supply-chain hardening (`minimumReleaseAge`, `allowBuilds`); `pnpm-lock.yaml` — the lockfile
+- `.node-version` / `.nvmrc` — pinned Node (24.16.0)
 - `.github/workflows/*.yml` — every CI workflow
-- `.github/scripts/*.sh` — CI helper scripts (`get_github_release_log.sh`, `get_packages_upgrades.sh`)
+- `.github/scripts/*.sh` — CI helper scripts (`prepare_release.sh`, `get_github_release_log.sh`, `get_packages_upgrades.sh`)
 - `dist/` output shape (gitignored, npm-published)
 - npm registry presence (the `universal-emoji-parser` package on npm.org)
 - GitHub Releases tag format (`vX.Y.Z`)
@@ -60,9 +62,9 @@ Current CI gates: Biome (lint + format), Vitest, Vite build (release only), buil
 
 Missing gates (worth considering):
 
-- `npm run build:tsc` (type-check via `tsc -p tsconfig.build.json --noEmit` before publish)
-- `npm audit --audit-level=high`
-- `npm pack --dry-run` to verify tarball contents
+- `pnpm run build:tsc` (type-check via `tsc -p tsconfig.build.json --noEmit` before publish)
+- `pnpm audit --audit-level=high`
+- `corepack pnpm pack --dry-run` to verify tarball contents
 
 ### "Should we add a new bundle format?"
 
@@ -81,8 +83,9 @@ Recommendation: don't add ESM until a consumer reports a real interop problem. T
 - A PR introduces a workflow that pushes directly to `main` from anyone other than the release bot
 - A PR uses deprecated GitHub Actions syntax (`::set-env`, `::set-output`) without the `ACTIONS_ALLOW_UNSECURE_COMMANDS` toggle
 - A PR adds a secret that's not necessary
-- A PR commits any of: `dist/`, `node_modules/`, `package-lock.json` (gitignored), `.env` files
+- A PR commits any of: `dist/`, `node_modules/`, `package-lock.json` (the lockfile is `pnpm-lock.yaml` — a stray `package-lock.json` signals bare `npm` was used), `.env` files
 - A PR changes the npm publish identity / token without coordinating
+- A PR uses bare `npm install`/`npm ci` in a workflow or Dockerfile instead of `corepack pnpm install --frozen-lockfile`, or drops the `"packageManager"` pin / `corepack enable`
 - A PR adds a release-notes generator without understanding the boundary marker (`[🤖 DailyBot] New release to v`)
 
 ## Heuristics
@@ -92,7 +95,8 @@ Recommendation: don't add ESM until a consumer reports a real interop problem. T
 - **Secrets are radioactive.** Never log them, never echo them, never commit them
 - **Branch protection on `main`** is the safety net. Direct pushes (from the release bot) need explicit bypass; everything else goes through PRs
 - **The bot identity is a string.** `🤖 DailyBot <ops@dailybot.com>`. Forks change this; the rest of the workflow's logic depends on it (the release-log script greps for `[🤖 DailyBot]`)
-- **`.npmignore` is the publishing blast radius.** Always verify with `npm pack --dry-run` before changing it
+- **`.npmignore` is the publishing blast radius.** Always verify with `corepack pnpm pack --dry-run` before changing it
+- **pnpm via Corepack is the contract.** CI/Docker install with `corepack pnpm install --frozen-lockfile`; releases publish with `corepack pnpm publish --no-git-checks` after `.github/scripts/prepare_release.sh` bumps + commits + tags. Keep the `"packageManager": "pnpm@11.1.2"` pin and the `minimumReleaseAge` quarantine in `pnpm-workspace.yaml` intact
 
 ## Common scenarios
 
@@ -128,7 +132,7 @@ The current `release_and_publish.yml` uses `::set-env name=... ::` (a deprecated
 
 Drop the `ACTIONS_ALLOW_UNSECURE_COMMANDS` env var.
 
-### "`npm publish` started failing with auth errors"
+### "`pnpm publish` started failing with auth errors"
 
 ```
 1. Verify the token in npm settings (still active? still scoped?)
@@ -145,7 +149,7 @@ Drop the `ACTIONS_ALLOW_UNSECURE_COMMANDS` env var.
 1. Check tsconfig.json has resolveJsonModule: true
 2. Check src/index.ts still has `import emojiLibJson from './lib/emoji-lib.json'`
 3. Check vite.config.ts doesn't externalize @twemoji/parser or .json (library mode must inline them; `dependencies` is empty)
-4. Run npm run build and read the Vite/Rollup output for warnings
+4. Run corepack pnpm run build and read the Vite/Rollup output for warnings
 ```
 
 ### "Need to update the release commit message"
@@ -158,7 +162,7 @@ if [[ "$text_line" =~ "[🤖 DailyBot] New release to v" ]]; then
 fi
 ```
 
-If you change the commit message in `package.json` `release` script, also change the regex. Otherwise the release-notes generator never finds the previous release boundary and dumps the entire git history.
+If you change the commit message in `.github/scripts/prepare_release.sh` (the `RELEASE_MESSAGE` variable; the `release` script in `package.json` is the legacy fallback), also change the regex. Otherwise the release-notes generator never finds the previous release boundary and dumps the entire git history.
 
 ### "Auto-merge of dep PR landed something broken"
 
@@ -173,7 +177,7 @@ The `check_and_merge_packages_upgrades_pr.yml` workflow auto-merges deps PRs whe
 
 ### "Dist tarball is missing files"
 
-Run `npm pack --dry-run` to see exactly what would publish. If a needed file is missing:
+Run `corepack pnpm pack --dry-run` to see exactly what would publish. If a needed file is missing:
 
 - It's in `.npmignore` — remove the entry
 - It's in a path not included by default — explicitly include via `package.json` `files`

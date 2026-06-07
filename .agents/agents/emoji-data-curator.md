@@ -156,7 +156,7 @@ Already done. If a similar issue appears for a different emoji, follow this patt
 Bump `unicode-emoji-json` and `emojilib`:
 
 ```bash
-npm install --save-dev unicode-emoji-json@latest emojilib@latest
+corepack pnpm add --save-dev unicode-emoji-json@latest emojilib@latest
 ```
 
 Regenerate the catalog. The new emoji should appear in `emoji-lib.json` automatically.

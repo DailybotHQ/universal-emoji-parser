@@ -203,16 +203,16 @@ The package has no time-dependent logic. No `Date.now()`, no timers. Don't write
 
 ## Speed
 
-- `npm run test:watch` (`vitest`) — your inner loop. Sub-second per re-run after the first transform
-- `npx vitest run test/main.test.ts -t "<pattern>"` — filter to a single test by name
-- The full suite is ~5 seconds. Reserve `npm test` (`vitest run`) for pre-commit / pre-push
+- `pnpm run test:watch` (`vitest`) — your inner loop. Sub-second per re-run after the first transform
+- `pnpm exec vitest run test/main.test.ts -t "<pattern>"` — filter to a single test by name
+- The full suite is ~5 seconds. Reserve `pnpm test` (`vitest run`) for pre-commit / pre-push
 
 ## Pre-push standard
 
 ```bash
-npm run biome:check
-npm test
-npm run build
+corepack pnpm run biome:check
+corepack pnpm test
+corepack pnpm run build
 ```
 
 All three must pass. CI mirrors this.

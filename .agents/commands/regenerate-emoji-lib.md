@@ -32,10 +32,10 @@ If there are uncommitted changes, stash or commit them first. Regeneration produ
 ### 2. Make sure deps are current
 
 ```bash
-npm install
+corepack pnpm install
 ```
 
-If `package-lock.json` doesn't exist (it's gitignored), `npm install` resolves from `package.json`. The regenerator uses `emojilib` and `unicode-emoji-json` — both are `devDependencies`.
+`corepack pnpm install` resolves from `pnpm-lock.yaml` (or `package.json` when the lockfile is absent). The regenerator uses `emojilib` and `unicode-emoji-json` — both are `devDependencies`.
 
 ### 3. Enable the regenerator test
 
@@ -56,7 +56,7 @@ it('create emojis lib json file', () => {
 The dedup loop is O(n²) and takes ~27 seconds, but Vitest's default `testTimeout` is 5s — pass a longer timeout so the test doesn't abort mid-write:
 
 ```bash
-npx vitest run test/prepareEmojiLibJson.test.ts --testTimeout=60000
+pnpm exec vitest run test/prepareEmojiLibJson.test.ts --testTimeout=60000
 ```
 
 Expected:
@@ -125,7 +125,7 @@ Open `test/prepareEmojiLibJson.test.ts` and change `it(` back to `it.skip(`. **D
 ### 9. Verify the suite passes against the new catalog
 
 ```bash
-npm test
+corepack pnpm test
 ```
 
 If `emojiLibJson.test.ts` fails on the deep-equal of a sample emoji (🤣, 😎), the upstream metadata changed for that emoji. Update the expected object in `emojiLibJson.test.ts` to match, then commit both.
@@ -158,7 +158,7 @@ chore: regenerate emoji catalog
 2. **Not reviewing the diff** — the dedup algorithm reassigns keywords across emojis when upstream changes. A single new keyword in `unicode-emoji-json` can shift many emojis' `keywords` arrays. Spot-check before committing
 3. **Forgetting `TOTAL_EMOJIS`** — `emojiLibJson.test.ts` will fail with a count mismatch. The fix is one digit, but the failed CI run looks confusing without context
 4. **Mixed commits** — committing the regeneration alongside unrelated code changes makes review hard. Always make the regeneration its own commit
-5. **Missing dependency** — if `npm install` hasn't been run since the last `package.json` change, `emojilib` or `unicode-emoji-json` may be missing. The regenerator will fail with `Cannot find module`
+5. **Missing dependency** — if `corepack pnpm install` hasn't been run since the last `package.json` change, `emojilib` or `unicode-emoji-json` may be missing. The regenerator will fail with `Cannot find module`
 
 ## Don't
 
@@ -172,7 +172,7 @@ chore: regenerate emoji catalog
 - ✅ Make the regeneration its own commit
 - ✅ Update `TOTAL_EMOJIS` in the same commit
 - ✅ Spot-check the diff for sanity (10–20 entries, not catastrophic)
-- ✅ Run `npm test` after restoring `it.skip` to verify the suite passes against the new catalog
+- ✅ Run `corepack pnpm test` after restoring `it.skip` to verify the suite passes against the new catalog
 
 ## Verification checklist
 
@@ -180,6 +180,6 @@ chore: regenerate emoji catalog
 - [ ] `it.skip` is **re-applied** in `prepareEmojiLibJson.test.ts`
 - [ ] `src/lib/emoji-lib-output.json` is **not** staged
 - [ ] `TOTAL_EMOJIS` matches `Object.keys(emojiLibJsonData).length`
-- [ ] `npm test` passes (all specs)
+- [ ] `corepack pnpm test` passes (all specs)
 - [ ] Diff was reviewed and looks correct
 - [ ] Single, well-named commit
