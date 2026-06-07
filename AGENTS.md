@@ -36,7 +36,7 @@ The package targets:
 
 - Twitter, GitHub, Slack, Discord, Google Chat, and Microsoft Teams shortcode dialects (single dictionary, normalized to one canonical slug per emoji)
 - Both **CommonJS** (`require('universal-emoji-parser')`) and **ES modules** (`import uEmojiParser from 'universal-emoji-parser'`)
-- Server-side (Node ≥ 22) and browser environments (consumers bundle via webpack/rollup/vite)
+- Server-side (Node ≥ 22) and browser environments (consumers bundle via Vite/rollup/esbuild)
 
 > **Forking this?** The package name (`universal-emoji-parser`), the npm scope, the maintainer block in `package.json`, the GitHub remote, and the DailyBot release-bot identity are the renameable identifiers. Walk [Fork Customization](docs/FORK_CUSTOMIZATION.md) before merging product code.
 

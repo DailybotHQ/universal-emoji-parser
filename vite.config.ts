@@ -3,6 +3,8 @@ import { defineConfig } from 'vite'
 
 // Library build for universal-emoji-parser.
 //
+// (vite.config.ts — see vitest.config.ts for the test runner setup.)
+//
 // Output contract (must match what consumers have always received):
 //   - dist/index.js          single minified CommonJS bundle (libraryTarget commonjs2
 //                            equivalent). @twemoji/parser and the emoji catalog are

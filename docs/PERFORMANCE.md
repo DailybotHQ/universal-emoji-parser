@@ -93,7 +93,7 @@ async function parseLazy(text: string): Promise<string> {
 }
 ```
 
-Webpack/Vite/Rollup turn this into a code-split chunk — the catalog only ships when first needed. Trade-off: first call awaits a network fetch.
+Vite/rollup/esbuild turn this into a code-split chunk — the catalog only ships when first needed. Trade-off: first call awaits a network fetch.
 
 ### Tree-shaking
 

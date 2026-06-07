@@ -231,7 +231,7 @@ The current three lines are battle-tested across:
 - Node CJS consumers (`require`)
 - Node ESM consumers (`.mjs` / `"type": "module"`)
 - TypeScript consumers (with and without `esModuleInterop`)
-- Bundler consumers (Vite, rollup, webpack, esbuild)
+- Bundler consumers (Vite, rollup, esbuild)
 
 Leave them alone.
 

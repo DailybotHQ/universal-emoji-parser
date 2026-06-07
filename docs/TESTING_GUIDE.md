@@ -119,7 +119,7 @@ expect(result).toMatch('alt="⭐️"')
 expect(fs.existsSync(filePath)).toBe(true)
 ```
 
-Unlike Chai's `expect(x).to.be.true`, Vitest's `expect(x).toBe(true)` is a normal call expression — there is no "no-op expression" lint suppression to add.
+`expect(x).toBe(true)` is a normal call expression, so no special lint suppression is needed for boolean assertions.
 
 ## Catalog tests (`emojiLibJson.test.ts`)
 

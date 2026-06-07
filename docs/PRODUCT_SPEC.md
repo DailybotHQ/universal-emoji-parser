@@ -44,7 +44,7 @@ consume it** — and the end users they serve:
 - **Content and CMS pipelines** that transform text to HTML and want emoji to
   survive that transformation cleanly.
 - **Both runtimes:** Node.js services (server-side rendering, message
-  processing) and browser apps (it bundles via webpack/rollup/vite), with dual
+  processing) and browser apps (it bundles via Vite/rollup/esbuild), with dual
   CommonJS and ES Module entry points.
 
 ## Why they choose it

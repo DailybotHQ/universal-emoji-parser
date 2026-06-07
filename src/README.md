@@ -25,10 +25,10 @@ design rationale: [`docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md).
 
 ## How it's tested
 
-Specs live in [`test/`](../test) and run with `tsx` + Mocha (no compile step):
+Specs live in [`test/`](../test) and run with Vitest (no compile step):
 
 ```bash
-npm test            # run all Mocha specs
+npm test            # run all Vitest specs
 npm run test:watch  # TDD inner loop while editing index.ts
 ```
 

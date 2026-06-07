@@ -38,21 +38,21 @@ function test() {
 }
 
 function build() {
-	print.success "Running TypeScript build (tsc)..."
+	print.success "Running TypeScript type-check (tsc --noEmit)..."
 	npm run build:tsc
 	if [ $? != 0 ]; then
-		print.error "⚠️ tsc build failed."
+		print.error "⚠️ tsc type-check failed."
 		return 1
 	fi
-	print.success "Running Webpack production build..."
+	print.success "Running Vite production build (+ tsc declarations)..."
 	npm run build
 	if [ $? != 0 ]; then
-		print.error "⚠️ Webpack build failed."
+		print.error "⚠️ Vite build failed."
 		return 1
 	fi
 }
 
-# Same gates as CI plus build:tsc + webpack (pre-merge / pre-publish).
+# Same gates as CI plus build:tsc + Vite build (pre-merge / pre-publish).
 # Order: lint/format -> build -> test. Build runs before test so the bundle suite
 # in test/exports.test.ts validates an up-to-date dist/index.js (otherwise it
 # self-skips with a hint).
@@ -73,7 +73,7 @@ function codecheck() {
 		print.error "⚠️ Tests failed."
 		return 1
 	fi
-	print.success "✅ codecheck passed (biome + build:tsc + webpack + test)"
+	print.success "✅ codecheck passed (biome + build:tsc + vite build + test)"
 }
 
 function install() {
@@ -308,8 +308,8 @@ function show_welcome() {
     echo "  • help                 - Show this message"
     echo "  • check                - npm run biome:check (CI lint/format gate)"
     echo "  • fix                  - npm run biome:fix (lint + format, apply fixes)"
-    echo "  • test                 - npm run test (Mocha + tsx)"
-    echo "  • build                - npm run build:tsc + npm run build (types + webpack)"
+    echo "  • test                 - npm run test (Vitest)"
+    echo "  • build                - npm run build:tsc + npm run build (type-check + Vite + tsc declarations)"
     echo "  • codecheck            - check (biome) + build + test (full local gate before push)"
     echo "  • install              - npm install"
     echo ""

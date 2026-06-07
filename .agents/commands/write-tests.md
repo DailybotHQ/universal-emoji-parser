@@ -222,7 +222,7 @@ The package has no external IO — everything is in-memory. Don't reach for Vite
 
 ## Pitfalls
 
-1. **Forgetting `import { describe, it, expect } from 'vitest'`** — unlike Mocha, Vitest does not expose `describe`/`it`/`expect` as globals by default; import them explicitly
+1. **Forgetting `import { describe, it, expect } from 'vitest'`** — Vitest does not expose `describe`/`it`/`expect` as globals; import them explicitly
 2. **Using `console.log` in `src/`** — Biome's `noConsole` blocks it. In tests it's fine (the rule is scoped to `src/`)
 3. **Testing the wrong shape** — `parseToHtml` returns full HTML; `parseToUnicode` returns text with unicode emojis; `parseToShortcode` returns text with `:slug:`. Match the test to the method
 4. **Assertion fragility** — pasting full HTML output into a test means the test breaks on Twemoji bumps. That's intentional — we want to know when the URL format changes — but use `.toContain()` instead of `.toBe()` if you only care about specific substrings

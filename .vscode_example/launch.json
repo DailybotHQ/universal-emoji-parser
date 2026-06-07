@@ -4,11 +4,13 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Mocha Tests",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["--import", "tsx"],
-      "program": "${workspaceFolder}/node_modules/mocha/bin/mocha.js",
-      "args": ["${workspaceFolder}/test/**/*.ts", "--timeout", "2000", "--colors"],
+      "name": "Vitest Tests",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "program": "${workspaceFolder}/node_modules/vitest/vitest.mjs",
+      "args": ["run", "--no-file-parallelism"],
+      "smartStep": true,
+      "console": "integratedTerminal",
       "internalConsoleOptions": "openOnSessionStart"
     }
   ]
