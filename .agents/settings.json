@@ -3,20 +3,23 @@
   "permissions": {
     "allow": [
       "Read(*)",
-      "Bash(npm test)",
-      "Bash(npm run test:watch)",
-      "Bash(npm run biome:check)",
-      "Bash(npm run biome:fix)",
-      "Bash(npm run biome:fix:unsafe)",
-      "Bash(npm run build)",
-      "Bash(npm run build:dev)",
-      "Bash(npm run build:types)",
-      "Bash(npm run build:tsc)",
-      "Bash(npm run ncu:check)",
+      "Bash(corepack enable)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm test)",
+      "Bash(pnpm run test:watch)",
+      "Bash(pnpm run biome:check)",
+      "Bash(pnpm run biome:fix)",
+      "Bash(pnpm run biome:fix:unsafe)",
+      "Bash(pnpm run build)",
+      "Bash(pnpm run build:dev)",
+      "Bash(pnpm run build:types)",
+      "Bash(pnpm run build:tsc)",
+      "Bash(pnpm run ncu:check)",
+      "Bash(corepack pnpm:*)",
       "Bash(git status)",
       "Bash(git diff:*)",
       "Bash(git log:*)"
     ],
-    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./**/*.pem)", "Bash(npm run release)", "Bash(npm publish:*)"]
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Read(./**/*.pem)", "Bash(pnpm run release)", "Bash(pnpm publish:*)"]
   }
 }

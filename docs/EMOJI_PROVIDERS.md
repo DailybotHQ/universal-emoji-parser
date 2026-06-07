@@ -164,7 +164,7 @@ Procedure (full version: [`/add-special-case`](../.agents/commands/add-special-c
      expect(uEmojiParser.parseToUnicode(':rocketship:')).to.be.equal('🚀')
    })
    ```
-5. Run `npm test` — expect `emojiLibJson.test.ts` to also still pass (count unchanged) and `main.test.ts` to include the new case
+5. Run `pnpm test` — expect `emojiLibJson.test.ts` to also still pass (count unchanged) and `main.test.ts` to include the new case
 6. Commit all four files: the test override, the catalog, the new test, and any `TOTAL_EMOJIS` update
 
 ### Removing a special case
@@ -182,7 +182,7 @@ Reverse the include/exclude (or delete the entry), regenerate, update tests, com
 When bumping `@twemoji/parser`:
 
 1. Read the release notes
-2. `npm test` — if snapshots break, the URL format changed (or a specific emoji was rerendered)
+2. `pnpm test` — if snapshots break, the URL format changed (or a specific emoji was rerendered)
 3. Update test expectations and consider whether this is a major bump for _our_ package
 4. Per [Standards](STANDARDS.md#versioning), HTML output changes are major bumps
 

@@ -26,6 +26,10 @@ npm install universal-emoji-parser --save
 
 or
 
+pnpm add universal-emoji-parser
+
+or
+
 yarn add universal-emoji-parser
 ```
 

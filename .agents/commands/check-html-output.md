@@ -56,8 +56,8 @@ console.log('--- Output ---')
 console.log(uEmojiParser.parseToHtml(input, cdn))
 EOF
 
-npx tsx tmp/check.ts 'hello :smile: 🚀'
-npx tsx tmp/check.ts 'hello 🚀' 'https://my-cdn.example.com/svg/'
+pnpm dlx tsx tmp/check.ts 'hello :smile: 🚀'
+pnpm dlx tsx tmp/check.ts 'hello 🚀' 'https://my-cdn.example.com/svg/'
 ```
 
 ### 2. Verify the output structure
@@ -102,7 +102,7 @@ So `🚀` should produce `.../1f680.svg`.
 Run with shortcode input:
 
 ```bash
-npx tsx tmp/check.ts ':rocket:'
+pnpm dlx tsx tmp/check.ts ':rocket:'
 ```
 
 Expected: same HTML as if you'd run `🚀` directly. The `parseToHtml` chain calls `parseToUnicode` first, so shortcodes resolve before HTML rendering.
@@ -110,7 +110,7 @@ Expected: same HTML as if you'd run `🚀` directly. The `parseToHtml` chain cal
 ### 5. Verify multi-emoji and mixed-content
 
 ```bash
-npx tsx tmp/check.ts 'hello 🚀 world :smile: again 🚀'
+pnpm dlx tsx tmp/check.ts 'hello 🚀 world :smile: again 🚀'
 ```
 
 Expected:
@@ -122,7 +122,7 @@ Expected:
 ### 6. Verify error case
 
 ```bash
-npx tsx -e "import u from './src/index'; u.parse(undefined as any)"
+pnpm dlx tsx -e "import u from './src/index'; u.parse(undefined as any)"
 ```
 
 Expected: `Error: The text parameter should be a string.`
@@ -157,7 +157,7 @@ Older versions or accidental refactors may emit `<img class="emoji" alt="..." sr
 
 - **Twemoji doesn't recognize it** — the package can only render what `@twemoji/parser` finds. Check `parse('your-emoji')` directly:
   ```bash
-  npx tsx -e "import { parse } from '@twemoji/parser'; console.log(parse('🚀'))"
+  pnpm dlx tsx -e "import { parse } from '@twemoji/parser'; console.log(parse('🚀'))"
   ```
 - **Variation selector mismatch** — `⭐️` (with VS-16) vs `⭐` (without) are different bytes. Check your input's actual codepoints
 

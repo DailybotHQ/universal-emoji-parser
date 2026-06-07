@@ -96,7 +96,7 @@ If your host supports memory (Claude Code does, Cursor does, others vary):
 When taking work from another agent:
 
 - Read the diff, don't trust the summary
-- Re-run the full pre-commit checklist on your machine (`npm run biome:check && npm test && npm run build`)
+- Re-run the full pre-commit checklist on your machine (`pnpm run biome:check && pnpm test && pnpm run build`)
 - If tests fail, the work isn't done — even if the previous agent claimed otherwise
 
 ## Updating these rules

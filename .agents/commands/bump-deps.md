@@ -38,7 +38,7 @@ Add package names to `reject` only when an upgrade needs deliberate follow-up (b
 ### 1. Check what's available
 
 ```bash
-npm run ncu:check
+corepack pnpm run ncu:check
 ```
 
 Output lists every dep with an upgrade available, respecting `.ncurc.json`. Sample:
@@ -61,9 +61,9 @@ Multi-bumps mask which dependency broke a build. Even if `ncu` proposes ten in o
 # Edit package.json manually
 $EDITOR package.json
 # Or use ncu for one specific dep
-npx ncu typescript -u
+pnpm dlx ncu typescript -u
 # Or for multiple
-npx ncu typescript vitest -u
+pnpm dlx ncu typescript vitest -u
 ```
 
 Note: `ncu -u` modifies `package.json`. Verify the diff:
@@ -72,21 +72,21 @@ Note: `ncu -u` modifies `package.json`. Verify the diff:
 git diff package.json
 ```
 
-### 2b. Apply via npm install
+### 2b. Apply via pnpm install
 
 ```bash
-npm install
+corepack pnpm install
 ```
 
-This refreshes `node_modules`. There's no committed `package-lock.json`, so the lock is regenerated.
+This refreshes `node_modules` and updates `pnpm-lock.yaml`. Commit the lockfile change alongside `package.json`.
 
 ### 3. Run the full check sequence
 
 ```bash
-npm run biome:check
-npm test
-npm run build
-npm run build:tsc
+corepack pnpm run biome:check
+corepack pnpm test
+corepack pnpm run build
+corepack pnpm run build:tsc
 ```
 
 Read every error. Common failure modes:
@@ -117,7 +117,7 @@ If the new version changed default behavior:
 `@twemoji/parser` is inlined into the bundle, so any change to it (or to Vite/TypeScript) can affect `dist/index.js`:
 
 ```bash
-npm run build
+corepack pnpm run build
 node -e "console.log(require('./dist/index.js').parse('hello :smile: 🚀'))"
 ```
 
@@ -137,7 +137,7 @@ Always update [`docs/TECHNOLOGIES.md`](../../docs/TECHNOLOGIES.md) version table
 ### 7. Commit
 
 ```bash
-git add package.json
+git add package.json pnpm-lock.yaml
 git commit -m "chore: bump <library> to <version>"
 ```
 
@@ -169,8 +169,8 @@ Inlined into the bundle (a devDep, not a runtime dep) and **pinned to `17.0.1` v
 Before lifting the `reject` pin and bumping:
 
 ```bash
-npm test                                   # assertions break if URL format changed
-npm run build && node -e "console.log(require('./dist/index.js').parse('❤️ 🚀'))"
+corepack pnpm test                         # assertions break if URL format changed
+corepack pnpm run build && node -e "console.log(require('./dist/index.js').parse('❤️ 🚀'))"
 ```
 
 If assertions break or `src` comes back empty, decide between:
@@ -183,8 +183,8 @@ If assertions break or `src` comes back empty, decide between:
 Type-only changes can ripple through the `.d.ts` we ship. After bumping:
 
 ```bash
-npm run build:tsc                    # check the .d.ts compiles cleanly
-npm pack                             # generate a tarball
+corepack pnpm run build:tsc          # check the .d.ts compiles cleanly
+corepack pnpm pack                    # generate a tarball
 # install in a sample project to verify types still work for consumers
 ```
 
@@ -226,7 +226,9 @@ Don't drift CI Node from the package's stated minimum.
 ## Do
 
 - ✅ Read release notes (at minimum the headline changes)
+- ✅ Run `corepack enable` first so the pinned `pnpm@11.1.2` is used
 - ✅ Run all checks (`biome:check`, test, build, types) after bumping
+- ✅ Commit the updated `pnpm-lock.yaml` alongside `package.json`
 - ✅ Update docs in the same commit
 - ✅ Use conventional commit messages
 - ✅ Treat `@twemoji/parser` URL/`src` changes as breaking (major bump for our package)
@@ -234,12 +236,12 @@ Don't drift CI Node from the package's stated minimum.
 
 ## Verification checklist
 
-- [ ] Edited only `package.json` (and re-ran `npm install` to regenerate locks if applicable)
+- [ ] Edited `package.json` and re-ran `corepack pnpm install` to update `pnpm-lock.yaml`
 - [ ] `dependencies` is still empty (zero runtime deps)
-- [ ] `npm run biome:check` passes
-- [ ] `npm test` passes
-- [ ] `npm run build` succeeds
-- [ ] `npm run build:tsc` succeeds (types compile)
+- [ ] `corepack pnpm run biome:check` passes
+- [ ] `corepack pnpm test` passes
+- [ ] `corepack pnpm run build` succeeds
+- [ ] `corepack pnpm run build:tsc` succeeds (types compile)
 - [ ] If `@twemoji/parser` was bumped, manual smoke-test of HTML output succeeded (non-empty `src`)
 - [ ] Docs updated for any documented version
 - [ ] Conventional commit message

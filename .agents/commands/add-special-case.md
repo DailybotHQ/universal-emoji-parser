@@ -78,7 +78,7 @@ For both:
 Follow [`/regenerate-emoji-lib`](regenerate-emoji-lib.md):
 
 1. Change `it.skip` → `it` in `prepareEmojiLibJson.test.ts`
-2. `npm test` (writes `src/lib/emoji-lib-output.json`)
+2. `corepack pnpm test` (writes `src/lib/emoji-lib-output.json`)
 3. Diff against `src/lib/emoji-lib.json`
 4. Verify the override took effect:
 
@@ -123,7 +123,7 @@ it('should not resolve :heart: to 💘 (excluded keyword)', () => {
 ### 5. Run the full test suite
 
 ```bash
-npm test
+corepack pnpm test
 ```
 
 Expected: all green. If `emojiLibJson.test.ts` fails on `TOTAL_EMOJIS`, the count changed during regeneration — update the constant.
@@ -170,6 +170,6 @@ Conventional commit type:
 - [ ] Regenerated catalog reflects the override (verified via inline check)
 - [ ] `it.skip` is restored
 - [ ] New regression test in `test/main.test.ts`
-- [ ] `npm test` passes
+- [ ] `corepack pnpm test` passes
 - [ ] `TOTAL_EMOJIS` updated if count changed
 - [ ] Single commit with descriptive message

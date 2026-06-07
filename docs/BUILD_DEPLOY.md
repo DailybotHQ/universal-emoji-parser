@@ -14,7 +14,7 @@ The fork checklist for these is in [Fork Customization](FORK_CUSTOMIZATION.md).
 
 ## The build artifact
 
-`npm run build` produces a single bundle in `dist/`:
+`pnpm run build` produces a single bundle in `dist/`:
 
 ```
 dist/
@@ -25,7 +25,7 @@ dist/
     └── type.d.ts     ← Re-exported interface types
 ```
 
-`npm run build` runs **both** steps in sequence: `vite build` (the executable bundle) followed by `npm run build:types` (`tsc -p tsconfig.build.json --emitDeclarationOnly`, which writes `dist/index.d.ts` + `dist/lib/type.d.ts`). One command produces a complete, publishable `dist/`.
+`pnpm run build` runs **both** steps in sequence: `vite build` (the executable bundle) followed by `tsc -p tsconfig.build.json --emitDeclarationOnly` (which writes `dist/index.d.ts` + `dist/lib/type.d.ts`). The two steps are inlined directly in the `build` script (`vite build && tsc -p tsconfig.build.json --emitDeclarationOnly`) — there is no nested package-manager call. One command produces a complete, publishable `dist/`.
 
 `package.json` points consumers at:
 
@@ -41,18 +41,18 @@ dist/
 ### Manual build
 
 ```bash
-npm run build              # Vite production bundle + tsc declarations (full dist/)
-npm run build:dev          # Vite development bundle (unminified, --mode development)
-npm run build:types        # tsc -p tsconfig.build.json --emitDeclarationOnly (just the .d.ts)
-npm run build:tsc          # tsc -p tsconfig.build.json --noEmit (type-check only, no output)
+pnpm run build             # Vite production bundle + tsc declarations (full dist/)
+pnpm run build:dev         # Vite development bundle (unminified, --mode development)
+pnpm run build:types       # tsc -p tsconfig.build.json --emitDeclarationOnly (just the .d.ts)
+pnpm run build:tsc         # tsc -p tsconfig.build.json --noEmit (type-check only, no output)
 ```
 
-A single `npm run build` produces a complete `dist/` because it chains `vite build && npm run build:types`:
+A single `pnpm run build` produces a complete `dist/` because it chains `vite build && tsc -p tsconfig.build.json --emitDeclarationOnly`:
 
 - `vite build` produces `dist/index.js` (executable, esbuild-minified, `@twemoji/parser` inlined)
-- `npm run build:types` produces `dist/index.d.ts` + `dist/lib/type.d.ts` (types)
+- `tsc -p tsconfig.build.json --emitDeclarationOnly` produces `dist/index.d.ts` + `dist/lib/type.d.ts` (types). The standalone `pnpm run build:types` script runs this same command on its own
 
-The CI workflow runs `npm run build`, so both the bundle and the declarations are always published together — there is no separate "remember to also run tsc" step anymore. `build:tsc` is a `--noEmit` type-check gate only; it writes nothing.
+The CI workflow runs `pnpm run build`, so both the bundle and the declarations are always published together — there is no separate "remember to also run tsc" step anymore. `build:tsc` is a `--noEmit` type-check gate only; it writes nothing.
 
 ### Inspecting the bundle
 
@@ -74,16 +74,16 @@ The package follows **Semantic Versioning** (loosely):
 - **Minor** (e.g., `2.1.x` → `2.2.0`) — new methods, new options, new catalog fields. **Manually bump** before merging
 - **Major** (e.g., `2.x` → `3.0`) — HTML output template change, default option flip, removed/renamed method, dual-export break, dropped Node version
 
-CI's `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` is the right default.
+CI's patch bump via `.github/scripts/prepare_release.sh` (committed with `[🤖 DailyBot] New release to v%s launched 🚀`) is the right default. The script bumps `package.json` with Node directly rather than `pnpm version`, because pnpm v11 runs `git status --porcelain` upfront and fails with `ERR_PNPM_UNCLEAN_WORKING_TREE` when CI's `pnpm install --frozen-lockfile` has left transient install-script artifacts (e.g. esbuild's postinstall). The Node bump only touches `package.json` and is safe regardless of untracked state.
 
 ### How to ship a non-patch release
 
-The release workflow auto-runs `npm version patch`, which fails if the working tree is dirty or if the new version already exists. To ship a minor or major:
+The release script (`prepare_release.sh`) auto-bumps the patch number and refuses to run if **tracked** files have uncommitted changes (untracked/gitignored build artifacts like `dist/` are fine). To ship a minor or major:
 
 1. **In the same PR**, edit `package.json` `"version"` manually to the next minor or major (e.g., `2.1.7` → `2.2.0` or `3.0.0`)
 2. Note in the PR description that this is a non-patch release
-3. The workflow's `npm version patch` will then bump from `2.2.0` → `2.2.1` (or `3.0.0` → `3.0.1`) — which is fine
-4. **Or**: temporarily disable the auto-bump in the workflow for that release, manually run `npm version minor`/`major` locally, push the tag, and re-enable the workflow
+3. The script's patch bump will then go from `2.2.0` → `2.2.1` (or `3.0.0` → `3.0.1`) — which is fine
+4. **Or**: temporarily disable the auto-bump in the workflow for that release, bump the version manually in `package.json` locally, commit + tag, push, and re-enable the workflow
 
 Right now the workflow has no toggle — modifying it is the way. File an issue if this happens often; we'll add a `[skip auto-bump]` PR-title convention.
 
@@ -112,30 +112,30 @@ on:
                                        │
                                        ▼
                                   deploy_setup
-                                  (npm install)
+                            (corepack pnpm install)
                                        │
                                        ▼
                 deploy_validate_linters_and_code_format
-                            (npm run biome:check)
+                       (corepack pnpm run biome:check)
                                        │
                                        ▼
                                   deploy_tests
-                                   (npm test)
+                             (corepack pnpm test)
                                        │
                                        ▼
                                       build
-                                  (npm run build)
+                            (corepack pnpm run build)
                                        │
                                        ▼
                             release_and_publish
-                       (version bump + tag + GH release + npm publish)
+            (prepare_release.sh bump + tag + GH release + pnpm publish)
                                        │
                             ┌──────────┴──────────┐
                             ▼                     ▼
                      cleanup_caches      notify_on_channel_end
 ```
 
-Every job runs on `ubuntu-latest` with Node **24** (latest `.x` available to `actions/setup-node`) and aggressive caching of `~/.npm`, `node_modules`, and `dist/`.
+Every job runs on `ubuntu-latest` with Node **24** (pinned to 24.16.0) and Corepack-provisioned **pnpm 11.1.2**, with aggressive caching of the pnpm store, `node_modules`, and `dist/`.
 
 ### Job-by-job
 
@@ -149,32 +149,32 @@ Posts a "deployment started" message to the DailyBot channel via `https://api.da
 
 #### 3. `deploy_setup`
 
-`actions/checkout@v6` + `actions/setup-node@v6` (Node 24) + `actions/cache@v5` for `~/.npm` and `node_modules`. If cache miss, runs `npm install`.
+`actions/checkout@v6` + `actions/setup-node@v6` (Node 24) + `corepack enable` (provisions pnpm 11.1.2) + `actions/cache@v5` for the pnpm store and `node_modules`. If cache miss, runs `corepack pnpm install --frozen-lockfile`.
 
 #### 4. `deploy_validate_linters_and_code_format`
 
 ```yaml
-- run: npm run biome:check
+- run: corepack pnpm run biome:check
 ```
 
 A single Biome step covers both lint and format. Hard gate — fails the whole pipeline if Biome reports any error.
 
 #### 5. `deploy_tests`
 
-`npm run test` — Vitest (`vitest run`) over `test/**/*.test.ts`. Hard gate.
+`corepack pnpm run test` — Vitest (`vitest run`) over `test/**/*.test.ts`. Hard gate.
 
 #### 6. `build`
 
 ```yaml
 - run: |
-    npm run build
+    corepack pnpm run build
     if [ ! -d "dist" ]; then
       echo "⚠️ Error: dist folder does not exist."
       exit 1
     fi
 ```
 
-Vite library build **plus** the `tsc` declaration emit (`npm run build` chains `vite build && npm run build:types`). Caches `dist/` so the next job can publish without rebuilding. Both the executable bundle and the `.d.ts` files are produced here — no separate type-build step is required.
+Vite library build **plus** the `tsc` declaration emit (`pnpm run build` chains `vite build && tsc -p tsconfig.build.json --emitDeclarationOnly`). Caches `dist/` so the next job can publish without rebuilding. Both the executable bundle and the `.d.ts` files are produced here — no separate type-build step is required.
 
 #### 7. `release_and_publish`
 
@@ -192,8 +192,9 @@ Vite library build **plus** the `tsc` declaration emit (`npm run build` chains `
     git config user.email "ops@dailybot.com"
 - run: |
     bash .github/scripts/get_github_release_log.sh
+- run: corepack enable
 - run: |
-    npm run release
+    corepack pnpm run release
     git push --follow-tags origin main
 - run: |
     GITHUB_RELEASE_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
@@ -205,7 +206,7 @@ Vite library build **plus** the `tsc` declaration emit (`npm run build` chains `
     bodyFile: git_logs_output.txt
     token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
 - run: |
-    npm publish
+    corepack pnpm publish --no-git-checks
   env:
     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 - run: |
@@ -217,10 +218,10 @@ Steps in order:
 1. **Checkout** with token + 30-commit history (for the release notes script)
 2. **Identity** — git as `🤖 DailyBot <ops@dailybot.com>`
 3. **Release notes** — `get_github_release_log.sh` walks `git log` from HEAD until it hits the previous `[🤖 DailyBot] New release to v...` commit, formats each as `🚩 <message>`, writes `git_logs_output.txt`
-4. **Bump version** — `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` updates `package.json`, creates a tag, commits
+4. **Bump version** — `corepack pnpm run release` runs `.github/scripts/prepare_release.sh`, which patch-bumps `package.json` (via Node), stages `package.json` + `pnpm-lock.yaml`, commits with `[🤖 DailyBot] New release to v%s launched 🚀`, and creates the annotated tag
 5. **Push** — `git push --follow-tags origin main` (sends the version commit + the tag)
 6. **GitHub Release** — `ncipollo/release-action@v1` creates a Release with notes from step 3
-7. **npm publish** — uses `secrets.NPM_TOKEN` via `NODE_AUTH_TOKEN`. The package goes live on npm
+7. **pnpm publish** — `corepack pnpm publish --no-git-checks` uses `secrets.NPM_TOKEN` via `NODE_AUTH_TOKEN`. The package goes live on npm (`--no-git-checks` skips pnpm's clean-tree assertion, which the cached `dist/` would otherwise trip)
 8. **Delete source branch** — tidies up the merged feature branch
 
 #### 8. `cleanup_caches`
@@ -243,13 +244,13 @@ Posts the final status (success/failure per job) to the DailyBot channel. Always
 | `package.json`      | `test/`                                                                                               |
 | `README.md`         | `vite.config.ts`, `vitest.config.ts`, `tsconfig.json`, `biome.json`, `.editorconfig`                  |
 | `LICENSE`           | `.github/`, `docker/`, `.vscode/`, `.devcontainer/`, `.agents/`, `.claude/`, `docs/`                  |
-|                     | `package-lock.json`, `git_logs*.txt`, `packages_upgrades*.txt`, `emoji-lib-output.json`               |
+|                     | `pnpm-lock.yaml`, `git_logs*.txt`, `packages_upgrades*.txt`, `emoji-lib-output.json`                  |
 
 Verify what would publish without actually publishing:
 
 ```bash
-npm pack --dry-run                  # Lists files; does not publish
-npm pack                            # Creates universal-emoji-parser-X.Y.Z.tgz locally
+corepack pnpm pack --dry-run        # Lists files; does not publish
+corepack pnpm pack                  # Creates universal-emoji-parser-X.Y.Z.tgz locally
 tar tzf universal-emoji-parser-*.tgz | sort
 ```
 
@@ -266,13 +267,14 @@ git pull
 git status                          # must be clean
 
 # 1. Lint, test, build
-npm install
-npm run biome:check
-npm test
-npm run build                       # vite build + tsc declarations (full dist/)
+corepack enable                     # provision the pinned pnpm@11.1.2 (one-time)
+corepack pnpm install
+corepack pnpm run biome:check
+corepack pnpm test
+corepack pnpm run build             # vite build + tsc declarations (full dist/)
 
-# 2. Bump version (this commits + tags)
-npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"
+# 2. Bump version (this commits + tags via prepare_release.sh)
+corepack pnpm run release
 
 # 3. Push commit + tag
 git push --follow-tags origin main
@@ -282,7 +284,7 @@ bash .github/scripts/get_github_release_log.sh
 cat git_logs_output.txt             # review
 
 # 5. Publish to npm (must have NPM_TOKEN configured or be logged in)
-npm publish
+corepack pnpm publish --no-git-checks
 
 # 6. Create the GitHub release manually via gh CLI
 TAG=$(git describe --tags --abbrev=0)
@@ -299,7 +301,7 @@ Walk through [`/release-npm`](../.agents/commands/release-npm.md) for the struct
 
 ### `code_check.yml` — runs on every PR
 
-Three jobs: `setup` → `validate_linters_and_code_format` (a single `npm run biome:check`) → `tests` (Vitest). Gates merging.
+Three jobs: `setup` → `validate_linters_and_code_format` (a single `corepack pnpm run biome:check`) → `tests` (Vitest). Gates merging.
 
 ### `pull_request_check.yml` — runs on PR open/edit
 
@@ -314,7 +316,7 @@ These exist for review hygiene; they don't directly affect the release.
 ### `check_packages_versions.yml` — runs every Tuesday 15:00 UTC
 
 1. Checks out a branch named `feature__packages_versions_update` (creates if missing)
-2. Runs `npm run ncu:upgrade` (respects `.ncurc.json` — `@twemoji/parser` stays pinned to 17.0.1)
+2. Runs `corepack pnpm run ncu:upgrade` (respects `.ncurc.json` — `@twemoji/parser` stays pinned to 17.0.1), then `corepack pnpm install` to refresh `pnpm-lock.yaml`
 3. If anything upgraded, commits `Upgrading packages versions`, pushes the branch
 4. Opens a PR titled `🤖 Upgrading packages versions` with the upgrade list as body
 5. Notifies DailyBot
@@ -340,7 +342,7 @@ If you're forking this repo (see [Fork Customization](FORK_CUSTOMIZATION.md)):
 
 ## Common build failures
 
-### `npm publish` 403 Forbidden
+### `pnpm publish` 403 Forbidden
 
 - `NPM_TOKEN` expired or wrong scope (needs `automation` or `publish`)
 - Package name conflict — the name `universal-emoji-parser` is taken by this repo; if you fork and rename, register the new name first
@@ -355,19 +357,19 @@ If you're forking this repo (see [Fork Customization](FORK_CUSTOMIZATION.md)):
 - Branch protection on `main` requires PRs — but the release workflow pushes directly. Verify the bot's token has the "bypass branch protection" toggle enabled, or weaken protection for that token
 - Tag already exists — manual push happened previously; delete the local tag and let CI retry
 
-### npm version says "git working tree is not clean"
+### "git working tree is not clean" / `ERR_PNPM_UNCLEAN_WORKING_TREE`
 
-- A previous step modified files (e.g., a test wrote to `dist/`). The workflow caches `dist/` between jobs; if it's dirty, the version bump aborts
-- Manual fix: `git checkout -- .` before `npm version`, or stage cleanly
+- pnpm v11 runs `git status --porcelain` before `pnpm version`/`pnpm publish` and aborts if the tree is dirty. The release path sidesteps this two ways: `prepare_release.sh` bumps the version with Node (not `pnpm version`) and only blocks on **tracked** changes, and `pnpm publish --no-git-checks` skips the clean-tree assertion entirely (the cached `dist/` would otherwise trip it)
+- If a previous step modified tracked files, manual fix: `git checkout -- .` before re-running the release, or stage cleanly
 
 ---
 
 ## Deployment checklist
 
-- [ ] `npm run biome:check` succeeds
-- [ ] `npm test` passes (Vitest)
-- [ ] `npm run build` produces `dist/index.js` **and** `dist/index.d.ts` (it chains `vite build && npm run build:types`)
-- [ ] `npm pack --dry-run` shows only the expected files
+- [ ] `pnpm run biome:check` succeeds
+- [ ] `pnpm test` passes (Vitest)
+- [ ] `pnpm run build` produces `dist/index.js` **and** `dist/index.d.ts` (it chains `vite build && tsc -p tsconfig.build.json --emitDeclarationOnly`)
+- [ ] `pnpm pack --dry-run` shows only the expected files
 - [ ] No `console.log` in `src/`
 - [ ] `package.json` `version` reflects the intent (patch/minor/major)
 - [ ] Release notes draft makes sense (`bash .github/scripts/get_github_release_log.sh && cat git_logs_output.txt`)

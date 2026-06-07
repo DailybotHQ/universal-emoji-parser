@@ -49,7 +49,7 @@ cat > tmp/repro.ts <<'EOF'
 import uEmojiParser from '../src/index'
 console.log(JSON.stringify(uEmojiParser.parse(':smile: 🚀')))
 EOF
-npx tsx tmp/repro.ts
+pnpm dlx tsx tmp/repro.ts
 ```
 
 This confirms what the **current** behavior is so the test asserts the **right** value.
@@ -128,7 +128,7 @@ it('should return the full EmojiType object for :smile:', () => {
 ### 5. Run the test
 
 ```bash
-npm run test:watch
+corepack pnpm run test:watch
 ```
 
 Confirm:
@@ -148,8 +148,8 @@ If the test was a regression:
 ### 7. Verify
 
 ```bash
-npm test                      # All specs (vitest run)
-npm run biome:check           # Lint + format (catches noConsole accidents)
+corepack pnpm test            # All specs (vitest run)
+corepack pnpm run biome:check # Lint + format (catches noConsole accidents)
 ```
 
 ### 8. Commit
@@ -226,7 +226,7 @@ The package has no external IO — everything is in-memory. Don't reach for Vite
 2. **Using `console.log` in `src/`** — Biome's `noConsole` blocks it. In tests it's fine (the rule is scoped to `src/`)
 3. **Testing the wrong shape** — `parseToHtml` returns full HTML; `parseToUnicode` returns text with unicode emojis; `parseToShortcode` returns text with `:slug:`. Match the test to the method
 4. **Assertion fragility** — pasting full HTML output into a test means the test breaks on Twemoji bumps. That's intentional — we want to know when the URL format changes — but use `.toContain()` instead of `.toBe()` if you only care about specific substrings
-5. **Not running watch mode** — slow inner loops mean fewer tests get written. Use `npm run test:watch` (`vitest`)
+5. **Not running watch mode** — slow inner loops mean fewer tests get written. Use `pnpm run test:watch` (`vitest`)
 
 ## Don't
 
@@ -240,7 +240,7 @@ The package has no external IO — everything is in-memory. Don't reach for Vite
 - ✅ Use the existing patterns in `main.test.ts` as templates
 - ✅ Paste failing inputs verbatim — preserve every byte (variation selectors, ZWJ sequences)
 - ✅ One behavior per `it`, but allow numbered sub-cases for variations
-- ✅ Run `npm run test:watch` while writing
+- ✅ Run `pnpm run test:watch` while writing
 - ✅ Commit fix + test together with `fix:` conventional message
 
 ## Verification checklist

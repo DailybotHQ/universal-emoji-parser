@@ -43,6 +43,9 @@ typings/
 # Optional npm cache directory
 .npm
 
+# pnpm store (local content-addressable store)
+.pnpm-store/
+
 # Optional REPL history
 .node_repl_history
 

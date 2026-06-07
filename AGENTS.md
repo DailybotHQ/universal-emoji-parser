@@ -43,14 +43,15 @@ The package targets:
 **Technology Stack** (full list with versions: [Technologies](docs/TECHNOLOGIES.md))
 
 - **TypeScript 6** — strict-null source language, compiles to `dist/index.js` + `dist/index.d.ts` (see `package.json` for exact semver)
-- **Node.js ≥ 22.0.0** — `engines.node` constraint enforced by package.json (CI and the dev container use Node 24)
+- **Node.js ≥ 22.0.0** — `engines.node` constraint enforced by package.json (pinned to 24.16.0 via `.node-version`/`.nvmrc`; CI and the dev container use Node 24)
+- **pnpm 11.1.2 (via Corepack)** — package manager, pinned via `"packageManager": "pnpm@11.1.2"` in `package.json` and provisioned by Corepack (`corepack enable`). Lockfile is `pnpm-lock.yaml`. Supply-chain hardening lives in `pnpm-workspace.yaml` (`minimumReleaseAge: 10080` — a 7-day quarantine — plus `allowBuilds: { esbuild: true }`). Rationale: <https://xergioalex.com/blog/supply-chain-attacks-ai-era/>
 - **`@twemoji/parser` 17.0.1 (pinned, inlined)** — finds emoji entities in text and produces CDN URLs; bundled into `dist/index.js` so the package ships with **zero runtime dependencies**. Pinned to exactly `17.0.1` (see `.ncurc.json` `reject`) — `17.0.2` regresses U+FE0F variation-selector handling
 - **emojilib 4 + unicode-emoji-json** (build/test only) — sources used to regenerate `src/lib/emoji-lib.json`
 - **Vite 8 (library mode)** — production bundler via `vite.config.ts` (CJS library build, esbuild minify); emits a single CommonJS entry at `dist/index.js`. Type declarations come from `tsc --emitDeclarationOnly`
 - **Vitest 4** — test runner via `vitest.config.ts`; specs import `{ describe, it, expect } from 'vitest'`
 - **Biome 2.4** — single tool for lint + format via `biome.json` (`semi: false`, `singleQuote: true`, `trailingComma: 'es5'`, `lineWidth: 120`)
 - **npm-check-updates** — dependency upgrade automation (rejects in `.ncurc.json`; pins `@twemoji/parser` to `17.0.1`)
-- **GitHub Actions** — CI/CD: Biome check → tests → build → npm publish + GitHub release on PR merge to `main`
+- **GitHub Actions** — CI/CD: install via `corepack pnpm install --frozen-lockfile` (pnpm store cached on `pnpm-lock.yaml`) → Biome check → tests → build → release via `.github/scripts/prepare_release.sh` + `corepack pnpm publish --no-git-checks` + GitHub release on PR merge to `main`
 
 ## Project Structure
 
@@ -152,16 +153,16 @@ Full reference: **[API Reference](docs/API_REFERENCE.md)**.
 - **Imports first, then constants, then implementation** — see `src/index.ts` for the canonical layout
 - **`max_line_length = 120`** (`.editorconfig` / Biome `lineWidth: 120`) — Biome reflows past it
 
-Run `npm run biome:check` before committing. Auto-fix is `npm run biome:fix` (or `npm run biome:fix:unsafe` for unsafe fixes).
+Run `pnpm run biome:check` before committing. Auto-fix is `pnpm run biome:fix` (or `pnpm run biome:fix:unsafe` for unsafe fixes).
 
 ### 5. Code Quality (MANDATORY)
 
 ```bash
-npm run biome:check        # Lint + format check (CI gate)
-npm run biome:fix          # Auto-fix lint + format
-npm run biome:fix:unsafe   # Auto-fix including unsafe transforms
-npm run build:tsc          # Type-check only (tsc -p tsconfig.build.json --noEmit)
-npm run build              # Vite production bundle + .d.ts to dist/
+pnpm run biome:check        # Lint + format check (CI gate)
+pnpm run biome:fix          # Auto-fix lint + format
+pnpm run biome:fix:unsafe   # Auto-fix including unsafe transforms
+pnpm run build:tsc          # Type-check only (tsc -p tsconfig.build.json --noEmit)
+pnpm run build              # Vite production bundle + .d.ts to dist/
 ```
 
 The CI runs `biome:check` + `test` + `build` on every PR (`.github/workflows/code_check.yml`). All three must pass.
@@ -169,8 +170,8 @@ The CI runs `biome:check` + `test` + `build` on every PR (`.github/workflows/cod
 ### 6. Testing (MANDATORY)
 
 ```bash
-npm test                  # Run all Vitest specs once (vitest run)
-npm run test:watch        # Re-run on file change (vitest)
+pnpm test                  # Run all Vitest specs once (vitest run)
+pnpm run test:watch        # Re-run on file change (vitest)
 ```
 
 Specs live in `test/*.test.ts` and import `{ describe, it, expect } from 'vitest'`. The runner is configured via `vitest.config.ts`.
@@ -221,9 +222,9 @@ See **[Security Guide](docs/SECURITY.md)**.
 
 ### 10. Watch Loop (Test-Driven)
 
-The fastest inner loop for this package is `npm run test:watch`. Edit `src/index.ts` or a test file and the suite re-runs in ~1 second. Use it as the default workflow for any change to parsing logic.
+The fastest inner loop for this package is `pnpm run test:watch`. Edit `src/index.ts` or a test file and the suite re-runs in ~1 second. Use it as the default workflow for any change to parsing logic.
 
-For type-only changes, `npm run build:tsc` (`tsc -p tsconfig.build.json --noEmit`) is faster than running tests.
+For type-only changes, `pnpm run build:tsc` (`tsc -p tsconfig.build.json --noEmit`) is faster than running tests.
 
 ## Shared Agent Coordination
 
@@ -231,27 +232,30 @@ Multiple AI agents collaborate on this codebase. When updating agent guidance, m
 
 ## Quick Commands
 
+> **Package manager: pnpm via Corepack.** Run `corepack enable` once so the pinned `pnpm@11.1.2` is available. In the dev container, bare `npm` is routed to pnpm by a wrapper at `/usr/local/bin/npm`, but always invoke `pnpm` (or `corepack pnpm`) directly in scripts and docs. **Why pnpm?** Strict, content-addressed installs plus supply-chain hardening (`minimumReleaseAge` quarantine in `pnpm-workspace.yaml`): <https://xergioalex.com/blog/supply-chain-attacks-ai-era/>
+
 ```bash
 # Develop
-npm install                              # Install everything
-npm run dev                              # nodemon src/index.ts (manual smoke runs)
-npm run test:watch                       # TDD inner loop
+corepack enable                          # One-time: provision the pinned pnpm via Corepack
+pnpm install                             # Install everything (uses pnpm-lock.yaml)
+pnpm run dev                             # nodemon src/index.ts (manual smoke runs)
+pnpm run test:watch                      # TDD inner loop
 
 # Verify
-npm run biome:check                      # Lint + format
-npm test                                 # Vitest specs
-npm run build:tsc                        # Type-check only (tsc --noEmit)
+pnpm run biome:check                     # Lint + format
+pnpm test                                # Vitest specs
+pnpm run build:tsc                       # Type-check only (tsc --noEmit)
 
 # Build
-npm run build                            # Vite production + .d.ts → dist/
-npm run build:dev                        # Vite development build (vite build --mode development)
+pnpm run build                           # Vite production + .d.ts → dist/
+pnpm run build:dev                       # Vite development build (vite build --mode development)
 
 # Maintenance
-npm run ncu:check                        # Show available dependency upgrades (respects .ncurc.json)
-npm run ncu:upgrade                      # Apply upgrades to package.json (then `npm install`)
+pnpm run ncu:check                       # Show available dependency upgrades (respects .ncurc.json)
+pnpm run ncu:upgrade                     # Apply upgrades to package.json (then `pnpm install`)
 
 # Release (typically run by CI on merge to main, not by hand)
-npm run release                          # npm version patch + auto commit message
+# CI bumps the Node version via .github/scripts/prepare_release.sh, then `corepack pnpm publish --no-git-checks`
 ```
 
 Full reference: **[Development Commands](docs/DEVELOPMENT_COMMANDS.md)**.
@@ -296,11 +300,11 @@ This is **intentionally redundant**. Vite library `commonjs` output exposes the 
 `test/exports.test.ts` enforces this rule two ways:
 
 1. **Static check (always runs, no build needed)** — parses `src/index.ts` and asserts every `export const X` has a matching `module.exports.X = X`. Fails CI on PR with the exact line to add. This is the line of defense that runs in `code_check.yml` (which doesn't build before testing).
-2. **Bundle smoke test (runs when `dist/` is fresh)** — `require('./dist/index.js')` and asserts the same property at runtime. Self-skips with a clear hint if `dist/` is missing or older than `src/`, so `npm test` and `npm run test:watch` never fail spuriously when you forget to rebuild. The `codecheck` shell helper builds before testing, so this suite always exercises in the local pre-merge gate.
+2. **Bundle smoke test (runs when `dist/` is fresh)** — `require('./dist/index.js')` and asserts the same property at runtime. Self-skips with a clear hint if `dist/` is missing or older than `src/`, so `pnpm test` and `pnpm run test:watch` never fail spuriously when you forget to rebuild. The `codecheck` shell helper builds before testing, so this suite always exercises in the local pre-merge gate.
 
 ### 6. CI-Driven Releases
 
-`npm run release` is **not run by humans**. The `.github/workflows/release_and_publish.yml` workflow runs on every `pull_request: closed` event with `merged == true`, bumps the patch version via `npm version patch`, tags, pushes, builds, and publishes to npm. The commit message is hardcoded: `[🤖 DailyBot] New release to v%s launched 🚀`.
+Releases are **not run by humans**. The `.github/workflows/release_and_publish.yml` workflow runs on every `pull_request: closed` event with `merged == true`: it installs with `corepack pnpm install --frozen-lockfile`, bumps the version (Node version handled by `.github/scripts/prepare_release.sh`), tags, pushes, builds, and publishes via `corepack pnpm publish --no-git-checks`. The commit message is hardcoded: `[🤖 DailyBot] New release to v%s launched 🚀`.
 
 ## Documentation Standards
 
@@ -317,35 +321,37 @@ Update docs after: changing the public API, adding/removing a runtime dependency
 5. Use `console.*` in `src/` — Biome's `noConsole` rule blocks it (error in `src/` only, off in `test/**`); test files are exempt
 6. Commit `dist/` — it's built by CI; locally regenerated on demand
 7. Strip `biome.json` or reintroduce a separate linter/formatter — Biome is the single lint + format tool in this repo
-8. Run `npm run release` locally — it bumps the version and creates a tag; CI does this on merge
+8. Run the release locally — CI bumps the version (via `.github/scripts/prepare_release.sh`) and publishes with `corepack pnpm publish` on merge
 9. Add new emoji metadata fields to `EmojiType` — they ship in 540 KB JSON to every browser consumer
 10. Use `==` (Biome enforces `===` only); use `Boolean(x)` instead of `!!x` in option parsing — see `getDefaultOptions`
 11. Update `CLAUDE.md` directly — it is a symlink to `AGENTS.md`. Edit `AGENTS.md`
 12. Add files inside `.claude/` — it is a symlink to `.agents/`. Edit `.agents/`
 13. Mutate `emojiLibJsonData` at runtime — tests deep-compare the catalog
 14. Skip the `:smile`/`:thumbsup` ⇄ `:thumbs_up` keyword fallback when adding new shortcodes — Slack/Twitter dialects depend on it
+15. Use bare `npm` for installs/scripts in the dev container — it is routed to pnpm by the `/usr/local/bin/npm` wrapper. Invoke `pnpm` (or `corepack pnpm`) directly so behavior is explicit. Never commit a `package-lock.json` — the lockfile is `pnpm-lock.yaml`
 
 ### DO:
 
 1. Add a regression test next to every parsing fix — paste the failing input verbatim
-2. Run `npm run test:watch` while editing `src/index.ts`
+2. Run `pnpm run test:watch` while editing `src/index.ts`
 3. Use `Object.getOwnPropertyDescriptor(options, 'emojiCDN')` (not `options.emojiCDN === undefined`) when distinguishing "explicitly undefined" from "missing" — that's how `getDefaultOptions` already works
 4. Update `EMOJIS_SPECIAL_CASES` in `prepareEmojiLibJson.test.ts` for keyword overrides — that's the only sanctioned mutation point for the catalog
-5. Run `npm run ncu:check` before bumping any dep manually; it respects `.ncurc.json`
+5. Run `pnpm run ncu:check` before bumping any dep manually; it respects `.ncurc.json`
 6. Keep `dependencies` minimal — every entry ships to consumer bundles
 7. Use the existing test patterns (`it('should parse ...')`) for new specs
 8. Test both unicode and shortcode inputs when adding a new emoji-related case
+9. Run `corepack enable` first so the pinned `pnpm@11.1.2` is on PATH before any install or script
 
 ## Pre-Commit Checklist
 
 - [ ] All code, comments, and identifiers in English
-- [ ] `npm run biome:check` passes (lint + format)
-- [ ] `npm test` passes (all Vitest specs green)
-- [ ] `npm run build` succeeds (Vite emits the bundle + `.d.ts` to `dist/`)
-- [ ] `npm run build:tsc` succeeds (types compile)
+- [ ] `pnpm run biome:check` passes (lint + format)
+- [ ] `pnpm test` passes (all Vitest specs green)
+- [ ] `pnpm run build` succeeds (Vite emits the bundle + `.d.ts` to `dist/`)
+- [ ] `pnpm run build:tsc` succeeds (types compile)
 - [ ] If you regenerated `emoji-lib.json`, the `TOTAL_EMOJIS` constant in `emojiLibJson.test.ts` is updated
 - [ ] If you changed the public API, `docs/API_REFERENCE.md` and `README.md` are updated
-- [ ] If you bumped a dep, `package-lock.json` is committed (or absent — see `.gitignore`)
+- [ ] If you bumped a dep, `pnpm-lock.yaml` is committed
 - [ ] No `console.*` calls in `src/`
 - [ ] No `dist/` artifacts staged (gitignored)
 - [ ] Commit message in English (conventional format)
@@ -370,6 +376,7 @@ This repository ships with a `.agents/` directory (symlinked as `.claude/`) cont
 - `emoji-data-pipeline` — Step-by-step regeneration of the catalog from upstream
 - `npm-publish-walkthrough` — Full release flow including GitHub Actions internals
 - `typescript-strict-style` — TS rules enforced by `tsconfig.json` + Biome
+- `pnpm-migration` — Playbook for migrating npm → pnpm (Corepack pin, supply-chain guards, npm→pnpm routing, pnpm publish + tarball parity)
 
 **Subagents (`.agents/agents/`):**
 

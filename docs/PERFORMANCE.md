@@ -152,7 +152,7 @@ node --prof-process isolate-*.log
 
 The output will show you which functions dominate. Expected: `RegExp.prototype[@@matchAll]` and the alternation regex construction in `parseToShortcode` — confirming the analysis above.
 
-For browser perf, Chrome DevTools' Performance panel works on bundles built by `npm run build:dev` (production minification obscures function names).
+For browser perf, Chrome DevTools' Performance panel works on bundles built by `pnpm run build:dev` (production minification obscures function names).
 
 ## Common performance mistakes
 

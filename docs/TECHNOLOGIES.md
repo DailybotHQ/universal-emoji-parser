@@ -1,19 +1,19 @@
 # Technologies
 
-A complete inventory of every tool, library, and configuration shipped with Universal Emoji Parser, with **versions, role, and where it's wired**. Every version is pinned in [`package.json`](../package.json) — bump there and through `package-lock.json`, never through unpinned ranges.
+A complete inventory of every tool, library, and configuration shipped with Universal Emoji Parser, with **versions, role, and where it's wired**. Every version is pinned in [`package.json`](../package.json) — bump there and through `pnpm-lock.yaml`, never through unpinned ranges.
 
 ## Languages and runtimes
 
 | Tool       | Version                        | Role                                                                                                   |
 | ---------- | ------------------------------ | ------------------------------------------------------------------------------------------------------ |
 | TypeScript | **6.0.3**                      | Source language; compiled by Vite/esbuild at bundle time and by `tsc` for `.d.ts` (`build:types`)      |
-| Node.js    | **≥ 22.0.0** (`engines.node`) | Runtime for tests, build, CI; CI and the dev container use **Node 24**                                 |
+| Node.js    | **≥ 22.0.0** (`engines.node`) | Runtime for tests, build, CI; CI and the dev container use **Node 24** (pinned to 24.16.0 via `.node-version`/`.nvmrc`) |
 | Vite       | **8.0.16**                     | Production bundler — **library mode**, single-entry, CommonJS output, esbuild minify                   |
 | Vitest     | **4.x**                        | Test runner — runs `.ts` specs directly (ESM-native, esbuild-powered, no separate compile step)        |
 | Biome      | **2.4.16**                     | Single tool for both lint and format — one config (`biome.json`)                                       |
-| tsx        | **4.22.4**                     | Runs `.ts` entrypoints directly (`npm run dev`, ad-hoc repro snippets)                                 |
-| nodemon    | **3.1.14**                     | Watcher behind `npm run dev` (`nodemon --exec tsx`)                                                    |
-| npm        | (Node-bundled)                 | Package manager — `package-lock.json` is excluded by `.gitignore` (CI relies on cached `node_modules`) |
+| tsx        | **4.22.4**                     | Runs `.ts` entrypoints directly (`pnpm run dev`, ad-hoc repro snippets)                                |
+| nodemon    | **3.1.14**                     | Watcher behind `pnpm run dev` (`nodemon --exec tsx`)                                                   |
+| pnpm       | **11.1.2** (pinned)            | Package manager — pinned via `"packageManager": "pnpm@11.1.2"`, provisioned by **Corepack** (`corepack enable`). Lockfile is `pnpm-lock.yaml` (committed). Inside the dev container a `/usr/local/bin/npm` wrapper routes stray `npm …` calls to `corepack pnpm` |
 
 ## Runtime dependencies
 
@@ -103,8 +103,11 @@ Every other dependency tracks **latest**. Add a name to `reject` only when an up
 | `biome.json`          | Biome lint **and** format — single quotes, no semicolons, trailing comma `es5`, lineWidth 120; `noConsole` error in `src/` only; excludes `.agents/skills/deepworkplan/` from formatting |
 | `.editorconfig`       | 2-space indent, LF, max 120 cols, trim trailing whitespace                                                                                        |
 | `.npmignore`          | Trims `src/`, `test/`, configs, etc. from the published tarball — only `dist/`, `package.json`, `README.md`, `LICENSE` ship                        |
-| `.gitignore`          | Excludes `node_modules/`, `dist/`, `.env`, `tmp/*`, `package-lock.json`, `emoji-lib-output.json`, etc.                                            |
+| `.gitignore`          | Excludes `node_modules/`, `dist/`, `.env`, `tmp/*`, `.pnpm-store/`, `emoji-lib-output.json`, etc. (`pnpm-lock.yaml` **is** committed)              |
 | `.ncurc.json`         | npm-check-updates config — `reject` pins `@twemoji/parser` to 17.0.1                                                                               |
+| `pnpm-workspace.yaml` | pnpm config — supply-chain hardening: `minimumReleaseAge: 10080` (7-day quarantine) + `allowBuilds: { esbuild: true }` (install-script allow-list) |
+| `pnpm-lock.yaml`      | Committed lockfile — CI installs with `pnpm install --frozen-lockfile` for reproducibility                                                         |
+| `.node-version` / `.nvmrc` | Pin local Node to 24.16.0 (matches CI)                                                                                                       |
 
 ## CI/CD platform
 
@@ -113,7 +116,8 @@ Every other dependency tracks **latest**. Add a name to `reject` only when an up
 | GitHub Actions            | (managed) | All CI workflows                                            |
 | `actions/checkout`        | v6        | Pull source on each runner                                  |
 | `actions/setup-node`      | v6        | Node **24** (`.x` from supported releases)                  |
-| `actions/cache`           | v5        | Cache `~/.npm`, `node_modules`, `dist`                      |
+| `actions/cache`           | v5        | Cache the pnpm store, `node_modules`, `dist`               |
+| Corepack                  | (bundled) | Provisions the pinned `pnpm@11.1.2` in CI (`corepack enable`) |
 | `ncipollo/release-action` | v1        | Publish GitHub Releases (used by `release_and_publish.yml`) |
 
 Workflows:
@@ -122,7 +126,7 @@ Workflows:
 | ------------------------------------------ | ------------------------------------- | ------------------------------------------------ |
 | `code_check.yml`                           | PR opened/sync/reopen → `main`        | Biome check + test gate                           |
 | `pull_request_check.yml`                   | PR opened/sync/edit → `main`          | Title/body length + size labels                  |
-| `release_and_publish.yml`                  | PR merged to `main`                   | Bump version, build, npm publish, GitHub release |
+| `release_and_publish.yml`                  | PR merged to `main`                   | Bump version (`prepare_release.sh`), build, `pnpm publish`, GitHub release |
 | `check_packages_versions.yml`              | Cron `0 15 * * 2` (Tue 15:00 UTC)     | Open auto-PR with `ncu:upgrade` results          |
 | `check_and_merge_packages_upgrades_pr.yml` | Push to upgrade branch                | Auto-merge that PR if green                      |
 | `check_branches_state.yml`                 | Manual / scheduled                    | Stale branch report                              |
@@ -138,7 +142,8 @@ Notifications go to a DailyBot Slack-like channel via `https://api.dailybot.com/
 - System packages: `git`, `curl`, `gh` (GitHub CLI), `chromium` (for Lighthouse audits — declared, not wired)
 - AI CLIs pre-installed for `node` user: **Claude Code**, **Codex**, **Cursor**
 - Persistent volumes for each AI CLI's auth/data so re-builds don't lose sessions
-- Custom shell helpers (`docker/custom_commands.sh`) added to `~/.bashrc`: `check` (→ `npm run biome:check`), `fix` (→ `npm run biome:fix`), `test`, `build`, `codecheck` (biome + build + test), `install`, `claudex`, `codexx`, `cursorx` (full-permission wrappers), plus git aliases (`gs`, `ga`, `gc`, `gp`, etc.)
+- **pnpm via Corepack** — Corepack is enabled in the image; the pinned `pnpm@11.1.2` from `package.json` is what runs. A `/usr/local/bin/npm` wrapper routes any `npm …` invocation to `corepack pnpm`
+- Custom shell helpers (`docker/custom_commands.sh`) added to `~/.bashrc`: `check` (→ `corepack pnpm run biome:check`), `fix` (→ `corepack pnpm run biome:fix`), `test` (→ `corepack pnpm run test`), `build` (→ `corepack pnpm run build`), `codecheck` (biome + build + test), `install` (→ `corepack pnpm install`), `claudex`, `codexx`, `cursorx` (full-permission wrappers), plus git aliases (`gs`, `ga`, `gc`, `gp`, etc.)
 
 VS Code Dev Containers users get this out of the box. Manual users can `cd docker/local && docker compose up -d uemojiparservscode` and `docker exec -it uemojiparser bash`.
 
@@ -157,10 +162,10 @@ If you find yourself wanting any of the above, either build it as a separate pac
 
 ## Upgrading dependencies
 
-1. **Routine bumps:** `npm run ncu:check` shows what's available; `npm run ncu:upgrade` applies them (it skips the `@twemoji/parser` pin via `.ncurc.json`); `npm install` to refresh `node_modules`. The CI workflow `check_packages_versions.yml` does this automatically every Tuesday and opens a PR.
+1. **Routine bumps:** `pnpm run ncu:check` shows what's available; `pnpm run ncu:upgrade` applies them (it skips the `@twemoji/parser` pin via `.ncurc.json`); `pnpm install` to refresh `node_modules` and `pnpm-lock.yaml`. The CI workflow `check_packages_versions.yml` does this automatically every Tuesday and opens a PR. Note: pnpm's `minimumReleaseAge` (set in `pnpm-workspace.yaml`) quarantines brand-new versions for 7 days, so a freshly published upgrade may not install until the quarantine window passes — see [Security](SECURITY.md#supply-chain-hardening-pnpm).
 2. **One library at a time** when something might break (Vite majors, TypeScript majors). Multi-bumps mask the breaking change.
 3. **`@twemoji/parser` is pinned to 17.0.1** — do not bump it until the 17.0.2 U+FE0F regression is resolved upstream (see [Pinned exclusions](#pinned-exclusions)). When you do lift the pin, re-run every VS-16 parsing test before merging.
-4. **Major TypeScript bumps** can change `.d.ts` shape; verify consumers' projects still type-check by running `npm pack` and installing the tarball locally.
+4. **Major TypeScript bumps** can change `.d.ts` shape; verify consumers' projects still type-check by running `pnpm pack` and installing the tarball locally.
 5. **Major Node bumps** are rare — only update `engines.node` when a new Node feature is needed and the dev container / CI Node line supports it (see `actions/setup-node` + `docker/local/uemojiparser/Dockerfile`).
 
 Walk through **[`/bump-deps`](../.agents/commands/bump-deps.md)** for a structured workflow.

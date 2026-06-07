@@ -221,9 +221,9 @@ Use sparingly — every optional field is a value the consumer has to handle.
 Lint and format are unified under **Biome 2.4.x** with a single config, `biome.json`. Run:
 
 ```bash
-npm run biome:check        # biome check — lint + format check (CI gate)
-npm run biome:fix          # biome check --write — safe auto-fix
-npm run biome:fix:unsafe   # biome check --write --unsafe — includes unsafe fixes
+pnpm run biome:check        # biome check — lint + format check (CI gate)
+pnpm run biome:fix          # biome check --write — safe auto-fix
+pnpm run biome:fix:unsafe   # biome check --write --unsafe — includes unsafe fixes
 ```
 
 Notable rule configuration in `biome.json`:
@@ -398,7 +398,7 @@ Remove the `console.log`. If you really need logging, the package doesn't ship a
 
 ### Formatter violation
 
-Run `npm run biome:fix`. If the auto-fix produces something you don't like, the disagreement is between your editor and Biome; configure your editor to use the Biome formatter.
+Run `pnpm run biome:fix`. If the auto-fix produces something you don't like, the disagreement is between your editor and Biome; configure your editor to use the Biome formatter.
 
 ## Type-driven refactors
 

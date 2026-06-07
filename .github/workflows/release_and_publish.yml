@@ -113,21 +113,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24.16.0'
-      - name: Step 0 - 📁 Cache node modules
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        id: cache-npm
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-        name: Step 1 - ⚙️ Install Dependencies
-        run: npm install
+            ${{ runner.os }}-pnpm-store-
+      - name: Step 1 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
 
   deploy_validate_linters_and_code_format:
     needs: deploy_setup
@@ -138,20 +137,22 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24.16.0'
-      - name: Step 0 - 📁 Cache node modules
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        id: cache-npm
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 1 - 🧪 Run Biome (lint + format check)
-        run: npm run biome:check
+            ${{ runner.os }}-pnpm-store-
+      - name: Step 1 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
+      - name: Step 2 - 🧪 Run Biome (lint + format check)
+        run: corepack pnpm run biome:check
 
   deploy_tests:
     needs: deploy_validate_linters_and_code_format
@@ -162,20 +163,22 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24.16.0'
-      - name: Step 0 - 📁 Cache node modules
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        id: cache-npm
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 1 - 🧪 Run tests
-        run: npm run test
+            ${{ runner.os }}-pnpm-store-
+      - name: Step 1 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
+      - name: Step 2 - 🧪 Run tests
+        run: corepack pnpm run test
 
   build:
     needs: deploy_tests
@@ -186,30 +189,32 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24.16.0'
-      - name: Step 0 - 📁 Cache node modules
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        id: cache-npm
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-pnpm-store-
       - name: Step 1 - 📁 Cache build dist
         uses: actions/cache@v5
         env:
           cache-name: cache-build-dist
         with:
           path: dist
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 2 - 🛠️ Build application bundle
+      - name: Step 2 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
+      - name: Step 3 - 🛠️ Build application bundle
         run: |
-          npm run build
+          corepack pnpm run build
           if [ ! -d "dist" ]; then
             echo "⚠️ Error: dist folder does not exist."
             exit 1
@@ -228,44 +233,45 @@ jobs:
         with:
           node-version: '24.16.0'
           registry-url: https://registry.npmjs.org/
-      - name: Step 0 - 📁 Cache node modules
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        id: cache-npm
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-            dist
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-pnpm-store-
       - name: Step 1 - 📁 Cache build dist
         uses: actions/cache@v5
         env:
           cache-name: cache-build-dist
         with:
           path: dist
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 2 - ⚙️ Setup GitHub Config
+      - name: Step 2 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
+      - name: Step 3 - ⚙️ Setup GitHub Config
         run: |
           git config user.name "🤖 DailyBot"
           git config user.email "ops@dailybot.com"
-      - name: Step 3 - 📄 Set GitHub release content "BODY" env var
+      - name: Step 4 - 📄 Set GitHub release content "BODY" env var
         run: |
           bash .github/scripts/get_github_release_log.sh
           if [[ ! -f git_logs_output.txt ]]; then
             echo "⚠️ No description found for release body content."
             exit 1
           fi
-      - name: Step 4 -🔄 Prepare release
+      - name: Step 5 -🔄 Prepare release
         run: |
-          npm run release
+          corepack pnpm run release
           git push --follow-tags origin main
-      - name: Step 5 - 🏷️ Set GitHub release "TAG" env vars
+      - name: Step 6 - 🏷️ Set GitHub release "TAG" env vars
         run: |
           GITHUB_RELEASE_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
           if [[ -z $GITHUB_RELEASE_TAG ]]; then
@@ -275,26 +281,29 @@ jobs:
           echo "::set-env name=GITHUB_RELEASE_TAG::$GITHUB_RELEASE_TAG"
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
-      - name: Step 6 - 🚀 Publish GitHub release
+      - name: Step 7 - 🚀 Publish GitHub release
         uses: ncipollo/release-action@v1
         with:
           name: Release ${{ env.GITHUB_RELEASE_TAG }}
           tag: ${{ env.GITHUB_RELEASE_TAG }}
           bodyFile: git_logs_output.txt
           token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
-      - name: Step 7 - 🚀🚀 Publish npm package
+      - name: Step 8 - 🚀🚀 Publish npm package
         id: publish_npm_package
         run: |
           if [ ! -d "dist" ]; then
             echo "⚠️ Error: dist folder does not exist."
             exit 1
           fi
-          npm publish
-          # Set npm version as output for next steps
-          echo "package_version=$(npm pkg get version)" >> $GITHUB_OUTPUT
+          # pnpm publishes to the npm registry (reads NODE_AUTH_TOKEN from the .npmrc
+          # written by setup-node). --no-git-checks: CI's tree is post-build, so pnpm's
+          # default clean-tree/tag-match guard must be bypassed.
+          corepack pnpm publish --no-git-checks
+          # Set package version as output for next steps
+          echo "package_version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Step 8 - 🗑️ Deleting source branch
+      - name: Step 9 - 🗑️ Deleting source branch
         env:
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |

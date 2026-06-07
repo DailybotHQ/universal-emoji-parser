@@ -22,7 +22,7 @@ and targets Node ≥ 22 and bundled browser environments.
 | [ARCHITECTURE.md](ARCHITECTURE.md)                 | Module layout, data flow, parse pipeline, emoji catalog                        |
 | [TECHNOLOGIES.md](TECHNOLOGIES.md)                 | Stack overview with versions and roles                                         |
 | [STANDARDS.md](STANDARDS.md)                       | TypeScript / Biome (lint + format) conventions, naming, exports                |
-| [DEVELOPMENT_COMMANDS.md](DEVELOPMENT_COMMANDS.md) | npm scripts, Vitest runs, Vite build, watch loops                             |
+| [DEVELOPMENT_COMMANDS.md](DEVELOPMENT_COMMANDS.md) | pnpm scripts, Vitest runs, Vite build, watch loops                            |
 | [TESTING_GUIDE.md](TESTING_GUIDE.md)               | Vitest setup, test conventions, regenerating expectations                      |
 | [RUNTIMES.md](RUNTIMES.md)                         | Node, browsers, ESM vs CommonJS, bundlers consuming the package                |
 | [BUILD_DEPLOY.md](BUILD_DEPLOY.md)                 | Vite production bundle, npm publish, GitHub release pipeline                   |

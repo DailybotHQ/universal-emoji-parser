@@ -1,0 +1,16 @@
+packages:
+  - .
+
+# Supply-chain guard: only allow installing package versions that were
+# published to the registry at least 1 week ago (10080 minutes). Protects
+# against compromised packages that get yanked or patched within days.
+# Affects new installs / updates only — the existing lockfile is respected.
+# See https://xergioalex.com/blog/supply-chain-attacks-ai-era/ for the rationale.
+minimumReleaseAge: 10080
+
+# Install/build scripts pnpm 11+ refuses to run unless explicitly allowed.
+# This is the curated allow-list for this repo's dev toolchain. Add entries
+# based on the [ERR_PNPM_IGNORED_BUILDS] warnings emitted by `corepack pnpm install`.
+# Only esbuild (pulled in by Vite) needs to run its install script here.
+allowBuilds:
+  esbuild: true

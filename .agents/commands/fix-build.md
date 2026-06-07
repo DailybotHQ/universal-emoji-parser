@@ -9,7 +9,7 @@ The build is broken. Find the root cause and fix it without disabling the failin
 
 ## Inputs to confirm
 
-- **Which command fails?** `npm test`, `npm run build`, `npm run biome:check`, `npm run build:tsc`
+- **Which command fails?** `pnpm test`, `pnpm run build`, `pnpm run biome:check`, `pnpm run build:tsc`
 - **Full error output** — paste the last ~30 lines, especially any "Caused by" / "Error:" / "TS####" lines
 
 ## Procedure
@@ -19,7 +19,7 @@ The build is broken. Find the root cause and fix it without disabling the failin
 Run the failing command yourself with verbose output:
 
 ```bash
-npm run <script> --silent=false 2>&1 | tee tmp/build.log
+corepack pnpm run <script> 2>&1 | tee tmp/build.log
 ```
 
 Read the actual root cause, not just the surface error.
@@ -36,22 +36,21 @@ Read the actual root cause, not just the surface error.
 | Biome `Formatter would have printed...`                  | Code violates Biome formatting                                   | F       |
 | Vitest run hangs / times out                             | Regenerator accidentally enabled                                 | G       |
 | Vitest fails with assertion mismatch                     | Real test failure — fix the code                                 | H       |
-| `npm publish` 401/403                                    | Auth or scope issue                                              | I       |
-| GitHub Actions fails on `npm install`                    | Lock file / cache issue in CI                                    | J       |
+| `pnpm publish` 401/403                                   | Auth or scope issue                                              | I       |
+| GitHub Actions fails on `corepack pnpm install`          | Lockfile / cache issue in CI                                     | J       |
 
 ### A. Stale `node_modules`
 
 ```bash
 rm -rf node_modules
-npm install
+corepack pnpm install
 ```
 
-If still broken, also clear npm cache:
+If still broken, also clear the pnpm store cache:
 
 ```bash
-npm cache verify
-npm cache clean --force   # last resort
-npm install
+corepack pnpm store prune   # remove unreferenced packages from the content-addressed store
+corepack pnpm install
 ```
 
 ### B. TypeScript compile error
@@ -67,7 +66,7 @@ Read the `error TS####:` line. Common patterns:
 | TS6053 | File not found                      | Path typo or missing source file                              |
 | TS7006 | Parameter implicitly has 'any' type | `noImplicitAny: true`; annotate the parameter                 |
 
-Run `npm run build:tsc` for the cleanest TS error output (it type-checks via `tsc -p tsconfig.build.json --noEmit` with no bundling noise).
+Run `pnpm run build:tsc` for the cleanest TS error output (it type-checks via `tsc -p tsconfig.build.json --noEmit` with no bundling noise).
 
 ### C. Vite can't resolve or transform a module
 
@@ -80,7 +79,7 @@ Vite (Rollup under the hood, esbuild for transforms) reports `Could not resolve`
 Verify the config and reinstall if a tool is missing:
 
 ```bash
-npm install
+corepack pnpm install
 node -e "require('vite/package.json')"   # confirm Vite is installed
 ```
 
@@ -96,7 +95,7 @@ Biome runs from a directory without `biome.json`. Run from the repo root:
 
 ```bash
 cd /app  # or wherever the repo is
-npm run biome:check
+corepack pnpm run biome:check
 ```
 
 ### E. Biome lint diagnostic
@@ -107,7 +106,7 @@ Common violations and fixes:
 | ------------------- | ---------------------------- | --------------------------------------------------------------------------------- |
 | `noConsole`         | `console.log(...)` in `src/` | Remove it. Tests are exempt                                                        |
 | `noUnusedVariables` | Declared but unused          | Remove or prefix with `_`                                                          |
-| Style/format        | Quotes, semicolons, commas   | Run `npm run biome:fix` (safe) or `npm run biome:fix:unsafe` (applies unsafe fixes) |
+| Style/format        | Quotes, semicolons, commas   | Run `pnpm run biome:fix` (safe) or `pnpm run biome:fix:unsafe` (applies unsafe fixes) |
 
 Note: `noExplicitAny` is **off** in `biome.json`, so `any` is allowed without a suppression. `noCommonJs` is also **off** (the dual-export tail in `src/index.ts` relies on `module.exports`).
 
@@ -121,11 +120,11 @@ const result: any = ...
 ### F. Biome formatting
 
 ```bash
-npm run biome:fix
+corepack pnpm run biome:fix
 git diff   # review what Biome changed
 ```
 
-Biome is the single source of both lint and format (single quotes, no semicolons, es5 trailing commas, lineWidth 120) — `biome check` covers both. If `biome:fix` doesn't resolve everything, run `npm run biome:fix:unsafe` and review the diff.
+Biome is the single source of both lint and format (single quotes, no semicolons, es5 trailing commas, lineWidth 120) — `biome check` covers both. If `biome:fix` doesn't resolve everything, run `pnpm run biome:fix:unsafe` and review the diff.
 
 ### G. Vitest hang/timeout — regenerator accidentally enabled
 
@@ -135,7 +134,7 @@ Open `test/prepareEmojiLibJson.test.ts`. If line ~39 reads `it(...)` instead of 
 it.skip('create emojis lib json file', () => {
 ```
 
-Save, re-run `npm test` (`vitest run`). Tests now finish in ~5 seconds.
+Save, re-run `corepack pnpm test` (`vitest run`). Tests now finish in ~5 seconds.
 
 ### H. Real test failure
 
@@ -151,7 +150,7 @@ If the failing test is a snapshot of HTML output and `@twemoji/parser` was bumpe
 - If the change is intentional (bumping Twemoji is documented): update the test expectation, **bump the major version** (HTML output change is breaking)
 - If the change is unintentional: pin Twemoji back
 
-### I. `npm publish` auth
+### I. `pnpm publish` auth
 
 | Error              | Fix                                                                                                       |
 | ------------------ | --------------------------------------------------------------------------------------------------------- |
@@ -163,7 +162,7 @@ If the failing test is a snapshot of HTML output and `@twemoji/parser` was bumpe
 ### J. CI cache / lock issues
 
 ```yaml
-# .github/workflows/code_check.yml caches node_modules and ~/.npm
+# .github/workflows/code_check.yml caches the pnpm store, keyed on pnpm-lock.yaml
 ```
 
 If CI is using a stale cache:
@@ -175,11 +174,11 @@ If CI is using a stale cache:
 ### 3. After fixing
 
 ```bash
-npm install                          # If you touched package.json
-npm run biome:check
-npm test
-npm run build
-npm run build:tsc                    # If you touched TS configs
+corepack pnpm install                # If you touched package.json
+corepack pnpm run biome:check
+corepack pnpm test
+corepack pnpm run build
+corepack pnpm run build:tsc           # If you touched TS configs
 ```
 
 All four should pass. If the original failure was in CI, push and verify the workflow goes green.
@@ -210,6 +209,6 @@ If you fix the same kind of build break twice, write it up:
 ## Do
 
 - ❌ Read the actual error message before guessing the fix
-- ✅ Use `npm run build:tsc` for clearer TS errors than `npm run build`
+- ✅ Use `pnpm run build:tsc` for clearer TS errors than `pnpm run build`
 - ✅ Run all checks (`biome:check` + test + build) after fixing
 - ✅ Commit the fix with a `fix:` conventional message

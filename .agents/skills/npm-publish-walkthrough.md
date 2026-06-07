@@ -14,15 +14,15 @@ For the day-to-day procedural commands, see [`/release-npm`](../commands/release
 Universal Emoji Parser uses a **merge-to-main = release** model:
 
 1. Every PR merge to `main` triggers `release_and_publish.yml`
-2. The workflow patch-bumps the version, builds, tags, creates a GitHub Release, and publishes to npm
-3. Humans don't run `npm version` or `npm publish` manually under normal conditions
+2. The workflow patch-bumps the version (via `.github/scripts/prepare_release.sh`), builds, tags, creates a GitHub Release, and publishes to npm with `corepack pnpm publish --no-git-checks`
+3. Humans don't run the release scripts or `pnpm publish` manually under normal conditions
 
 Tradeoffs:
 
 - ✅ Every change ships immediately — no batching, no delayed release
 - ✅ Release notes are automatic
 - ✅ Patch number reflects merge count
-- ❌ Can't easily ship a major version (the workflow auto-runs `npm version patch`)
+- ❌ Can't easily ship a major version (the workflow auto-runs a patch bump via `prepare_release.sh`)
 - ❌ Unreviewable releases — by the time you see version X, it's already on npm
 
 ## The CI workflow in detail
@@ -59,26 +59,24 @@ Includes PR number, title, body, size label, workflow URL.
 
 ```yaml
 - uses: actions/checkout@v4
+- run: corepack enable
 - uses: actions/setup-node@v4
   with: { node-version: '24.16.0' }
 - uses: actions/cache@v4
   with:
-    path: |
-      ~/.npm
-      node_modules
-    key: ${{ runner.os }}-build-cache-node-modules-${{ hashFiles('**/package-lock.json') }}
-- if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-  run: npm install
+    path: ~/.local/share/pnpm/store   # the pnpm content-addressed store
+    key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+- run: corepack pnpm install --frozen-lockfile
 ```
 
-Cache key uses `package-lock.json`'s hash — but we don't commit `package-lock.json`. So the hash is empty/missing, and the cache key collapses to `${{ runner.os }}-build-cache-node-modules-`. This effectively means "always cache hits across all runs that share the OS." Good for speed; bad if a security advisory requires invalidating.
+The cache key is keyed on `pnpm-lock.yaml`'s hash — which **is** committed — so the cache invalidates precisely when dependencies change. `--frozen-lockfile` makes the install fail (rather than silently mutate the lockfile) if `package.json` and `pnpm-lock.yaml` are out of sync, which is what you want in CI.
 
-To force a fresh install, bump the cache key (e.g., add `-v2`).
+`corepack enable` provisions the pinned `pnpm@11.1.2` (from `"packageManager"` in `package.json`) before any install step.
 
 #### 4. `deploy_validate_linters_and_code_format`
 
 ```yaml
-- run: npm run biome:check
+- run: corepack pnpm run biome:check
 ```
 
 Hard gate. A single `biome check` covers both linting and formatting. Must pass.
@@ -86,7 +84,7 @@ Hard gate. A single `biome check` covers both linting and formatting. Must pass.
 #### 5. `deploy_tests`
 
 ```yaml
-- run: npm run test
+- run: corepack pnpm run test
 ```
 
 All Vitest specs must pass (`vitest run`). The regenerator test (`prepareEmojiLibJson.test.ts`) is `it.skip`'d so it doesn't run.
@@ -95,16 +93,16 @@ All Vitest specs must pass (`vitest run`). The regenerator test (`prepareEmojiLi
 
 ```yaml
 - run: |
-    npm run build
+    corepack pnpm run build
     if [ ! -d "dist" ]; then
       echo "⚠️ Error: dist folder does not exist."
       exit 1
     fi
 ```
 
-Vite library build. `npm run build` runs `vite build && npm run build:types`, where `build:types` (`tsc -p tsconfig.build.json --emitDeclarationOnly`) emits `dist/index.d.ts` + `dist/lib/type.d.ts` alongside the single minified CJS `dist/index.js` (~403 KB). The output (`dist/`) is cached for the publish job.
+Vite library build. `pnpm run build` runs `vite build && tsc -p tsconfig.build.json --emitDeclarationOnly` (the `tsc` step is inlined into the `build` script), emitting `dist/index.d.ts` + `dist/lib/type.d.ts` alongside the single minified CJS `dist/index.js` (~403 KB). The output (`dist/`) is cached for the publish job.
 
-> **Always run `npm run build`, not `vite build` alone** — `vite build` skips `build:types`, so the published tarball would ship without `dist/index.d.ts` and consumers would report "no types." The `build` script chains both steps so declarations are always emitted.
+> **Always run `pnpm run build`, not `vite build` alone** — `vite build` skips the `tsc --emitDeclarationOnly` step, so the published tarball would ship without `dist/index.d.ts` and consumers would report "no types." The `build` script chains both steps so declarations are always emitted.
 
 #### 7. `release_and_publish`
 
@@ -129,7 +127,7 @@ The actual release. Steps:
       exit 1
     fi
 - run: |
-    npm run release          # npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"
+    bash .github/scripts/prepare_release.sh   # Node patch bump + commit + tag "[🤖 DailyBot] New release to v%s launched 🚀"
     git push --follow-tags origin main
 - run: |
     GITHUB_RELEASE_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
@@ -151,7 +149,7 @@ The actual release. Steps:
       echo "⚠️ Error: dist folder does not exist."
       exit 1
     fi
-    npm publish
+    corepack pnpm publish --no-git-checks
     echo "package_version=$(npm pkg get version)" >> $GITHUB_OUTPUT
   env:
     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -201,25 +199,28 @@ Implications:
 - **Release notes are commit-message-quality** — write good commit messages; they become the changelog
 - **Merges are filtered** — if your repo's merge style is "Squash and merge," the squash commit's message is what's recorded (good); if "Create a merge commit," the merge message is filtered (so the underlying commits are preserved as long as they're not squashed away)
 
-## The `npm version` step
+## The version-bump step (`prepare_release.sh`)
 
 ```bash
-npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"
+bash .github/scripts/prepare_release.sh
 ```
 
 What this does:
 
-1. Reads current version from `package.json`
-2. Increments the patch number (e.g., `2.0.79` → `2.0.80`)
-3. Writes the new version back to `package.json`
-4. Creates a git commit: `[🤖 DailyBot] New release to v2.0.80 launched 🚀`
-5. Creates a git tag: `v2.0.80`
+1. Refuses to run if **tracked** files have uncommitted changes (untracked/gitignored build artifacts like `dist/` are fine)
+2. Reads current version from `package.json`
+3. Increments the patch number with a small Node script (e.g., `2.0.79` → `2.0.80`)
+4. Stages `package.json` (and `pnpm-lock.yaml` if present)
+5. Creates a git commit: `[🤖 DailyBot] New release to v2.0.80 launched 🚀`
+6. Creates an annotated git tag: `v2.0.80`
 
-If `npm version` fails (working tree dirty, network issue), the workflow aborts and no release happens.
+It bumps with Node rather than `pnpm version` deliberately: pnpm v11 runs `git status --porcelain` upfront and aborts with `ERR_PNPM_UNCLEAN_WORKING_TREE` when the tree carries transient install artifacts (e.g. esbuild's postinstall after `pnpm install --frozen-lockfile`). The Node bump only touches `package.json` and is safe regardless of untracked state.
+
+If `prepare_release.sh` fails (tracked files dirty, nothing to bump), the workflow aborts and no release happens.
 
 ### Why patch only
 
-`npm run release` is hardcoded to patch:
+The script is hardcoded to a patch increment. The legacy `release` script in `package.json` (kept for reference) was:
 
 ```json
 "release": "npm version patch -m \"[🤖 DailyBot] New release to v%s launched 🚀\""
@@ -237,7 +238,7 @@ $EDITOR package.json   # change version from 2.0.79 to 2.1.0
 git commit -am "chore: bump version to 2.1.0 for release"
 git push
 # Merge the PR
-# Workflow runs `npm version patch`, bumps 2.1.0 → 2.1.1
+# Workflow runs prepare_release.sh (patch bump), bumps 2.1.0 → 2.1.1
 # Final published version is 2.1.1, not 2.1.0
 ```
 
@@ -245,7 +246,7 @@ That last detail (`2.1.1`, not `2.1.0`) means the "minor" version users see is t
 
 **Option B: Disable auto-bump for the release**
 
-Edit the workflow temporarily to skip `npm run release`, run `npm version minor` locally, push the tag, re-enable the workflow. More involved.
+Edit the workflow temporarily to skip `prepare_release.sh`, set the target minor version in `package.json` and commit + tag locally (preserving the `[🤖 DailyBot] New release to v%s launched 🚀` message), push the tag, re-enable the workflow. More involved.
 
 Neither is great. A future improvement: add a `[skip auto-bump]` PR-title convention or a `release-type: minor` PR label that the workflow honors.
 
@@ -255,11 +256,11 @@ Required when: CI is down, the workflow is broken, an emergency hotfix needs to 
 
 See [`/release-npm`](../commands/release-npm.md) for the procedural walkthrough. Key points:
 
-1. **Always run the full check sequence** (`npm run biome:check`, `npm run test`, `npm run build`) — never publish unverified
-2. **Use `npm version`** to bump + commit + tag atomically (don't edit `package.json` by hand)
+1. **Always run the full check sequence** (`corepack pnpm run biome:check`, `corepack pnpm run test`, `corepack pnpm run build`) — never publish unverified
+2. **Use `bash .github/scripts/prepare_release.sh`** to bump + commit + tag atomically (don't edit `package.json` by hand for a patch)
 3. **`git push --follow-tags`** — pushing without `--follow-tags` leaves the tag local
-4. **`npm publish`** requires `npm login` or `NODE_AUTH_TOKEN` env var
-5. **Smoke-test in a fresh directory** after publish — `npm install` the published version and verify
+4. **`corepack pnpm publish --no-git-checks`** requires `npm login` or a `NODE_AUTH_TOKEN` env var
+5. **Smoke-test in a fresh directory** after publish — `corepack pnpm add` the published version and verify
 
 ## Rollback strategies
 
@@ -291,7 +292,7 @@ For severe issues (security, malware in a dep), npm support can intervene faster
 
 ## Common failure modes
 
-### `npm publish` 401 Unauthorized
+### `pnpm publish` 401 Unauthorized
 
 - `secrets.NPM_TOKEN` is expired
 - Token is account-wide but doesn't have the new package's name in its allowlist
@@ -299,15 +300,17 @@ For severe issues (security, malware in a dep), npm support can intervene faster
 
 Fix: regenerate the token in npm settings → Profile → Access Tokens → Generate New Token → "Automation". Update `secrets.NPM_TOKEN` in GitHub repo settings.
 
-### `npm version` says "Git working directory not clean"
+### `prepare_release.sh` says tracked files have uncommitted changes
 
-Some prior step modified the repo. Common causes:
+A prior step modified a **tracked** file. (Untracked/gitignored artifacts like `dist/` are tolerated — the script only checks `git diff --quiet HEAD -- .`.) Common causes:
 
-- A test wrote to a file in the repo (regenerator, sloppy test)
-- `dist/` was modified between cache restore and `npm version` step
-- `package-lock.json` was generated by `npm install` and isn't in `.gitignore`
+- A test wrote to a tracked file in the repo (regenerator, sloppy test)
+- A tracked config or source file was modified between checkout and the release step
+- A stray `package-lock.json` was committed (the lockfile is `pnpm-lock.yaml`; bare `npm` must not be used)
 
-Fix: add the offending file to `.gitignore`, or `git checkout -- .` before `npm version`.
+Fix: add the offending file to `.gitignore`, or `git checkout -- .` before re-running `prepare_release.sh`.
+
+> Note: this is also why the script uses a Node bump instead of `pnpm version` — `pnpm version` would reject the run with `ERR_PNPM_UNCLEAN_WORKING_TREE` even for harmless untracked build artifacts.
 
 ### `git push --follow-tags` rejected
 
@@ -319,10 +322,10 @@ Branch protection on `main` requires PRs, blocking direct pushes. The workflow n
 
 ### `actions/cache` cache miss every run
 
-If the cache key uses `hashFiles('**/package-lock.json')` but you don't commit the lockfile, the hash is empty → cache key is constant → caches collide. This usually still works (collisions are valid hits), but if you ever need to force-refresh, bump the cache key suffix:
+The cache key is `hashFiles('pnpm-lock.yaml')`, and `pnpm-lock.yaml` **is** committed, so the key changes only when dependencies change — exactly the desired behavior. If you ever need to force-refresh, bump the cache key suffix:
 
 ```yaml
-key: ${{ runner.os }}-build-cache-node-modules-v2-${{ hashFiles('**/package-lock.json') }}
+key: ${{ runner.os }}-pnpm-store-v2-${{ hashFiles('pnpm-lock.yaml') }}
 ```
 
 ## Runtime dependencies
@@ -341,7 +344,7 @@ Excluded:
   src, test
   .babelrc, .env, .env_example
   .gitignore, .travis.yml
-  package-lock.json
+  package-lock.json   (legacy entry; the lockfile is now pnpm-lock.yaml)
   tsconfig.json, tsconfig.build.json, vite.config.ts, vitest.config.ts
   docker, .github
   biome.json (single Biome lint + format config)
@@ -362,7 +365,7 @@ Included by default (everything not excluded):
 Verify before publishing:
 
 ```bash
-npm pack --dry-run
+corepack pnpm pack --dry-run
 ```
 
 If the output includes `src/`, `test/`, or config files, fix `.npmignore`.
