@@ -34,7 +34,7 @@
     "biome:fix:unsafe": "biome check --write --unsafe",
     "test": "vitest run",
     "test:watch": "vitest",
-    "release": "npm version patch -m \"[🤖 DailyBot] New release to v%s launched 🚀\"",
+    "release": "bash .github/scripts/prepare_release.sh",
     "start": "node dist/index.js",
     "dev": "nodemon --exec tsx src/index.ts",
     "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
