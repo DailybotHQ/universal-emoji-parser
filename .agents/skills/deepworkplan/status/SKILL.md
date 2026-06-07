@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-status
 description: Report the status of a Deep Work Plan — completed tasks, what's left, and blockers — without executing. Use when the developer asks for plan status or what remains.
-version: "2.5.0"
+version: "2.7.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write

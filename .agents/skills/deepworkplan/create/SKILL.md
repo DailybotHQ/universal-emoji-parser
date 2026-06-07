@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-create
 description: Create a Deep Work Plan. Gather context, draft, and refine into a single final plan under .dwp/plans/, with a refined draft staged in .dwp/drafts/. Use when the developer wants a new structured multi-task plan.
-version: "2.5.0"
+version: "2.7.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write

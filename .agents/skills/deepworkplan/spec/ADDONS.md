@@ -97,7 +97,7 @@ An addon **MAY** additionally ship examples, per-stack presets, or migration not
 
 ## 6. Shipping Addons
 
-Two addons ship today. Both are **opt-in** and **never required** — a repository
+Four addons ship today. All are **opt-in** and **never required** — a repository
 is fully conformant with **zero** addons installed.
 
 ### 6.1 Devcontainer Support (first addon)
@@ -156,6 +156,70 @@ is fully conformant with **zero** addons installed.
   never-block rule, vendor-neutral guardrail, validation), and
   `templates/INTEGRATION.md` (reasoning aid).
 
+### 6.3 Dependency Upgrade (third addon)
+
+- **Dependency upgrade** is the **third** addon. Its full normative content (spec,
+  reasoning templates, onboarding hook, validation step, the `/lib-upgrade`
+  delegator template) **MUST** live at:
+
+  ```
+  skills/deepworkplan/addons/dependency-upgrade/
+  ```
+
+- Scope: **package-manager agnostic**, **opt-in** dependency upgrades. When
+  accepted, it detects the repo's **real** package manager (npm/pnpm/yarn + ncu,
+  pip/poetry/uv, cargo, go mod, bundler, composer, …), classifies upgrades by
+  semver, upgrades in **safe batches**, runs the repo's **real** validation gate
+  after each batch, **reverts** a failing batch, and summarizes — and **only when
+  accepted** installs a `/lib-upgrade` delegator into the repo's
+  `.agents/commands/`.
+- The full implementation lives at
+  `skills/deepworkplan/addons/dependency-upgrade/` — see its
+  [`SKILL.md`](../addons/dependency-upgrade/SKILL.md) (onboarding hook),
+  [`SPEC.md`](../addons/dependency-upgrade/SPEC.md) (RFC-2119 contract: detection,
+  semver classification, batched upgrade, validate-after-each-batch gate,
+  revert-on-failure, reconcile-don't-clobber, validation), and `templates/`.
+
+### 6.4 Design System (fourth addon)
+
+- **Design system** is the **fourth** addon. Its full normative content (spec,
+  reasoning templates, onboarding hook, validation step) **MUST** live at:
+
+  ```
+  skills/deepworkplan/addons/design-system/
+  ```
+
+- Scope: a **frontend/UI-scoped**, **opt-in** capability that gives a repo a
+  **`DESIGN.md`** — placed at **`docs/DESIGN.md`** alongside the repo's other specs
+  (root only if the repo has no `docs/` tree) and **indexed from `AGENTS.md`** — a
+  Markdown design-system file any coding agent reads to generate UI consistent with
+  the repo's **own** design system. When accepted,
+  it **reasons about the repo's actual design tokens** (CSS custom properties, a
+  Tailwind config, token files, component styles) — **never** copying a brand file —
+  documents the canonical sections (colors & roles, typography, layout/spacing,
+  elevation, shapes, components, responsive behavior, do's & don'ts, agent prompt
+  guide), checks **WCAG AA** contrast and token integrity, and reconciles an
+  existing `DESIGN.md` instead of clobbering it. It is **default-on when detected**
+  (addon SPEC §3.1): when a UI surface / design system **is** detected the `onboard`
+  flow **applies** it in trust mode and **strongly recommends** it in guided mode;
+  when no UI surface is present it is **not** offered. It remains **never required** —
+  a zero-addon repo is fully conformant.
+- **Distinct from per-feature design docs:** this addon provides a **repo-level,
+  persistent** design-system file; it is **not** a per-feature technical design
+  document (the "requirements → design → tasks" `design.md` of tool-bound
+  spec-driven workflows). DeepWorkPlan deliberately ships **no** separate
+  per-feature design-doc archetype — a plan's README (Goal + Context), each task's
+  Context and **Acceptance Criteria**, and the **validation gates** already fulfill
+  that role; this addon fills the one gap that role does not cover: durable,
+  repo-native **UI** design context.
+- The full implementation lives at
+  `skills/deepworkplan/addons/design-system/` — see its
+  [`SKILL.md`](../addons/design-system/SKILL.md) (onboarding hook),
+  [`SPEC.md`](../addons/design-system/SPEC.md) (RFC-2119 contract: frontend-scope
+  gate, canonical sections, reason-don't-copy, reconcile-don't-clobber,
+  accessibility & token integrity, pragmatic-reference posture, validation), and
+  `templates/` (the `DESIGN.md` skeleton, per-stack presets, agent prompt guide).
+
 > This `ADDONS.md` is the concept + pointer; it **MUST NOT** be treated as any
 > addon's implementation.
 
@@ -168,6 +232,8 @@ is fully conformant with **zero** addons installed.
 - `../RECONCILIATION.md` (divergence #7), `../../ORCHESTRATOR_MANIFEST.md` (devcontainer-addon decision)
 - Devcontainer addon implementation (`skills/deepworkplan/addons/devcontainer/`)
 - Dailybot addon implementation (`skills/deepworkplan/addons/dailybot/`)
+- Dependency-upgrade addon implementation (`skills/deepworkplan/addons/dependency-upgrade/`)
+- Design-system addon implementation (`skills/deepworkplan/addons/design-system/`)
 
 ---
 

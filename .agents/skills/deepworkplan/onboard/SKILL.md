@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-onboard
 description: Make a repository AI-first by reasoning about its stack and archetype, then generating adapted AGENTS.md, docs/, per-module docs, .agents/, and the .claude to .agents symlink. Offers opt-in addons. Use when the developer wants to onboard or AI-enable a repo.
-version: "2.5.0"
+version: "2.7.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
@@ -370,13 +370,14 @@ After the core AI-first scaffolding, **enumerate** the available addons under
 required** — a repo is fully conformant with zero addons. In **trust mode**, you
 MAY recommend the obviously-applicable ones, but still surface them.
 
-Three addons ship today; enumerate **all** and offer each independently:
+Four addons ship today; enumerate **all** and offer each independently:
 
 | Addon | Folder | Recommend in trust mode when… |
 |-------|--------|-------------------------------|
 | **Devcontainer support** | [`../addons/devcontainer/`](../addons/devcontainer/SKILL.md) | the repo benefits from a reproducible isolated dev container (most repos with Docker/services). |
 | **Dailybot integration** | [`../addons/dailybot/`](../addons/dailybot/SKILL.md) | the developer/team **already uses Dailybot** or asks for team progress reporting — **do NOT auto-install for everyone**. |
 | **Dependency upgrade** | [`../addons/dependency-upgrade/`](../addons/dependency-upgrade/SKILL.md) | the repo has a lockfile + a dependency-heavy stack and wants safe, batched, validated upgrades — recommend only when a lockfile is present; **never auto-install for everyone**. |
+| **Design system** | [`../addons/design-system/`](../addons/design-system/SKILL.md) | **default-on when detected** — whenever the repo has a **UI surface / design system** (a stylesheet with CSS custom properties, a Tailwind config or `@theme` block, UI components, or a brand/style guide), in trust mode **apply** it (generate `DESIGN.md`); in guided mode **strongly recommend** and ask. **Never offer for a backend/CLI/library-only repo.** |
 
 The first addon is **devcontainer support**
 ([`../addons/devcontainer/SKILL.md`](../addons/devcontainer/SKILL.md) +
@@ -430,6 +431,33 @@ batch, revert a failing batch, and summarize. **Only when accepted**, the addon
 installs a `/lib-upgrade` delegator into the repo's `.agents/commands/`. After
 applying, run the addon's validation step (SPEC §9). If declined, skip it — the
 repo stays baseline-conformant and no command is installed.
+
+The fourth addon is **design system**
+([`../addons/design-system/SKILL.md`](../addons/design-system/SKILL.md) +
+[`SPEC.md`](../addons/design-system/SPEC.md)). It is **frontend-scoped** and
+**default-on when detected** (addon SPEC §3.1) — during Phase 1 detection, check
+whether the repo has a **UI surface / design system**: a stylesheet with CSS custom
+properties, a Tailwind config or a Tailwind v4 `@theme {}` block, UI components
+(`.tsx`/`.vue`/`.svelte`/`.astro`), a design-token file, or a brand/style guide.
+When that signal **is** present, do not merely list the addon: in **trust mode
+apply it automatically** (generate `DESIGN.md`, developer may still decline), and in
+**guided mode present it as a strong recommendation** and ask. When the signal is
+**absent**, **do not offer it** (a backend/CLI/library-only repo must never get a
+`DESIGN.md`). Declining always leaves a baseline-conformant repo. If accepted (or
+auto-applied): read that addon's `SKILL.md` and run
+its flow — locate the repo's **real** design source, **reason out** each canonical
+section of `DESIGN.md` from those tokens (Overview/atmosphere, colors & roles incl.
+dark mode, typography, layout & spacing, elevation, shapes, components, responsive
+behavior, do's & don'ts incl. the repo's accessibility rules, agent prompt guide),
+and write it at **`docs/DESIGN.md`** (alongside the other specs you generated in
+Phase 4 — root only if the repo has no `docs/` tree) — **never** copying a
+third-party brand file. Then **add a `DESIGN.md` reference to the `AGENTS.md`
+documentation index** (and `CLAUDE.md`) so agents discover it like the rest of
+`docs/`. An **existing `DESIGN.md`/token source MUST be reconciled, not clobbered**.
+After applying, run the addon's validation step (SPEC §11: file at `docs/DESIGN.md`
+or root with all sections, AGENTS.md references it, values traceable to the real
+source, WCAG AA contrast, token references resolve). If declined, skip it — the repo
+stays baseline-conformant.
 
 ## Phase 8 — Self-check / validation (mandatory)
 
