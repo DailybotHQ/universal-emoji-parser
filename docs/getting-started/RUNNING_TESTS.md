@@ -1,8 +1,8 @@
 # Running Tests
 
-How to run, watch, filter, and debug Mocha specs in Universal Emoji Parser. Each section explains what to do, why it works, and how to confirm the suite is healthy.
+How to run, watch, filter, and debug Vitest specs in Universal Emoji Parser. Each section explains what to do, why it works, and how to confirm the suite is healthy.
 
-If you haven't installed dependencies yet, start with [Environment Setup](ENVIRONMENT_SETUP.md). For full Mocha/Chai conventions see [`../TESTING_GUIDE.md`](../TESTING_GUIDE.md).
+If you haven't installed dependencies yet, start with [Environment Setup](ENVIRONMENT_SETUP.md). For full Vitest conventions see [`../TESTING_GUIDE.md`](../TESTING_GUIDE.md).
 
 What healthy output looks like — `npm test`:
 
@@ -35,7 +35,7 @@ Total: ~5 seconds for the full suite.
 npm test
 ```
 
-Internally: `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors`. **tsx** executes `.ts` on the fly — no separate compile step.
+Internally: `vitest run` (config in `vitest.config.ts`). **Vitest** transpiles `.ts` on the fly via esbuild — no separate compile step.
 
 Tests live in `test/*.test.ts`. There are three files:
 
@@ -51,16 +51,16 @@ Tests live in `test/*.test.ts`. There are three files:
 npm run test:watch
 ```
 
-Re-runs the suite on every save in `src/` or `test/`. ~1 second per re-run after the first compile. **This is the recommended default loop** for any code change.
+Runs `vitest` (watch mode), re-running affected specs on every save in `src/` or `test/`. ~1 second per re-run after the first compile. **This is the recommended default loop** for any code change.
 
-To stop: `Ctrl+C`.
+To stop: `Ctrl+C` (or `q` in Vitest's interactive watch).
 
 ---
 
 ## 3. Run a single file
 
 ```bash
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors
+npx vitest run test/main.test.ts
 ```
 
 Useful when iterating on `main.test.ts` and you don't care about catalog tests.
@@ -69,17 +69,17 @@ Useful when iterating on `main.test.ts` and you don't care about catalog tests.
 
 ## 4. Filter by name
 
-Mocha's `--grep` matches against the concatenated `describe` + `it` names:
+Vitest's `-t` (`--testNamePattern`) matches against the concatenated `describe` + `it` names:
 
 ```bash
 # Run only "should parse emojis from unicode"
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should parse emojis from unicode" --colors
+npx vitest run test/main.test.ts -t "should parse emojis from unicode"
 
 # Run all tests in the "Using default options" describe block
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "Using default options" --colors
+npx vitest run test/main.test.ts -t "Using default options"
 
 # Run anything mentioning "shortcode"
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "shortcode" --colors
+npx vitest run test/main.test.ts -t "shortcode"
 ```
 
 ---
@@ -135,13 +135,13 @@ Full procedure: [`/regenerate-emoji-lib`](../../.agents/commands/regenerate-emoj
 
 ### Quick inspection — `console.log`
 
-Tests are exempt from the `no-console` ESLint rule in `src/` (that rule targets library code). Drop a `console.log` in the test, run `npm test`, look at the output.
+Tests are exempt from the `no-console` Biome rule that targets `src/` library code. Drop a `console.log` in the test, run `npm test`, look at the output.
 
 ```ts
 it('should parse :smile:', () => {
   const result = uEmojiParser.parse(':smile:')
   console.log('Result:', result) // ← debugging
-  expect(result).to.contain('alt="🙂"')
+  expect(result).toContain('alt="🙂"')
 })
 ```
 
@@ -151,10 +151,10 @@ Don't commit the `console.log` — but during dev, no problem.
 
 ```bash
 # Run tests with the inspector enabled, paused at start
-node --import tsx --inspect-brk ./node_modules/mocha/bin/mocha.js test/main.test.ts --timeout 999999 --colors
+npx vitest run test/main.test.ts --inspect-brk --no-file-parallelism
 ```
 
-Then in Chrome: `chrome://inspect` → "Open dedicated DevTools for Node" → set breakpoints in `src/index.ts` (TypeScript with source maps via **tsx**).
+Then in Chrome: `chrome://inspect` → "Open dedicated DevTools for Node" → set breakpoints in `src/index.ts` (TypeScript with source maps via **Vitest**/esbuild).
 
 VS Code users: configure a launch config:
 
@@ -162,10 +162,9 @@ VS Code users: configure a launch config:
 {
   "type": "node",
   "request": "launch",
-  "name": "Mocha tests",
-  "runtimeExecutable": "node",
-  "runtimeArgs": ["--import", "tsx"],
-  "args": ["./node_modules/mocha/bin/mocha.js", "test/**/*.ts", "--timeout", "999999", "--colors"],
+  "name": "Vitest tests",
+  "runtimeExecutable": "npx",
+  "runtimeArgs": ["vitest", "run", "test/main.test.ts", "--no-file-parallelism"],
   "console": "integratedTerminal",
   "internalConsoleOptions": "neverOpen"
 }
@@ -185,10 +184,10 @@ const result = uEmojiParser.parse('hello :smile: 🚀', { parseToHtml: false, pa
 console.log(JSON.stringify(result))
 EOF
 
-npx ts-node tmp/repro.ts
+npx vite-node tmp/repro.ts
 ```
 
-`tmp/` is gitignored, so it's safe for throwaway scripts.
+`tmp/` is gitignored, so it's safe for throwaway scripts. (`vite-node` ships with Vitest and runs `.ts` directly.)
 
 ---
 
@@ -198,10 +197,9 @@ To match what the CI does on a PR:
 
 ```bash
 npm install                          # Or skip if node_modules is current
-npm run eslint:check                 # Lint
-npm run prettier:check               # Format
-npm test                             # Mocha
-npm run build                        # Webpack — only if you want full CI parity (the PR `code_check.yml` doesn't build)
+npm run biome:check                  # Lint + format (single Biome step)
+npm test                             # Vitest
+npm run build                        # Vite — only if you want full CI parity (the PR `code_check.yml` doesn't build)
 ```
 
 The release workflow does the same plus `npm run build` and `npm version patch`. See [Build & Deploy](../BUILD_DEPLOY.md).
@@ -213,7 +211,7 @@ The release workflow does the same plus `npm run build` and `npm version patch`.
 Follow the patterns in `test/main.test.ts`:
 
 ```ts
-import { expect } from 'chai'
+import { describe, expect, it } from 'vitest'
 import uEmojiParser from '../src/index'
 
 describe('Test <subject>', () => {
@@ -226,7 +224,7 @@ describe('Test <subject>', () => {
       const result: string = uEmojiParser.parse(text)
 
       // Assert
-      expect(result).to.contain('alt="🙂"')
+      expect(result).toContain('alt="🙂"')
     })
   })
 })
@@ -238,14 +236,14 @@ Conventions in [`../TESTING_GUIDE.md`](../TESTING_GUIDE.md). Skill: [`/write-tes
 
 ## 9. Quick reference
 
-| Goal                 | Command                                                                                                      |
-| -------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Run all tests        | `npm test`                                                                                                   |
-| Watch mode (TDD)     | `npm run test:watch`                                                                                         |
-| Run a single file    | `npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors`                                       |
-| Filter by name       | `npx tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --grep "<pattern>" --colors`                       |
-| Debug with inspector | `node --import tsx --inspect-brk ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 999999 --colors` |
-| Quick repro          | `npx ts-node tmp/repro.ts`                                                                                   |
-| CI parity            | `npm install && npm run eslint:check && npm run prettier:check && npm test && npm run build`                 |
+| Goal                 | Command                                                                |
+| -------------------- | --------------------------------------------------------------------- |
+| Run all tests        | `npm test`                                                            |
+| Watch mode (TDD)     | `npm run test:watch`                                                  |
+| Run a single file    | `npx vitest run test/main.test.ts`                                    |
+| Filter by name       | `npx vitest run -t "<pattern>"`                                       |
+| Debug with inspector | `npx vitest run test/main.test.ts --inspect-brk --no-file-parallelism` |
+| Quick repro          | `npx vite-node tmp/repro.ts`                                          |
+| CI parity            | `npm install && npm run biome:check && npm test && npm run build`     |
 
 If a test doesn't run, check [Troubleshooting](TROUBLESHOOTING.md) — every issue we've actually hit is in there.

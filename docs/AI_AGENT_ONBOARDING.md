@@ -5,7 +5,7 @@ Whether you're Claude Code, Cursor, Codex, Gemini, GitHub Copilot, or any other 
 ## In one minute
 
 1. **Read [`AGENTS.md`](../AGENTS.md)** — the non-negotiable rules. Don't skip it.
-2. **This is a TypeScript library** that parses emoji unicodes/shortcodes into HTML `<img>` tags or between formats. Single runtime dependency: `@twemoji/parser`
+2. **This is a TypeScript library** that parses emoji unicodes/shortcodes into HTML `<img>` tags or between formats. Zero runtime dependencies — `@twemoji/parser` is inlined into the bundle at build time
 3. **Two files matter most:** `src/index.ts` (the parser) and `src/lib/emoji-lib.json` (the catalog)
 4. **Don't hand-edit `emoji-lib.json`.** Regenerate via `prepareEmojiLibJson.test.ts` (see [`/regenerate-emoji-lib`](../.agents/commands/regenerate-emoji-lib.md))
 5. **The HTML output template is a contract.** `<img class="emoji" alt="..." src="..."/>` — exactly that shape, forever (until a major bump)
@@ -38,11 +38,10 @@ Whether you're Claude Code, Cursor, Codex, Gemini, GitHub Copilot, or any other 
 Run the pre-commit checklist from `AGENTS.md`:
 
 - [ ] All code, comments, and identifiers in English
-- [ ] `npm run eslint:check` passes
-- [ ] `npm run prettier:check` passes
+- [ ] `npm run biome:check` passes (lint + format)
 - [ ] `npm test` passes
-- [ ] `npm run build` succeeds (Webpack produces `dist/index.js`)
-- [ ] `npm run build:tsc` succeeds (types compile)
+- [ ] `npm run build` succeeds (Vite produces `dist/index.js`; `build:types` emits the `.d.ts` files)
+- [ ] `npm run build:tsc` succeeds (types type-check)
 - [ ] If you regenerated `emoji-lib.json`, the `TOTAL_EMOJIS` constant in `emojiLibJson.test.ts` is updated
 - [ ] If you changed the public API, `docs/API_REFERENCE.md` and `README.md` are updated
 - [ ] No `console.*` calls in `src/`
@@ -67,7 +66,7 @@ Run the pre-commit checklist from `AGENTS.md`:
    import uEmojiParser from '../src/index'
    console.log(uEmojiParser.parse('the input that breaks'))
    ```
-2. `npx ts-node tmp/repro.ts` — confirm the bug
+2. `npx vite-node tmp/repro.ts` — confirm the bug
 3. Add a failing test in `test/main.test.ts` that asserts the _expected_ output. Paste the broken input verbatim
 4. `npm run test:watch` — watch it fail
 5. Fix `src/index.ts`
@@ -105,9 +104,9 @@ Skill: [`/bump-deps`](../.agents/commands/bump-deps.md).
 ### Diagnosing a build failure
 
 1. Read the actual error output, not just the symptom
-2. Check ESLint/Prettier first (most failures are lint, not build)
+2. Check Biome first (most failures are lint/format, not build): `npm run biome:check`
 3. If TypeScript: `npm run build:tsc` for clearer error messages
-4. If Webpack: `npm run build:dev` (no minification) for readable output
+4. If the Vite bundle: `npm run build:dev` (development mode, no minification) for readable output
 
 Skill: [`/fix-build`](../.agents/commands/fix-build.md).
 
@@ -122,7 +121,7 @@ What kind of change is it?
 ├── Internal helper (refactor, perf)
 │     → src/index.ts only; existing tests should still pass
 ├── Build/CI
-│     → webpack.config.js / .github/workflows/*.yml + docs/BUILD_DEPLOY.md
+│     → vite.config.ts / vitest.config.ts / .github/workflows/*.yml + docs/BUILD_DEPLOY.md
 ├── Documentation
 │     → docs/<file>.md (or AGENTS.md for top-level rules)
 └── AI tooling (skill / command / subagent)
@@ -145,7 +144,7 @@ Before bulk changes, read the relevant section of `AGENTS.md` and the doc it lin
 - **Hand-editing `emoji-lib.json`** — feels faster but the next regeneration overwrites it. Always go through `EMOJIS_SPECIAL_CASES`
 - **Adding a runtime dependency** — every byte ships to consumer bundles. Justify with measurement
 - **Changing the HTML output template** — breaks every consumer's snapshot tests; major version
-- **Major bumps to test or lint tooling** — Chai 6 + ESLint 10 + tsx are the current baseline; still read release notes and run `npm test` + `npm run eslint:check` + `npm run build` before merging
+- **Major bumps to test or lint tooling** — Vitest 4 + Biome 2.4 are the current baseline; still read release notes and run `npm test` + `npm run biome:check` + `npm run build` before merging
 - **Skipping the `it.skip` on the regenerator test** — if you forget to re-skip it, the next CI run regenerates the catalog into `emoji-lib-output.json` (which is gitignored, so it's a wasted run, not a leak)
 
 ## Asking for clarification

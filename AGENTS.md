@@ -14,11 +14,11 @@
 | Product         | [Product Spec](docs/PRODUCT_SPEC.md)                                                            | Non-technical "why" and "for whom": problem, audience, capabilities, non-goals |
 | Architecture    | [Architecture](docs/ARCHITECTURE.md)                                                            | Module layout, data flow, parse pipeline, emoji catalog                        |
 | Technologies    | [Technologies](docs/TECHNOLOGIES.md)                                                            | Stack overview with versions and roles                                         |
-| Standards       | [Standards](docs/STANDARDS.md)                                                                  | TypeScript / lint / Prettier conventions, naming, exports                      |
-| Commands        | [Development Commands](docs/DEVELOPMENT_COMMANDS.md)                                            | npm scripts, Mocha runs, Webpack, watch loops                                  |
-| Testing         | [Testing](docs/TESTING_GUIDE.md)                                                                | Mocha + Chai setup, test conventions, regenerating expectations                |
+| Standards       | [Standards](docs/STANDARDS.md)                                                                  | TypeScript / Biome lint + format conventions, naming, exports                  |
+| Commands        | [Development Commands](docs/DEVELOPMENT_COMMANDS.md)                                            | npm scripts, Vitest runs, Vite build, watch loops                             |
+| Testing         | [Testing](docs/TESTING_GUIDE.md)                                                                | Vitest setup, test conventions, regenerating expectations                      |
 | Runtimes        | [Runtimes](docs/RUNTIMES.md)                                                                    | Node, browsers, ESM vs CommonJS, bundlers consuming the package                |
-| Build & Deploy  | [Build & Deploy](docs/BUILD_DEPLOY.md)                                                          | Webpack production bundle, npm publish, GitHub release pipeline                |
+| Build & Deploy  | [Build & Deploy](docs/BUILD_DEPLOY.md)                                                          | Vite production bundle, npm publish, GitHub release pipeline                   |
 | Emoji Providers | [Emoji Providers](docs/EMOJI_PROVIDERS.md)                                                      | Twemoji CDN, custom CDNs, shortcode dialects (Slack/GitHub/Discord)            |
 | Performance     | [Performance](docs/PERFORMANCE.md)                                                              | Lookup hot paths, RegExp caches, bundle size, large catalog handling           |
 | API Reference   | [API Reference](docs/API_REFERENCE.md)                                                          | Public methods, types, options, return values                                  |
@@ -44,14 +44,13 @@ The package targets:
 
 - **TypeScript 6** — strict-null source language, compiles to `dist/index.js` + `dist/index.d.ts` (see `package.json` for exact semver)
 - **Node.js ≥ 20.19.0** — `engines.node` constraint enforced by package.json (CI and the dev container use Node 24)
-- **`@twemoji/parser` 17** — single runtime dependency; finds emoji entities in text and produces CDN URLs
+- **`@twemoji/parser` 17.0.1 (pinned, inlined)** — finds emoji entities in text and produces CDN URLs; bundled into `dist/index.js` so the package ships with **zero runtime dependencies**. Pinned to exactly `17.0.1` (see `.ncurc.json` `reject`) — `17.0.2` regresses U+FE0F variation-selector handling
 - **emojilib 4 + unicode-emoji-json** (build/test only) — sources used to regenerate `src/lib/emoji-lib.json`
-- **Webpack 5 + ts-loader** — production bundler, emits a single CommonJS entry at `dist/index.js`
-- **Mocha 11 + Chai 6 + tsx** — test runner; `tsx` loads `.ts` specs (Chai 6 is ESM-first — `ts-node/register` alone is insufficient)
-- **ESLint 10 + `typescript-eslint` (flat config)** — code linting via `eslint.config.mjs`
-- **Prettier 3** — code formatting (`semi: false`, `singleQuote: true`, `trailingComma: 'es5'`)
-- **npm-check-updates** — dependency upgrade automation (optional rejects in `.ncurc.json`; empty by default)
-- **GitHub Actions** — CI/CD: lint → tests → build → npm publish + GitHub release on PR merge to `main`
+- **Vite 8 (library mode)** — production bundler via `vite.config.ts` (CJS library build, esbuild minify); emits a single CommonJS entry at `dist/index.js`. Type declarations come from `tsc --emitDeclarationOnly`
+- **Vitest 4** — test runner via `vitest.config.ts`; specs import `{ describe, it, expect } from 'vitest'`
+- **Biome 2.4** — single tool for lint + format via `biome.json` (`semi: false`, `singleQuote: true`, `trailingComma: 'es5'`, `lineWidth: 120`)
+- **npm-check-updates** — dependency upgrade automation (rejects in `.ncurc.json`; pins `@twemoji/parser` to `17.0.1`)
+- **GitHub Actions** — CI/CD: Biome check → tests → build → npm publish + GitHub release on PR merge to `main`
 
 ## Project Structure
 
@@ -62,7 +61,7 @@ src/
 ├── index.ts                  # Public API: uEmojiParser, DEFAULT_EMOJI_CDN, emojiLibJsonData
 └── lib/
     ├── type.ts               # Shared TypeScript interfaces (EmojiType, EmojiParseOptionsType, …)
-    ├── emoji-lib.json        # Curated emoji catalog (1906 entries) — committed, generated by a test
+    ├── emoji-lib.json        # Curated emoji catalog (1914 entries) — committed, generated by a test
     └── emoji-lib-output.json # Last regeneration output (git-ignored)
 
 test/
@@ -70,7 +69,7 @@ test/
 ├── emojiLibJson.test.ts               # Snapshot-style validation of the catalog
 └── prepareEmojiLibJson.test.ts        # `it.skip`-guarded regenerator for emoji-lib.json
 
-dist/                                  # Webpack output (git-ignored, npm-published)
+dist/                                  # Vite output (git-ignored, npm-published)
 docker/local/                          # Dev container Docker Compose + Dockerfile
 .devcontainer/                         # VS Code Dev Container config (uses docker/local/)
 .github/
@@ -81,9 +80,10 @@ docs/                                  # Project documentation
 tmp/                                   # Scratch workspace (git-ignored, see below)
 package.json                           # npm scripts, deps, version, engines
 tsconfig.json                          # strict TS config for src + tests (declaration: true, strictNullChecks: true)
-tsconfig.build.json                    # `tsc --build` / ts-loader: emit from `src/` only (`rootDir`)
-webpack.config.js                      # commonjs2 output, ts-loader, clean-webpack-plugin on prod
-eslint.config.mjs / .prettierrc / .editorconfig   # Style enforcement (ESLint flat config)
+tsconfig.build.json                    # `tsc --emitDeclarationOnly`: emit .d.ts from `src/` only (`rootDir`)
+vite.config.ts                         # CJS library build, esbuild minify, @twemoji/parser inlined
+vitest.config.ts                       # Vitest test runner config
+biome.json / .editorconfig             # Style enforcement (Biome lint + format)
 .ncurc.json                            # npm-check-updates defaults (`reject` optional)
 .npmignore                             # Trims source/test/config from the npm tarball
 ```
@@ -144,40 +144,39 @@ Full reference: **[API Reference](docs/API_REFERENCE.md)**.
 ### 4. TypeScript Style (MANDATORY)
 
 - **Strict null checks on** (`strictNullChecks: true` in `tsconfig.json`) — every nullable must be handled
-- **No `any` without justification** (`noImplicitAny: true`); when forced, suppress with a targeted `// eslint-disable-line` and a comment
-- **No semicolons** (Prettier `semi: false`, ESLint `semi: [2, 'never']`)
+- **No `any` without justification** (`noImplicitAny: true` in `tsconfig.json`; Biome's `noExplicitAny` is off); when forced, suppress with a targeted `// biome-ignore` and a comment
+- **No semicolons** (Biome `semicolons: 'asNeeded'`)
 - **Single quotes** (`singleQuote: true`); use template literals when interpolating
 - **Trailing comma `es5`** — multi-line arrays/objects, never in function call args
 - **Explicit return types on exported functions** — `parse(text: string): string`, not inferred
 - **Imports first, then constants, then implementation** — see `src/index.ts` for the canonical layout
-- **`max_line_length = 120`** (`.editorconfig`) — Prettier reflows past it
+- **`max_line_length = 120`** (`.editorconfig` / Biome `lineWidth: 120`) — Biome reflows past it
 
-Run `npm run eslint:check` and `npm run prettier:check` before committing. Auto-fix is `npm run eslint:fix` / `npm run prettier:fix`.
+Run `npm run biome:check` before committing. Auto-fix is `npm run biome:fix` (or `npm run biome:fix:unsafe` for unsafe fixes).
 
 ### 5. Code Quality (MANDATORY)
 
 ```bash
-npm run eslint:check       # Lint check (CI gate)
-npm run prettier:check     # Format check (CI gate)
-npm run eslint:fix         # Auto-fix lint
-npm run prettier:fix       # Auto-fix format
-npm run build:tsc          # Type-check via tsc (no emit when used with --noEmit, otherwise builds .d.ts)
-npm run build              # Webpack production bundle to dist/
+npm run biome:check        # Lint + format check (CI gate)
+npm run biome:fix          # Auto-fix lint + format
+npm run biome:fix:unsafe   # Auto-fix including unsafe transforms
+npm run build:tsc          # Type-check only (tsc -p tsconfig.build.json --noEmit)
+npm run build              # Vite production bundle + .d.ts to dist/
 ```
 
-The CI runs `eslint:check` + `prettier:check` + `test` + `build` on every PR (`.github/workflows/code_check.yml`). All four must pass.
+The CI runs `biome:check` + `test` + `build` on every PR (`.github/workflows/code_check.yml`). All three must pass.
 
 ### 6. Testing (MANDATORY)
 
 ```bash
-npm test                  # Run all Mocha specs (tsx + mocha; no compile step)
-npm run test:watch        # Re-run on file change
+npm test                  # Run all Vitest specs once (vitest run)
+npm run test:watch        # Re-run on file change (vitest)
 ```
 
-Specs live in `test/*.test.ts`. The runner config: `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors`.
+Specs live in `test/*.test.ts` and import `{ describe, it, expect } from 'vitest'`. The runner is configured via `vitest.config.ts`.
 
 - **Always add a regression test** when fixing a parsing bug — paste the exact input that broke and the expected output
-- **Snapshot the catalog count** when regenerating: `emojiLibJson.test.ts` asserts `TOTAL_EMOJIS = 1906`. Bump it intentionally if a regeneration changes the count
+- **Snapshot the catalog count** when regenerating: `emojiLibJson.test.ts` asserts `TOTAL_EMOJIS = 1914`. Bump it intentionally if a regeneration changes the count
 - The regeneration test (`prepareEmojiLibJson.test.ts`) is `it.skip`'d by default; **never commit it un-skipped** — it writes to disk
 
 Conventions: **[Testing Guide](docs/TESTING_GUIDE.md)**.
@@ -205,7 +204,7 @@ Bug-fix changes that alter HTML output break every consumer's snapshot tests. Cu
 3. **`parseToHtml` calls `parseToUnicode` first**, then a single Twemoji `parse()` pass — preserve this order; doing them in parallel duplicates work
 4. **Avoid full catalog object cloning.** `emojiLibJsonData` is shared; never mutate it. Tests rely on it being deep-equal across runs
 5. **Bundle size matters.** `emoji-lib.json` is ~543 KB; don't add per-emoji metadata that isn't actively consumed
-6. **Browser consumers bundle this package**; keep `dependencies` minimal — moving anything from `devDependencies` to `dependencies` ships it to every consumer's bundle
+6. **Browser consumers bundle this package**; the package currently ships **zero runtime dependencies** (`@twemoji/parser` is inlined by Vite). Keep it that way — adding anything to `dependencies` ships it to every consumer's bundle
 
 See **[Performance Guide](docs/PERFORMANCE.md)**.
 
@@ -224,7 +223,7 @@ See **[Security Guide](docs/SECURITY.md)**.
 
 The fastest inner loop for this package is `npm run test:watch`. Edit `src/index.ts` or a test file and the suite re-runs in ~1 second. Use it as the default workflow for any change to parsing logic.
 
-For type-only changes, `npm run build:tsc` is faster than running tests.
+For type-only changes, `npm run build:tsc` (`tsc -p tsconfig.build.json --noEmit`) is faster than running tests.
 
 ## Shared Agent Coordination
 
@@ -239,14 +238,13 @@ npm run dev                              # nodemon src/index.ts (manual smoke ru
 npm run test:watch                       # TDD inner loop
 
 # Verify
-npm run eslint:check                     # Lint
-npm run prettier:check                   # Format
-npm test                                 # Mocha specs
-npm run build:tsc                        # tsc --build (emits .d.ts to dist/)
+npm run biome:check                      # Lint + format
+npm test                                 # Vitest specs
+npm run build:tsc                        # Type-check only (tsc --noEmit)
 
 # Build
-npm run build                            # Webpack production → dist/
-npm run build:dev                        # Webpack development (no minify)
+npm run build                            # Vite production + .d.ts → dist/
+npm run build:dev                        # Vite development build (vite build --mode development)
 
 # Maintenance
 npm run ncu:check                        # Show available dependency upgrades (respects .ncurc.json)
@@ -293,7 +291,7 @@ module.exports.emojiLibJsonData = emojiLibJsonData
 module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
 ```
 
-This is **intentionally redundant**. Webpack with `libraryTarget: 'commonjs2'` exposes the default export as `module.exports.default`, which breaks `require('universal-emoji-parser').parse(...)`. The three assignments at the bottom of `src/index.ts` reattach the API and the named exports to `module.exports` itself so `require` users get the same shape as `import` users. **Every `export const` in `src/index.ts` must also be reattached here**, otherwise it ships as `undefined` to CommonJS consumers.
+This is **intentionally redundant**. Vite library `commonjs` output exposes the default export as `module.exports.default`, which breaks `require('universal-emoji-parser').parse(...)`. The assignments at the bottom of `src/index.ts` reattach the API and the named exports to `module.exports` itself so `require` users get the same shape as `import` users. The `module.exports = uEmojiParser` tail is wrapped in a `try/catch` so it no-ops under ESM/Vitest while the published CJS bundle keeps the working `require()` shape. **Every `export const` in `src/index.ts` must also be reattached here**, otherwise it ships as `undefined` to CommonJS consumers.
 
 `test/exports.test.ts` enforces this rule two ways:
 
@@ -316,12 +314,12 @@ Update docs after: changing the public API, adding/removing a runtime dependency
 2. Move a `devDependency` to `dependencies` without measuring the bundle-size impact on consumers
 3. Change the HTML output template (`<img class="emoji" alt="..." src="..."/>`) without a major version bump
 4. Add a new top-level export — extend the `uEmojiParser` object instead
-5. Use `console.*` in `src/` — ESLint blocks it (`no-console: 2`); test files are exempt
+5. Use `console.*` in `src/` — Biome's `noConsole` rule blocks it (error in `src/` only, off in `test/**`); test files are exempt
 6. Commit `dist/` — it's built by CI; locally regenerated on demand
-7. Strip `eslint.config.mjs` or revert to legacy `.eslintrc` — ESLint 10 uses flat config only in this repo
+7. Strip `biome.json` or reintroduce ESLint/Prettier configs — Biome is the single lint + format tool in this repo
 8. Run `npm run release` locally — it bumps the version and creates a tag; CI does this on merge
 9. Add new emoji metadata fields to `EmojiType` — they ship in 540 KB JSON to every browser consumer
-10. Use `==` (TypeScript ESLint allows `===` only); use `Boolean(x)` instead of `!!x` in option parsing — see `getDefaultOptions`
+10. Use `==` (Biome enforces `===` only); use `Boolean(x)` instead of `!!x` in option parsing — see `getDefaultOptions`
 11. Update `CLAUDE.md` directly — it is a symlink to `AGENTS.md`. Edit `AGENTS.md`
 12. Add files inside `.claude/` — it is a symlink to `.agents/`. Edit `.agents/`
 13. Mutate `emojiLibJsonData` at runtime — tests deep-compare the catalog
@@ -341,10 +339,9 @@ Update docs after: changing the public API, adding/removing a runtime dependency
 ## Pre-Commit Checklist
 
 - [ ] All code, comments, and identifiers in English
-- [ ] `npm run eslint:check` passes
-- [ ] `npm run prettier:check` passes
-- [ ] `npm test` passes (all Mocha specs green)
-- [ ] `npm run build` succeeds (Webpack emits to `dist/`)
+- [ ] `npm run biome:check` passes (lint + format)
+- [ ] `npm test` passes (all Vitest specs green)
+- [ ] `npm run build` succeeds (Vite emits the bundle + `.d.ts` to `dist/`)
 - [ ] `npm run build:tsc` succeeds (types compile)
 - [ ] If you regenerated `emoji-lib.json`, the `TOTAL_EMOJIS` constant in `emojiLibJson.test.ts` is updated
 - [ ] If you changed the public API, `docs/API_REFERENCE.md` and `README.md` are updated
@@ -361,8 +358,8 @@ This repository ships with a `.agents/` directory (symlinked as `.claude/`) cont
 
 - `/regenerate-emoji-lib` — Regenerate `src/lib/emoji-lib.json` from upstream `emojilib` + `unicode-emoji-json`
 - `/add-special-case` — Add a keyword include/exclude override to `EMOJIS_SPECIAL_CASES`
-- `/write-tests` — Author Mocha + Chai tests for a parsing bug or new feature
-- `/fix-build` — Diagnose a failing TypeScript / Webpack / Mocha build
+- `/write-tests` — Author Vitest tests for a parsing bug or new feature
+- `/fix-build` — Diagnose a failing TypeScript / Vite / Vitest build
 - `/bump-deps` — Update one or more npm dependencies safely (respects `.ncurc.json`)
 - `/release-npm` — Walk through a manual release if CI is unavailable
 - `/check-html-output` — Verify the HTML output contract for a given input
@@ -372,15 +369,15 @@ This repository ships with a `.agents/` directory (symlinked as `.claude/`) cont
 - `emoji-parser-conventions` — Deep dive on the parse pipeline, regex caching, dual-export shape
 - `emoji-data-pipeline` — Step-by-step regeneration of the catalog from upstream
 - `npm-publish-walkthrough` — Full release flow including GitHub Actions internals
-- `typescript-strict-style` — TS rules enforced by `tsconfig.json` + ESLint
+- `typescript-strict-style` — TS rules enforced by `tsconfig.json` + Biome
 
 **Subagents (`.agents/agents/`):**
 
 - `parser-architect` — Decides where new logic lives and reviews public API shape
 - `emoji-data-curator` — Owns the catalog, keyword resolution, and special-case overrides
-- `test-author` — Writes Mocha + Chai tests, regression cases, and integration coverage
+- `test-author` — Writes Vitest tests, regression cases, and integration coverage
 - `dependency-auditor` — Reviews `package.json` changes, license/CVE checks, `.ncurc.json` exclusions
-- `release-engineer` — Owns Webpack config, CI workflows, npm publish, GitHub release notes
+- `release-engineer` — Owns Vite config, CI workflows, npm publish, GitHub release notes
 - `doc-writer` — Keeps `AGENTS.md`, `docs/`, and `README.md` synchronized with code
 
 ### How to Invoke Commands
@@ -411,10 +408,10 @@ Examples:
 
 - `feat: support :neckbeard: as a Slack dialect alias`
 - `fix: parse :star: even when followed by VS-16 modifier`
-- `chore: bump @twemoji/parser to 17.1.0`
-- `build: emit ESM bundle alongside commonjs2 output`
+- `chore: pin @twemoji/parser to 17.0.1 to avoid VS-16 regression`
+- `build: emit ESM bundle alongside the Vite commonjs output`
 - `docs: document EMOJIS_SPECIAL_CASES override workflow`
 - `perf: cache parseToShortcode alternation regex`
-- `ci: run lighthouse on the published bundle size`
+- `ci: run biome:check as the single lint + format gate`
 
 The CI release commit (`[🤖 DailyBot] New release to vX.Y.Z launched 🚀`) is reserved for the release workflow — humans should not write it.

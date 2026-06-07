@@ -254,7 +254,7 @@ const sunglasses = emojiLibJsonData['😎']
 // → { name: 'smiling face with sunglasses', slug: 'smiling_face_with_sunglasses', char: '😎', keywords: [...], ... }
 
 Object.keys(emojiLibJsonData).length
-// → 1906
+// → 1914
 ```
 
 ---
@@ -409,5 +409,5 @@ To skip the auto-bump for a non-patch release, edit `package.json` `"version"` m
 
 - **Node.js** ≥ 20.19.0 (`engines.node` constraint; CI runs on Node 24)
 - **TypeScript** ≥ 4.0 for consumers (the `.d.ts` uses modern features but nothing 5.0-only)
-- **Bundlers** — webpack, rollup, vite, esbuild, parcel all handle `commonjs2` output. See [Runtimes](RUNTIMES.md)
+- **Bundlers** — webpack, rollup, vite, esbuild, parcel all handle the CommonJS output (emitted by Vite library mode). See [Runtimes](RUNTIMES.md)
 - **Browsers** — anything modern. The catalog inlines into the bundle; no runtime fetch

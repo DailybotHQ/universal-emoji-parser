@@ -1,6 +1,6 @@
 ---
 name: fix-build
-description: Diagnose and repair a failing TypeScript / Webpack / Mocha build
+description: Diagnose and repair a failing TypeScript / Vite / Vitest build
 ---
 
 # Command: `/fix-build`
@@ -9,7 +9,7 @@ The build is broken. Find the root cause and fix it without disabling the failin
 
 ## Inputs to confirm
 
-- **Which command fails?** `npm test`, `npm run build`, `npm run eslint:check`, `npm run prettier:check`, `npm run build:tsc`
+- **Which command fails?** `npm test`, `npm run build`, `npm run biome:check`, `npm run build:tsc`
 - **Full error output** — paste the last ~30 lines, especially any "Caused by" / "Error:" / "TS####" lines
 
 ## Procedure
@@ -29,14 +29,13 @@ Read the actual root cause, not just the surface error.
 | Symptom                                                  | Likely cause                                                     | Section |
 | -------------------------------------------------------- | ---------------------------------------------------------------- | ------- |
 | `Cannot find module '@twemoji/parser'` (or similar)      | Stale `node_modules`                                             | A       |
-| `TSError: ⨯ Unable to compile TypeScript`                | TS source error                                                  | B       |
 | `error TS####:`                                          | TypeScript compiler error                                        | B       |
-| `Module parse failed` (Webpack)                          | TS file Webpack can't parse — usually `ts-loader` not picking up | C       |
-| ESLint `Parsing error: Cannot read file 'tsconfig.json'` | Wrong working directory                                          | D       |
-| ESLint `'X' is not defined` (no-console, etc.)           | Code violates a lint rule                                        | E       |
-| Prettier `Code style issues found`                       | Code violates Prettier formatting                                | F       |
-| Mocha tests time out                                     | Regenerator accidentally enabled                                 | G       |
-| Mocha tests fail with assertion mismatch                 | Real test failure — fix the code                                 | H       |
+| `[vite:dts]` / Rollup `Could not resolve` / parse error  | Vite can't resolve or transform a module                        | C       |
+| Biome `Cannot find configuration`                        | Wrong working directory                                          | D       |
+| Biome `noConsole` / lint diagnostic                      | Code violates a Biome rule                                       | E       |
+| Biome `Formatter would have printed...`                  | Code violates Biome formatting                                   | F       |
+| Vitest run hangs / times out                             | Regenerator accidentally enabled                                 | G       |
+| Vitest fails with assertion mismatch                     | Real test failure — fix the code                                 | H       |
 | `npm publish` 401/403                                    | Auth or scope issue                                              | I       |
 | GitHub Actions fails on `npm install`                    | Lock file / cache issue in CI                                    | J       |
 
@@ -68,71 +67,67 @@ Read the `error TS####:` line. Common patterns:
 | TS6053 | File not found                      | Path typo or missing source file                              |
 | TS7006 | Parameter implicitly has 'any' type | `noImplicitAny: true`; annotate the parameter                 |
 
-Run `npm run build:tsc` for the cleanest TS error output (Webpack obscures TypeScript errors slightly).
+Run `npm run build:tsc` for the cleanest TS error output (it type-checks via `tsc -p tsconfig.build.json --noEmit` with no bundling noise).
 
-### C. Webpack `Module parse failed` on a `.ts` file
+### C. Vite can't resolve or transform a module
 
-ts-loader didn't get a chance to compile. Verify `webpack.config.js` rules:
+Vite (Rollup under the hood, esbuild for transforms) reports `Could not resolve` or a transform/parse error. Common causes:
 
-```js
-module: {
-  rules: [
-    { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
-  ],
-},
-```
+- **Bad import path** — Vite resolves from `src/`; verify the specifier exists and the extension/casing match
+- **JSON not inlined** — `src/index.ts` must `import emojiLibJson from './lib/emoji-lib.json'`; Vite inlines JSON natively
+- **Type-only construct in runtime position** — esbuild strips types but won't evaluate them; check for `import type` misuse
 
-If this looks right, `ts-loader` may not be installed:
+Verify the config and reinstall if a tool is missing:
 
 ```bash
 npm install
-ls node_modules/ts-loader
+node -e "require('vite/package.json')"   # confirm Vite is installed
 ```
 
-### D. ESLint can't find tsconfig
+Check `vite.config.ts` — library mode must keep CJS output and esbuild minify intact. Type declarations are emitted separately by `build:types` (`tsc -p tsconfig.build.json --emitDeclarationOnly`), not by Vite.
+
+### D. Biome can't find its configuration
 
 ```
-eslint.config.mjs » @typescript-eslint/...
-Parsing error: Cannot read file '/.../tsconfig.json'
+Biome: Cannot find configuration file biome.json
 ```
 
-ESLint runs from a directory without `tsconfig.json`. Run from the repo root:
+Biome runs from a directory without `biome.json`. Run from the repo root:
 
 ```bash
 cd /app  # or wherever the repo is
-npm run eslint:check
+npm run biome:check
 ```
 
-### E. ESLint rule violation
+### E. Biome lint diagnostic
 
 Common violations and fixes:
 
-| Rule                                 | Violation                    | Fix                                                                                    |
-| ------------------------------------ | ---------------------------- | -------------------------------------------------------------------------------------- |
-| `no-console`                         | `console.log(...)` in `src/` | Remove it. Tests are exempt                                                            |
-| `semi`                               | Stray semicolon              | Run `npm run prettier:fix`                                                             |
-| `@typescript-eslint/no-unused-vars`  | Declared but unused          | Remove or prefix with `_`                                                              |
-| `@typescript-eslint/no-explicit-any` | `any` type                   | Use `unknown` and narrow, or suppress with `// eslint-disable-next-line` and a comment |
+| Rule                | Violation                    | Fix                                                                                |
+| ------------------- | ---------------------------- | --------------------------------------------------------------------------------- |
+| `noConsole`         | `console.log(...)` in `src/` | Remove it. Tests are exempt                                                        |
+| `noUnusedVariables` | Declared but unused          | Remove or prefix with `_`                                                          |
+| Style/format        | Quotes, semicolons, commas   | Run `npm run biome:fix` (safe) or `npm run biome:fix:unsafe` (applies unsafe fixes) |
 
-If the rule is genuinely wrong for the case, suppress with:
+Note: `noExplicitAny` is **off** in `biome.json`, so `any` is allowed without a suppression. `noCommonJs` is also **off** (the dual-export tail in `src/index.ts` relies on `module.exports`).
+
+If a diagnostic is genuinely wrong for the case, suppress with a Biome ignore comment and **always** explain why:
 
 ```ts
-// eslint-disable-next-line @typescript-eslint/<rule-name>
+// biome-ignore lint/suspicious/<rule>: <reason>
 const result: any = ...
 ```
 
-…and **always** add a comment explaining why.
-
-### F. Prettier formatting
+### F. Biome formatting
 
 ```bash
-npm run prettier:fix
-git diff   # review what Prettier changed
+npm run biome:fix
+git diff   # review what Biome changed
 ```
 
-If Prettier and ESLint disagree (rare — `eslint-config-prettier` should prevent this), ensure `eslint-plugin-prettier/recommended` stays **last** in `eslint.config.mjs` so it wins.
+Biome is the single source of both lint and format (single quotes, no semicolons, es5 trailing commas, lineWidth 120). There is no separate Prettier step — `biome check` covers both. If `biome:fix` doesn't resolve everything, run `npm run biome:fix:unsafe` and review the diff.
 
-### G. Mocha timeout — regenerator accidentally enabled
+### G. Vitest hang/timeout — regenerator accidentally enabled
 
 Open `test/prepareEmojiLibJson.test.ts`. If line ~39 reads `it(...)` instead of `it.skip(...)`, that's the bug. Restore:
 
@@ -140,7 +135,7 @@ Open `test/prepareEmojiLibJson.test.ts`. If line ~39 reads `it(...)` instead of 
 it.skip('create emojis lib json file', () => {
 ```
 
-Save, re-run `npm test`. Tests now finish in ~5 seconds.
+Save, re-run `npm test` (`vitest run`). Tests now finish in ~5 seconds.
 
 ### H. Real test failure
 
@@ -181,21 +176,20 @@ If CI is using a stale cache:
 
 ```bash
 npm install                          # If you touched package.json
-npm run eslint:check
-npm run prettier:check
+npm run biome:check
 npm test
 npm run build
 npm run build:tsc                    # If you touched TS configs
 ```
 
-All five should pass. If the original failure was in CI, push and verify the workflow goes green.
+All four should pass. If the original failure was in CI, push and verify the workflow goes green.
 
 ### 4. Don't bypass
 
 Avoid:
 
 - `--skip-tests`, `--no-test`, `it.skip`-ing the failing test (unless it's testing something that no longer applies and you've considered carefully)
-- Disabling lint rules wholesale (`/* eslint-disable */` at the file level) — target the specific line
+- Disabling lint rules wholesale (a file-level `biome-ignore-all` comment) — target the specific line
 - Lowering TypeScript strictness (`strictNullChecks: false`) to make errors go away
 - Editing `dist/` directly to "fix" a build issue — the next build overwrites it
 
@@ -217,5 +211,5 @@ If you fix the same kind of build break twice, write it up:
 
 - ❌ Read the actual error message before guessing the fix
 - ✅ Use `npm run build:tsc` for clearer TS errors than `npm run build`
-- ✅ Run all four checks (lint + format + test + build) after fixing
+- ✅ Run all checks (`biome:check` + test + build) after fixing
 - ✅ Commit the fix with a `fix:` conventional message

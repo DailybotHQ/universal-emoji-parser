@@ -1,6 +1,6 @@
 ---
 name: release-engineer
-description: Owns Webpack config, GitHub Actions workflows, npm publish, and GitHub release notes
+description: Owns Vite config, GitHub Actions workflows, npm publish, and GitHub release notes
 ---
 
 # Subagent: `release-engineer`
@@ -11,9 +11,8 @@ You own the build-time and release-time concerns of Universal Emoji Parser. You 
 
 ## You own
 
-- `webpack.config.js` — production bundler config
-- `tsconfig.json` — TypeScript compiler config (only the build-relevant parts; types/strictness are `parser-architect`'s domain)
-- `.babelrc` — legacy, currently unused; safe to delete in a future cleanup
+- `vite.config.ts` — production bundler config (library mode, CJS output, esbuild minify)
+- `tsconfig.json` / `tsconfig.build.json` — TypeScript compiler config (only the build-relevant parts; types/strictness are `parser-architect`'s domain). `build:types` emits `dist/index.d.ts` via `tsc -p tsconfig.build.json --emitDeclarationOnly`
 - `.npmignore` — what gets published to npm
 - `package.json` `scripts` — npm script definitions
 - `.github/workflows/*.yml` — every CI workflow
@@ -38,7 +37,7 @@ You own the build-time and release-time concerns of Universal Emoji Parser. You 
 1. Does it change the dist/ output shape?
    - File names change → YES breaking (consumers reference paths)
    - export shape changes → BREAKING (require/import shape changes)
-   - bundle format (commonjs2 → umd, esm) → BREAKING (loaders behave differently)
+   - bundle format (CJS → umd, esm) → BREAKING (loaders behave differently)
 2. Does it change which files are published?
    - .npmignore changes → potentially breaking if consumers expected something to be in the tarball
 3. Does it change CI behavior?
@@ -57,30 +56,22 @@ If it duplicates an existing gate → no
 If it's slow (>2 min on cache hit) → reconsider; CI throughput matters
 ```
 
-Current CI gates: ESLint, Prettier, Mocha, Webpack build (release only), Webpack build verification (presence of `dist/`).
+Current CI gates: Biome (lint + format), Vitest, Vite build (release only), build verification (presence of `dist/`).
 
 Missing gates (worth considering):
 
-- `npm run build:tsc` (so `dist/index.d.ts` is verified before publish)
+- `npm run build:tsc` (type-check via `tsc -p tsconfig.build.json --noEmit` before publish)
 - `npm audit --audit-level=high`
 - `npm pack --dry-run` to verify tarball contents
 
-### "Should I touch the legacy `.babelrc`?"
-
-The `.babelrc` predates the current Webpack + ts-loader setup. It defines `@babel/preset-env` + `transform-runtime` + `transform-modules-commonjs`. Babel is **not** invoked during `npm run build` or `npm test` — those use `ts-loader` (build) and **tsx** + Mocha (tests), both backed by the TypeScript compiler.
-
-The `.babelrc` exists for downstream tools that may opt in (e.g., a consumer using Babel-based bundling that picks up our `.babelrc`). Removing it might break those consumers. Leaving it is harmless.
-
-If you decide to delete it, do so deliberately, document the reasoning in the commit message, and bump the major version (defensively).
-
 ### "Should we add a new bundle format?"
 
-Currently we ship CommonJS (`dist/index.js` with `libraryTarget: 'commonjs2'`). Adding ESM would let modern bundlers tree-shake (though our catalog isn't tree-shakeable, so the win is small).
+Currently we ship CommonJS (`dist/index.js`, Vite library mode with CJS output, esbuild minify, `@twemoji/parser` inlined, ~403 KB). Adding ESM would let modern bundlers tree-shake (though our catalog isn't tree-shakeable, so the win is small).
 
 Pros: explicit ESM support; modern Node has stronger ESM than CJS interop
-Cons: dual builds double the dist size; package.json `exports` field gets tricky; risk of subtle interop bugs
+Cons: dual builds increase the dist size; package.json `exports` field gets tricky; risk of subtle interop bugs (the `module.exports =` tail in `src/index.ts` is already wrapped in try/catch so it no-ops under ESM/Vitest)
 
-Recommendation: don't add ESM until a consumer reports a real interop problem. Today, every modern bundler handles `commonjs2` fine.
+Recommendation: don't add ESM until a consumer reports a real interop problem. Today, every modern bundler handles the CJS output fine.
 
 ## You push back when
 
@@ -148,13 +139,13 @@ Drop the `ACTIONS_ALLOW_UNSECURE_COMMANDS` env var.
 
 ### "Bundle is suspiciously small after a build"
 
-`dist/index.js` should be ~600 KB minified (catalog dominates). If it's <100 KB, the catalog isn't being inlined.
+`dist/index.js` should be ~403 KB minified (catalog + inlined `@twemoji/parser` dominate). If it's much smaller, the catalog or the parser isn't being inlined.
 
 ```
 1. Check tsconfig.json has resolveJsonModule: true
 2. Check src/index.ts still has `import emojiLibJson from './lib/emoji-lib.json'`
-3. Check webpack.config.js rules don't exclude .json files
-4. Run npm run build with --display-error-details
+3. Check vite.config.ts doesn't externalize @twemoji/parser or .json (library mode must inline them; `dependencies` is empty)
+4. Run npm run build and read the Vite/Rollup output for warnings
 ```
 
 ### "Need to update the release commit message"
@@ -204,7 +195,7 @@ If extra files are present:
 - [`AGENTS.md`](../../AGENTS.md) — non-negotiable rules
 - [`docs/BUILD_DEPLOY.md`](../../docs/BUILD_DEPLOY.md) — release pipeline reference
 - [`docs/DEVELOPMENT_COMMANDS.md`](../../docs/DEVELOPMENT_COMMANDS.md) — npm script reference
-- `webpack.config.js` — bundler config
+- `vite.config.ts` — bundler config
 - `.github/workflows/release_and_publish.yml` — release workflow
 
 When the build/release process changes, update `docs/BUILD_DEPLOY.md` in the same change.

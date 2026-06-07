@@ -12,7 +12,7 @@ Per-environment reference for Universal Emoji Parser: where it runs, how it's lo
 | Bun                                             | `bun add universal-emoji-parser`                        | Untested but expected to work — Bun is Node-compatible                                       |
 | Edge runtimes (Cloudflare Workers, Vercel Edge) | Bundled by the framework                                | Catalog inlines fine; bundle size matters at the edge                                        |
 
-The package is **environment-agnostic**: no `process`, no `fs`, no `Buffer`, no DOM APIs. It's a pure string transformer with a JSON catalog and a single `@twemoji/parser` call.
+The package is **environment-agnostic**: no `process`, no `fs`, no `Buffer`, no DOM APIs. It's a pure string transformer with a JSON catalog and a single `@twemoji/parser` call (inlined into the bundle — zero runtime dependencies).
 
 ---
 
@@ -80,7 +80,7 @@ The package is synchronous and stateless — safe to call from worker threads (`
 
 ### Bundling
 
-This package is **not** publishable as a static `<script>` import — it relies on `require('@twemoji/parser')` to be resolved by a bundler. Consumers integrate it via:
+This package is **not** publishable as a static `<script>` import — `dist/index.js` is a CommonJS module that a bundler must resolve. (`@twemoji/parser` is already inlined, so there's no transitive dependency to resolve — only the package's own CJS entry.) Consumers integrate it via:
 
 | Bundler | Integration                                                                |
 | ------- | -------------------------------------------------------------------------- |
@@ -90,7 +90,7 @@ This package is **not** publishable as a static `<script>` import — it relies 
 | esbuild | Works out of the box                                                       |
 | Parcel  | Works out of the box                                                       |
 
-The package's own bundle (`dist/index.js`) is `commonjs2` — it expects `module.exports` to be writable. All modern bundlers handle this.
+The package's own bundle (`dist/index.js`) is **CommonJS** (emitted by Vite library mode) — it expects `module.exports` to be writable. All modern bundlers handle this.
 
 ### Tree-shaking
 
@@ -173,7 +173,7 @@ If a Deno-specific bug surfaces, file an issue. We don't actively test on Deno b
 bun add universal-emoji-parser
 ```
 
-Bun is Node-compatible and runs the package without modification. Bun's faster startup makes the catalog parse less noticeable. The Webpack bundle works as-is.
+Bun is Node-compatible and runs the package without modification. Bun's faster startup makes the catalog parse less noticeable. The Vite-built CJS bundle works as-is.
 
 ---
 
@@ -196,7 +196,7 @@ export default {
 
 Caveats:
 
-- Worker bundle size limit is 1 MB (Free plan) / 10 MB (Paid). The package alone is ~600 KB minified, so on Free plan you have ~400 KB of headroom for your code
+- Worker bundle size limit is 1 MB (Free plan) / 10 MB (Paid). The package alone is ~403 KB minified, so on Free plan you have ~600 KB of headroom for your code
 - No `fs`, no `Buffer` — fine, this package doesn't need them
 - The Twemoji CDN is reachable from Workers; no proxy needed
 
@@ -212,7 +212,7 @@ Standard Node Lambda — works as a regular `npm install`. Catalog lives in memo
 
 ## TypeScript users
 
-The package ships `.d.ts` files (built by `tsc --build`):
+The package ships `.d.ts` files (built by `npm run build:types` — `tsc -p tsconfig.build.json --emitDeclarationOnly`):
 
 ```
 dist/
@@ -253,7 +253,7 @@ We don't currently target React Native, NativeScript, or any non-V8 runtime. If 
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | React Native                                   | Should work — RN's Metro bundler handles CommonJS. Catalog size matters; consider lazy-load                                     |
 | NativeScript                                   | Same as RN — works through their CommonJS shim                                                                                  |
-| Browser-direct `<script>` (no bundler)         | Need to ship a UMD bundle. Currently we don't. Adding one means a second `webpack.config.js` mode and a second `dist/` artifact |
+| Browser-direct `<script>` (no bundler)         | Need to ship a UMD bundle. Currently we don't. Adding one means a second Vite library-mode output (`formats: ['umd']`) and a second `dist/` artifact |
 | ESM-only consumers (`"type": "module"` strict) | Already works — `import` resolves through the `.d.ts` and Node's CommonJS interop                                               |
 
 For each, the path is: open an issue describing the use case, add CI coverage for the new runtime if possible, document here.
@@ -263,6 +263,6 @@ For each, the path is: open an issue describing the use case, add CI coverage fo
 ## Gotchas across runtimes
 
 1. **Catalog parse is synchronous and eager.** Every runtime pays the catalog parse cost at module load. This is fine for long-lived processes (Node servers, Lambdas), notable for cold-starting edge functions, irrelevant for browsers (the bundler precompiles the JSON into a JS object literal)
-2. **The `@twemoji/parser` dependency is not optional.** It's `dependencies`, not `peerDependencies`. Consumers can't swap it out
+2. **`@twemoji/parser` is inlined into the bundle.** It's a `devDependency` baked into `dist/index.js` at build time, not a `dependency` or `peerDependency`. Consumers can't swap it out — and they don't install it separately
 3. **`require()` cache is shared.** If a Node app calls `require('universal-emoji-parser')` from multiple files, they all get the same `uEmojiParser` object. Don't mutate it
 4. **`process.exit()` mid-`parse`** would leave the catalog parse incomplete; not a real risk because `parse()` is fast (microseconds) and synchronous, but worth knowing

@@ -21,11 +21,11 @@ and targets Node ≥ 20.19 and bundled browser environments.
 | -------------------------------------------------- | ------------------------------------------------------------------------------ |
 | [ARCHITECTURE.md](ARCHITECTURE.md)                 | Module layout, data flow, parse pipeline, emoji catalog                        |
 | [TECHNOLOGIES.md](TECHNOLOGIES.md)                 | Stack overview with versions and roles                                         |
-| [STANDARDS.md](STANDARDS.md)                       | TypeScript / lint / Prettier conventions, naming, exports                      |
-| [DEVELOPMENT_COMMANDS.md](DEVELOPMENT_COMMANDS.md) | npm scripts, Mocha runs, Webpack, watch loops                                  |
-| [TESTING_GUIDE.md](TESTING_GUIDE.md)               | Mocha + Chai setup, test conventions, regenerating expectations                |
+| [STANDARDS.md](STANDARDS.md)                       | TypeScript / Biome (lint + format) conventions, naming, exports                |
+| [DEVELOPMENT_COMMANDS.md](DEVELOPMENT_COMMANDS.md) | npm scripts, Vitest runs, Vite build, watch loops                             |
+| [TESTING_GUIDE.md](TESTING_GUIDE.md)               | Vitest setup, test conventions, regenerating expectations                      |
 | [RUNTIMES.md](RUNTIMES.md)                         | Node, browsers, ESM vs CommonJS, bundlers consuming the package                |
-| [BUILD_DEPLOY.md](BUILD_DEPLOY.md)                 | Webpack production bundle, npm publish, GitHub release pipeline                |
+| [BUILD_DEPLOY.md](BUILD_DEPLOY.md)                 | Vite production bundle, npm publish, GitHub release pipeline                   |
 | [API_REFERENCE.md](API_REFERENCE.md)               | Public methods, types, options, return values                                  |
 | [PERFORMANCE.md](PERFORMANCE.md)                   | Lookup hot paths, RegExp caches, bundle size, large catalog handling           |
 | [SECURITY.md](SECURITY.md)                         | XSS in HTML output, input validation, npm publish security, dependency hygiene |
@@ -52,5 +52,5 @@ Short, task-focused walkthroughs in [`getting-started/`](getting-started/):
 | ------------------------------------------------------------ | ------------------------------------------ |
 | [ENVIRONMENT_SETUP.md](getting-started/ENVIRONMENT_SETUP.md) | Set up the local/dev-container environment |
 | [USING_THE_LIBRARY.md](getting-started/USING_THE_LIBRARY.md) | Consume the package from CommonJS / ESM    |
-| [RUNNING_TESTS.md](getting-started/RUNNING_TESTS.md)         | Run and scope the Mocha test suite         |
+| [RUNNING_TESTS.md](getting-started/RUNNING_TESTS.md)         | Run and scope the Vitest test suite        |
 | [TROUBLESHOOTING.md](getting-started/TROUBLESHOOTING.md)     | Common build/test/parse problems and fixes |

@@ -18,12 +18,14 @@ The fork checklist for these is in [Fork Customization](FORK_CUSTOMIZATION.md).
 
 ```
 dist/
-├── index.js          ← Webpack production bundle (~600 KB minified, catalog inlined)
+├── index.js          ← Vite library bundle (~403 KB minified, catalog + @twemoji/parser inlined)
 ├── index.js.map      ← Source map (production: minimal; dev: full)
-├── index.d.ts        ← TypeScript declarations (emitted by tsc --build separately)
+├── index.d.ts        ← TypeScript declarations (emitted by tsc --emitDeclarationOnly)
 └── lib/
     └── type.d.ts     ← Re-exported interface types
 ```
+
+`npm run build` runs **both** steps in sequence: `vite build` (the executable bundle) followed by `npm run build:types` (`tsc -p tsconfig.build.json --emitDeclarationOnly`, which writes `dist/index.d.ts` + `dist/lib/type.d.ts`). One command produces a complete, publishable `dist/`.
 
 `package.json` points consumers at:
 
@@ -39,16 +41,18 @@ dist/
 ### Manual build
 
 ```bash
-npm run build              # Webpack production (minified, single file, CleanWebpackPlugin)
-npm run build:tsc          # tsc --build (emits .d.ts)
+npm run build              # Vite production bundle + tsc declarations (full dist/)
+npm run build:dev          # Vite development bundle (unminified, --mode development)
+npm run build:types        # tsc -p tsconfig.build.json --emitDeclarationOnly (just the .d.ts)
+npm run build:tsc          # tsc -p tsconfig.build.json --noEmit (type-check only, no output)
 ```
 
-**Both** must run before `npm publish` because:
+A single `npm run build` produces a complete `dist/` because it chains `vite build && npm run build:types`:
 
-- Webpack produces `dist/index.js` (executable)
-- tsc produces `dist/index.d.ts` (types)
+- `vite build` produces `dist/index.js` (executable, esbuild-minified, `@twemoji/parser` inlined)
+- `npm run build:types` produces `dist/index.d.ts` + `dist/lib/type.d.ts` (types)
 
-The CI workflow runs `npm run build` (which is Webpack-only) — that's enough because Webpack with `ts-loader` also emits declarations when configured. Currently it doesn't, so tsc is the source of truth for `.d.ts`. **If you find missing types in the published package, add `npm run build:tsc` to the release workflow before `npm publish`.**
+The CI workflow runs `npm run build`, so both the bundle and the declarations are always published together — there is no separate "remember to also run tsc" step anymore. `build:tsc` is a `--noEmit` type-check gate only; it writes nothing.
 
 ### Inspecting the bundle
 
@@ -58,7 +62,7 @@ node -e "console.log(Object.keys(require('./dist/index.js')))"   # Exported keys
 node -e "console.log(require('./dist/index.js').parse('hello :smile:'))"   # Smoke run
 ```
 
-The exported keys should be: `default`, `DEFAULT_EMOJI_CDN`, `emojiLibJsonData`, plus the `parse`, `parseToHtml`, etc. methods on the default. The CommonJS reattachment in `src/index.ts` ensures `require('./dist/index.js')` returns `uEmojiParser` directly (not `{ default: uEmojiParser }`).
+The exported keys should be: `default`, `DEFAULT_EMOJI_CDN`, `emojiLibJsonData`, plus the `parse`, `parseToHtml`, etc. methods on the default. The CommonJS reattachment tail in `src/index.ts` (`module.exports = uEmojiParser`, wrapped in a `try/catch` so it no-ops under ESM/Vitest) ensures `require('./dist/index.js')` returns `uEmojiParser` directly (not `{ default: uEmojiParser }`).
 
 ---
 
@@ -66,8 +70,8 @@ The exported keys should be: `default`, `DEFAULT_EMOJI_CDN`, `emojiLibJsonData`,
 
 The package follows **Semantic Versioning** (loosely):
 
-- **Patch** (e.g., `2.0.79` → `2.0.80`) — bug fixes, catalog regenerations, dep bumps without API change. CI auto-bumps on every PR merge
-- **Minor** (e.g., `2.0.x` → `2.1.0`) — new methods, new options, new catalog fields. **Manually bump** before merging
+- **Patch** (e.g., `2.1.7` → `2.1.8`) — bug fixes, catalog regenerations, dep bumps without API change. CI auto-bumps on every PR merge
+- **Minor** (e.g., `2.1.x` → `2.2.0`) — new methods, new options, new catalog fields. **Manually bump** before merging
 - **Major** (e.g., `2.x` → `3.0`) — HTML output template change, default option flip, removed/renamed method, dual-export break, dropped Node version
 
 CI's `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` is the right default.
@@ -76,9 +80,9 @@ CI's `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` i
 
 The release workflow auto-runs `npm version patch`, which fails if the working tree is dirty or if the new version already exists. To ship a minor or major:
 
-1. **In the same PR**, edit `package.json` `"version"` manually to the next minor or major (e.g., `2.0.79` → `2.1.0` or `3.0.0`)
+1. **In the same PR**, edit `package.json` `"version"` manually to the next minor or major (e.g., `2.1.7` → `2.2.0` or `3.0.0`)
 2. Note in the PR description that this is a non-patch release
-3. The workflow's `npm version patch` will then bump from `2.1.0` → `2.1.1` (or `3.0.0` → `3.0.1`) — which is fine
+3. The workflow's `npm version patch` will then bump from `2.2.0` → `2.2.1` (or `3.0.0` → `3.0.1`) — which is fine
 4. **Or**: temporarily disable the auto-bump in the workflow for that release, manually run `npm version minor`/`major` locally, push the tag, and re-enable the workflow
 
 Right now the workflow has no toggle — modifying it is the way. File an issue if this happens often; we'll add a `[skip auto-bump]` PR-title convention.
@@ -112,7 +116,7 @@ on:
                                        │
                                        ▼
                 deploy_validate_linters_and_code_format
-                       (eslint:check + prettier:check)
+                            (npm run biome:check)
                                        │
                                        ▼
                                   deploy_tests
@@ -150,15 +154,14 @@ Posts a "deployment started" message to the DailyBot channel via `https://api.da
 #### 4. `deploy_validate_linters_and_code_format`
 
 ```yaml
-- run: npm run eslint:check
-- run: npm run prettier:check
+- run: npm run biome:check
 ```
 
-Hard gate. Fails the whole pipeline if either lint check fails.
+A single Biome step covers both lint and format. Hard gate — fails the whole pipeline if Biome reports any error.
 
 #### 5. `deploy_tests`
 
-`npm run test` — Mocha + Chai over `test/**/*.ts` via **tsx**. Hard gate.
+`npm run test` — Vitest (`vitest run`) over `test/**/*.test.ts`. Hard gate.
 
 #### 6. `build`
 
@@ -171,9 +174,7 @@ Hard gate. Fails the whole pipeline if either lint check fails.
     fi
 ```
 
-Webpack production build. Caches `dist/` so the next job can publish without rebuilding.
-
-> **Gotcha:** the workflow doesn't run `npm run build:tsc` — only Webpack. If a consumer reports missing types in a published version, that's why. Fix is to add `npm run build:tsc` to the build job (a one-line change).
+Vite library build **plus** the `tsc` declaration emit (`npm run build` chains `vite build && npm run build:types`). Caches `dist/` so the next job can publish without rebuilding. Both the executable bundle and the `.d.ts` files are produced here — no separate type-build step is required.
 
 #### 7. `release_and_publish`
 
@@ -240,7 +241,7 @@ Posts the final status (success/failure per job) to the DailyBot channel. Always
 | ------------------- | ----------------------------------------------------------------------------------------------------- |
 | `dist/`             | `src/`                                                                                                |
 | `package.json`      | `test/`                                                                                               |
-| `README.md`         | `webpack.config.js`, `tsconfig.json`, `.babelrc`, `eslint.config.mjs`, `.prettierrc`, `.editorconfig` |
+| `README.md`         | `vite.config.ts`, `vitest.config.ts`, `tsconfig.json`, `biome.json`, `.editorconfig`                  |
 | `LICENSE`           | `.github/`, `docker/`, `.vscode/`, `.devcontainer/`, `.agents/`, `.claude/`, `docs/`                  |
 |                     | `package-lock.json`, `git_logs*.txt`, `packages_upgrades*.txt`, `emoji-lib-output.json`               |
 
@@ -266,11 +267,9 @@ git status                          # must be clean
 
 # 1. Lint, test, build
 npm install
-npm run eslint:check
-npm run prettier:check
+npm run biome:check
 npm test
-npm run build
-npm run build:tsc
+npm run build                       # vite build + tsc declarations (full dist/)
 
 # 2. Bump version (this commits + tags)
 npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"
@@ -300,7 +299,7 @@ Walk through [`/release-npm`](../.agents/commands/release-npm.md) for the struct
 
 ### `code_check.yml` — runs on every PR
 
-Three jobs: `setup` → `validate_linters_and_code_format` → `tests`. Gates merging.
+Three jobs: `setup` → `validate_linters_and_code_format` (a single `npm run biome:check`) → `tests` (Vitest). Gates merging.
 
 ### `pull_request_check.yml` — runs on PR open/edit
 
@@ -315,7 +314,7 @@ These exist for review hygiene; they don't directly affect the release.
 ### `check_packages_versions.yml` — runs every Tuesday 15:00 UTC
 
 1. Checks out a branch named `feature__packages_versions_update` (creates if missing)
-2. Runs `npm run ncu:upgrade` (respects `.ncurc.json` — chai 4 / eslint 8 stay pinned)
+2. Runs `npm run ncu:upgrade` (respects `.ncurc.json` — `@twemoji/parser` stays pinned to 17.0.1)
 3. If anything upgraded, commits `Upgrading packages versions`, pushes the branch
 4. Opens a PR titled `🤖 Upgrading packages versions` with the upgrade list as body
 5. Notifies DailyBot
@@ -347,9 +346,9 @@ If you're forking this repo (see [Fork Customization](FORK_CUSTOMIZATION.md)):
 - Package name conflict — the name `universal-emoji-parser` is taken by this repo; if you fork and rename, register the new name first
 - Org permission missing — for scoped packages, the publishing user must have `developer` or above in the org
 
-### Webpack build is empty / missing methods
+### Vite build is empty / missing methods
 
-- `ts-loader` failed silently — check `dist/index.js` size; if it's tiny (<10 KB), the catalog wasn't bundled. Likely a `tsconfig.json` change broke `resolveJsonModule: true`
+- Check `dist/index.js` size; if it's tiny (<10 KB), the catalog wasn't bundled. Likely a `tsconfig.json` change broke `resolveJsonModule: true`, or `vite.config.ts` accidentally marked `@twemoji/parser` as `external` (it must stay inlined)
 
 ### `git push --follow-tags` rejected
 
@@ -365,11 +364,9 @@ If you're forking this repo (see [Fork Customization](FORK_CUSTOMIZATION.md)):
 
 ## Deployment checklist
 
-- [ ] `npm run eslint:check` succeeds
-- [ ] `npm run prettier:check` succeeds
-- [ ] `npm test` passes
-- [ ] `npm run build` produces `dist/index.js`
-- [ ] `npm run build:tsc` produces `dist/index.d.ts` (manual releases only — CI doesn't)
+- [ ] `npm run biome:check` succeeds
+- [ ] `npm test` passes (Vitest)
+- [ ] `npm run build` produces `dist/index.js` **and** `dist/index.d.ts` (it chains `vite build && npm run build:types`)
 - [ ] `npm pack --dry-run` shows only the expected files
 - [ ] No `console.log` in `src/`
 - [ ] `package.json` `version` reflects the intent (patch/minor/major)

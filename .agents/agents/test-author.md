@@ -1,6 +1,6 @@
 ---
 name: test-author
-description: Writes and maintains Mocha + Chai specs, regression tests, and integration coverage
+description: Writes and maintains Vitest specs, regression tests, and integration coverage
 ---
 
 # Subagent: `test-author`
@@ -38,9 +38,11 @@ There's no separation by source-file ↔ test-file pairing — `main.test.ts` co
 
 ### Test naming
 
-Mocha's BDD style:
+Vitest's BDD style (import `describe`, `it`, `expect` from `vitest`):
 
 ```ts
+import { describe, it, expect } from 'vitest'
+
 describe('Test emoji parser', () => {
   // Top-level: subject
   describe('Using default options', () => {
@@ -56,7 +58,7 @@ describe('Test emoji parser', () => {
 - **Top-level `describe`** matches the subject (`Test emoji parser`, `Test emoji lib json data`)
 - **Nested `describe`** groups by scenario or option configuration
 - **`it` names start with `'should '`** describing observable behavior, never internal mechanics
-- **No backticks in names** — keep them ASCII (Mocha grep handles ASCII better)
+- **No backticks in names** — keep them ASCII (cleaner `--grep`/filter matching)
 
 ### Structure (AAA)
 
@@ -69,7 +71,7 @@ it('should resolve :thumbsup: to 👍 even when nested in text', () => {
   const result: string = uEmojiParser.parseToUnicode(text)
 
   // Assert — verify
-  expect(result).to.be.equal('great work 👍 keep it up')
+  expect(result).toBe('great work 👍 keep it up')
 })
 ```
 
@@ -84,12 +86,12 @@ it('should parse emojis from shortcode', () => {
   // (1) Smile
   let text: string = ':smile:'
   let result: string = uEmojiParser.parse(text)
-  expect(result).to.contain('alt="🙂"')
+  expect(result).toContain('alt="🙂"')
 
   // (2) Sunglasses
   text = ':smiling_face_with_sunglasses:'
   result = uEmojiParser.parse(text)
-  expect(result).to.contain('alt="😎"')
+  expect(result).toContain('alt="😎"')
 })
 ```
 
@@ -108,39 +110,41 @@ it('should parse emojis from shortcode', ...)
 it('should throw error with not string parameter', ...)
 ```
 
-### No backticked test names in `commonTest`
+### No backticked test names
 
-The original KMPStarter rule was about Kotlin Native runners; Mocha doesn't have that limitation, but the convention here is still **`camelCase`-style** describing English (`'should parse emojis from unicode'`) rather than backticks. Keep names simple.
+The convention here is **plain English describing behavior** (`'should parse emojis from unicode'`) rather than backticks. Keep names ASCII and simple.
 
-### Chai idioms
+### Vitest `expect` idioms
 
 ```ts
-import { expect } from 'chai'
+import { describe, it, expect } from 'vitest'
 
 // Equality
-expect(result).to.be.equal('expected') // primitive
-expect(obj).to.be.deep.equal({ a: 1 }) // structural
+expect(result).toBe('expected') // primitive
+expect(obj).toEqual({ a: 1 }) // structural
 
 // Type
-expect(result).to.be.a('string')
-expect(arr).to.be.an('array')
-expect(obj).to.be.an('object')
+expect(result).toBeTypeOf('string')
+expect(Array.isArray(arr)).toBe(true)
+expect(obj).toBeTypeOf('object')
 
-// Length
-expect(arr.length).to.be.equal(1906)
+// Length / numeric
+expect(arr.length).toBe(1914)
+expect(count).toBeGreaterThan(0)
 
 // Substring
-expect(html).to.contain('alt="🙂"')
+expect(html).toContain('alt="🙂"')
+expect(html).toMatch(/alt="🙂"/)
 
 // Throws
-expect(() => uEmojiParser.parse(undefined as any)).to.throw(Error)
+// biome-ignore lint/suspicious/noExplicitAny: testing a non-string input
+expect(() => uEmojiParser.parse(undefined as any)).toThrow(Error)
 
-// Boolean (with eslint suppression)
-// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-expect(fs.existsSync(path)).to.be.true
+// Boolean
+expect(fs.existsSync(path)).toBe(true)
 ```
 
-We use Chai 6. Prefer existing `expect(...).to.be.*` BDD style from the current specs.
+We use Vitest 4. Prefer the `expect(...).toBe()/.toEqual()/.toBeTypeOf()/.toThrow()/.toMatch()/.toBeGreaterThan()` matchers from the current specs.
 
 ## What you test
 
@@ -148,7 +152,7 @@ We use Chai 6. Prefer existing `expect(...).to.be.*` BDD style from the current 
 
 - Public method behavior (parse, parseToHtml, parseToUnicode, parseToShortcode, getEmojiObjectByShortcode, getDefaultOptions)
 - Error paths (`Error: The text parameter should be a string.`)
-- Catalog metadata (`TOTAL_EMOJIS`, sample emojis like 🤣 and 😎)
+- Catalog metadata (`TOTAL_EMOJIS = 1914`, sample emojis like 🤣 and 😎)
 - Regression cases (every parsing bug gets a test that captures the failing input)
 - New `EMOJIS_SPECIAL_CASES` entries (every override has a corresponding test)
 
@@ -173,7 +177,7 @@ it('should resolve :thumbsup: when followed by punctuation (regression #123)', (
 
   const result: string = uEmojiParser.parseToUnicode(text)
 
-  expect(result).to.be.equal('thanks 👍!')
+  expect(result).toBe('thanks 👍!')
 })
 ```
 
@@ -181,13 +185,13 @@ Rules:
 
 - **Paste the input verbatim.** Preserve every byte (variation selectors `️`, ZWJ sequences `‍`, leading/trailing whitespace)
 - **Mention the bug number** in parentheses
-- **Assert the expected output exactly** when possible; use `.contain` only if the rest of the output is irrelevant
+- **Assert the expected output exactly** when possible; use `.toContain` only if the rest of the output is irrelevant
 
 ## What you don't write
 
 ### Mocking
 
-The package has no external IO. Don't introduce mocking libraries (`sinon`, `jest.mock`). If you find yourself wanting one, the production code probably has dependency injection that doesn't make sense — talk to `parser-architect`.
+The package has no external IO. Don't reach for Vitest's mocking primitives (`vi.mock`, `vi.fn`, `vi.spyOn`). If you find yourself wanting one, the production code probably has dependency injection that doesn't make sense — talk to `parser-architect`.
 
 ### Async tests
 
@@ -199,20 +203,19 @@ The package has no time-dependent logic. No `Date.now()`, no timers. Don't write
 
 ## Speed
 
-- `npm run test:watch` — your inner loop. Sub-second per re-run after the first compile
-- `npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "<pattern>"` — filter to a single test
-- The full suite is ~5 seconds. Reserve `npm test` for pre-commit / pre-push
+- `npm run test:watch` (`vitest`) — your inner loop. Sub-second per re-run after the first transform
+- `npx vitest run test/main.test.ts -t "<pattern>"` — filter to a single test by name
+- The full suite is ~5 seconds. Reserve `npm test` (`vitest run`) for pre-commit / pre-push
 
 ## Pre-push standard
 
 ```bash
-npm run eslint:check
-npm run prettier:check
+npm run biome:check
 npm test
 npm run build
 ```
 
-All four must pass. CI mirrors this.
+All three must pass. CI mirrors this.
 
 ## You push back when
 
