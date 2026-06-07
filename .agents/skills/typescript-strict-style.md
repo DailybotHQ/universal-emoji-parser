@@ -218,7 +218,7 @@ Use sparingly — every optional field is a value the consumer has to handle.
 
 ## Biome rules in detail
 
-Lint and format are unified under **Biome 2.4.x** with a single config, `biome.json` (it replaced the old `eslint.config.mjs` + `.prettierrc` + `typescript-eslint` setup). Run:
+Lint and format are unified under **Biome 2.4.x** with a single config, `biome.json`. Run:
 
 ```bash
 npm run biome:check        # biome check — lint + format check (CI gate)
@@ -286,7 +286,7 @@ The dual-export tail in `src/index.ts` assigns to `module.exports` directly. Bio
 
 ### Suppressing a Biome rule inline
 
-Use a `// biome-ignore` comment with the rule path and a reason (the old `// eslint-disable-line` syntax no longer applies):
+Use a `// biome-ignore` comment with the rule path and a reason:
 
 ```ts
 // biome-ignore lint/suspicious/noExplicitAny: upstream type is untyped
@@ -297,7 +297,7 @@ The reason after the colon is mandatory — Biome errors on a `biome-ignore` wit
 
 ## Formatter (semicolons, quotes, trailing commas)
 
-Biome's formatter is configured in `biome.json` and replaces Prettier. The style is **unchanged** from the old Prettier setup:
+Biome's formatter is configured in `biome.json`:
 
 | Setting                | Effect                                                                     |
 | ---------------------- | -------------------------------------------------------------------------- |

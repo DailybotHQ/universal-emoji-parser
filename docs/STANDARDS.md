@@ -108,7 +108,7 @@ Configured in `biome.json` (Biome formats and lints in one tool):
 }
 ```
 
-Equivalent to the old Prettier `semi: false`, `singleQuote: true`, `trailingComma: 'es5'`. Implications:
+In short: no semicolons, single quotes, ES5 trailing commas. Implications:
 
 ```ts
 // ✅ no semicolons (except where ASI hazards exist — Biome inserts a leading semi)

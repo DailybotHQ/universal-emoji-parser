@@ -316,7 +316,7 @@ Update docs after: changing the public API, adding/removing a runtime dependency
 4. Add a new top-level export — extend the `uEmojiParser` object instead
 5. Use `console.*` in `src/` — Biome's `noConsole` rule blocks it (error in `src/` only, off in `test/**`); test files are exempt
 6. Commit `dist/` — it's built by CI; locally regenerated on demand
-7. Strip `biome.json` or reintroduce ESLint/Prettier configs — Biome is the single lint + format tool in this repo
+7. Strip `biome.json` or reintroduce a separate linter/formatter — Biome is the single lint + format tool in this repo
 8. Run `npm run release` locally — it bumps the version and creates a tag; CI does this on merge
 9. Add new emoji metadata fields to `EmojiType` — they ship in 540 KB JSON to every browser consumer
 10. Use `==` (Biome enforces `===` only); use `Boolean(x)` instead of `!!x` in option parsing — see `getDefaultOptions`

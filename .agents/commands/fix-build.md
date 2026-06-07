@@ -125,7 +125,7 @@ npm run biome:fix
 git diff   # review what Biome changed
 ```
 
-Biome is the single source of both lint and format (single quotes, no semicolons, es5 trailing commas, lineWidth 120). There is no separate Prettier step — `biome check` covers both. If `biome:fix` doesn't resolve everything, run `npm run biome:fix:unsafe` and review the diff.
+Biome is the single source of both lint and format (single quotes, no semicolons, es5 trailing commas, lineWidth 120) — `biome check` covers both. If `biome:fix` doesn't resolve everything, run `npm run biome:fix:unsafe` and review the diff.
 
 ### G. Vitest hang/timeout — regenerator accidentally enabled
 

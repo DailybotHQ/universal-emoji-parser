@@ -290,13 +290,13 @@ export default defineConfig({
       fileName: () => 'index.js',
     },
     minify: 'esbuild',
-    emptyOutDir: true,           // wipes dist/ on each build (replaces clean-webpack-plugin)
+    emptyOutDir: true,           // wipes dist/ on each build
     // @twemoji/parser is NOT externalized — it is inlined into the bundle (zero runtime deps)
   },
 })
 ```
 
-Single-entry, single-output. Vite compiles TypeScript with esbuild — no `ts-loader`, no Babel. Because `@twemoji/parser` is left as a normal (non-`external`) import, Vite bundles it into `dist/index.js`, so the published package has **zero runtime dependencies**. Type declarations are produced separately by `tsc` (`npm run build:types`), not by Vite.
+Single-entry, single-output. Vite compiles TypeScript with esbuild. Because `@twemoji/parser` is left as a normal (non-`external`) import, Vite bundles it into `dist/index.js`, so the published package has **zero runtime dependencies**. Type declarations are produced separately by `tsc` (`npm run build:types`), not by Vite.
 
 ### TypeScript (`tsconfig.json`)
 

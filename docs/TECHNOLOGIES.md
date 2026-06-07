@@ -10,7 +10,7 @@ A complete inventory of every tool, library, and configuration shipped with Univ
 | Node.js    | **≥ 22.0.0** (`engines.node`) | Runtime for tests, build, CI; CI and the dev container use **Node 24**                                 |
 | Vite       | **8.0.16**                     | Production bundler — **library mode**, single-entry, CommonJS output, esbuild minify                   |
 | Vitest     | **4.x**                        | Test runner — runs `.ts` specs directly (ESM-native, esbuild-powered, no separate compile step)        |
-| Biome      | **2.4.16**                     | Single tool for both lint and format — one config (`biome.json`), no ESLint/Prettier                   |
+| Biome      | **2.4.16**                     | Single tool for both lint and format — one config (`biome.json`)                                       |
 | tsx        | **4.22.4**                     | Runs `.ts` entrypoints directly (`npm run dev`, ad-hoc repro snippets)                                 |
 | nodemon    | **3.1.14**                     | Watcher behind `npm run dev` (`nodemon --exec tsx`)                                                    |
 | npm        | (Node-bundled)                 | Package manager — `package-lock.json` is excluded by `.gitignore` (CI relies on cached `node_modules`) |
@@ -50,9 +50,9 @@ Neither is imported by `src/index.ts`. They are merged into `src/lib/emoji-lib.j
 
 | Library          | Version     | Role                                                              |
 | ---------------- | ----------- | ---------------------------------------------------------------- |
-| `@biomejs/biome` | **2.4.16**  | Single tool for lint **and** format — replaces ESLint + Prettier |
+| `@biomejs/biome` | **2.4.16**  | Single tool for lint **and** format                              |
 
-Biome is configured by one file, `biome.json`. There are no `@eslint/*`, `typescript-eslint`, `eslint-plugin-prettier`, `eslint-config-prettier`, or `prettier` packages anymore — Biome covers both jobs in a single fast pass.
+Biome is configured by one file, `biome.json`, and covers both lint and format in a single fast pass.
 
 ### Bundler
 
@@ -60,7 +60,7 @@ Biome is configured by one file, `biome.json`. There are no `@eslint/*`, `typesc
 | ------- | ---------- | -------------------------------------------------------------------- |
 | `vite`  | **8.0.16** | Library-mode bundler — single entry, CommonJS output, esbuild minify |
 
-Vite compiles `src/index.ts` via esbuild and inlines `@twemoji/parser`. There is no `ts-loader`, no `webpack-cli`, and no `clean-webpack-plugin` — Vite empties `dist/` on each build itself. `.d.ts` files are emitted separately by `tsc` (`build:types`).
+Vite compiles `src/index.ts` via esbuild and inlines `@twemoji/parser`. Vite empties `dist/` on each build (no extra plugins needed). `.d.ts` files are emitted separately by `tsc` (`build:types`).
 
 ### Testing
 
@@ -68,7 +68,7 @@ Vite compiles `src/index.ts` via esbuild and inlines `@twemoji/parser`. There is
 | -------- | -------- | ---------------------------------------------------------------------------- |
 | `vitest` | **4.x**  | Test runner — runs `.ts` specs directly (ESM-native, esbuild, no compile step) |
 
-Specs import `{ describe, it, expect } from 'vitest'` and use the `expect().toBe()` / `.toEqual()` family. There are no `mocha`, `chai`, `@types/mocha`, `@types/chai`, or `ts-node` packages anymore — Vitest replaces the whole Mocha + Chai + tsx test stack. The runner is configured by `vitest.config.ts`.
+Specs import `{ describe, it, expect } from 'vitest'` and use the `expect().toBe()` / `.toEqual()` family. The runner is configured by `vitest.config.ts`.
 
 ### Maintenance
 

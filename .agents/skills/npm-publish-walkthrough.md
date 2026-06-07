@@ -81,7 +81,7 @@ To force a fresh install, bump the cache key (e.g., add `-v2`).
 - run: npm run biome:check
 ```
 
-Hard gate. A single `biome check` covers both linting and formatting (it replaced the separate `eslint:check` + `prettier:check` steps). Must pass.
+Hard gate. A single `biome check` covers both linting and formatting. Must pass.
 
 #### 5. `deploy_tests`
 
