@@ -20,6 +20,8 @@ jobs:
         with:
           node-version: '24.16.0'
           registry-url: https://registry.npmjs.org/
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
       - name: Step 1 - ⚙️ Setup GitHub Config
         run: |
           git config user.name "🤖 DailyBot"
@@ -38,7 +40,7 @@ jobs:
         name: Step 3 - ⚙️ Install Dependencies
         run: |
           echo ${{ steps.creating_pr_step.outputs.branch_created }}
-          npm install
+          corepack pnpm install --frozen-lockfile
       - if: ${{ steps.creating_pr_step.outputs.branch_created == 'true' }}
         name: Step 4 - Check Packages Versions
         run: |
@@ -54,7 +56,11 @@ jobs:
           echo "upgrades_available=$UPGRADES_AVAILABLE" >> $GITHUB_OUTPUT
       - if: ${{ steps.creating_pr_step.outputs.branch_created == 'true' && steps.check_upgrades_available_step.outputs.upgrades_available == 'true' }}
         name: Step 6 - ⚙️ Re-install dependencies with upgrades
-        run: npm install
+        # --no-frozen-lockfile: package.json changed (ncu -u), so the lockfile must
+        # be regenerated. The minimumReleaseAge guard still applies here, so a
+        # brand-new (<7-day) version proposed by ncu will be refused — that is the
+        # supply-chain quarantine working as intended.
+        run: corepack pnpm install --no-frozen-lockfile
       - if: ${{ steps.creating_pr_step.outputs.branch_created == 'true' && steps.check_upgrades_available_step.outputs.upgrades_available == 'true' }}
         id: git_commit_and_push_changes_step
         name: Step 7 - Commit and push changes to repository branch

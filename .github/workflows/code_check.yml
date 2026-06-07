@@ -22,21 +22,20 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24.16.0'
-      - name: Step 0 - 📁 Cache node modules
-        id: cache-npm
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
-        name: Step 1 - ⚙️ Install Dependencies
-        run: npm install
+            ${{ runner.os }}-pnpm-store-
+      - name: Step 1 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
 
   validate_linters_and_code_format:
     needs: setup
@@ -47,20 +46,22 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24.16.0'
-      - name: Step 0 - 📁 Cache node modules
-        id: cache-npm
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 1 - 🧪 Run Biome (lint + format check)
-        run: npm run biome:check
+            ${{ runner.os }}-pnpm-store-
+      - name: Step 1 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
+      - name: Step 2 - 🧪 Run Biome (lint + format check)
+        run: corepack pnpm run biome:check
 
   tests:
     needs: validate_linters_and_code_format
@@ -71,17 +72,19 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24.16.0'
-      - name: Step 0 - 📁 Cache node modules
-        id: cache-npm
+      - name: Step 0 - ⚙️ Enable Corepack
+        run: corepack enable
+      - name: Step 0a - 📁 Get pnpm store path
+        id: pnpm-store
+        run: echo "STORE_PATH=$(corepack pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+      - name: Step 0b - 📁 Cache pnpm store
         uses: actions/cache@v5
-        env:
-          cache-name: cache-node-modules
         with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ steps.pnpm-store.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 1 - 🧪 Run tests
-        run: npm run test
+            ${{ runner.os }}-pnpm-store-
+      - name: Step 1 - ⚙️ Install Dependencies
+        run: corepack pnpm install --frozen-lockfile
+      - name: Step 2 - 🧪 Run tests
+        run: corepack pnpm run test
