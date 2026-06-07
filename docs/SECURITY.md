@@ -161,12 +161,26 @@ Mitigations:
 
 To harden further, consider:
 
-- Adding `npm audit` to CI (`npm audit --audit-level=high`)
+- Adding an audit step to CI (`pnpm audit --audit-level high`)
 - Pinning to exact SHAs for action versions (`actions/checkout@<sha>`)
 - Using [Socket.dev](https://socket.dev/) or [Snyk](https://snyk.io/) PR checks
 - Disabling auto-merge and reviewing every dep PR by hand
 
 We don't currently do any of these; document the gap so a future security-focused contributor can add them.
+
+### Supply-chain hardening (pnpm)
+
+The repo uses **pnpm** as its package manager and leans on three pnpm/Corepack features to reduce supply-chain risk during development and CI. Rationale and threat model: [Supply-chain attacks in the AI era](https://xergioalex.com/blog/supply-chain-attacks-ai-era/).
+
+1. **Version quarantine — `minimumReleaseAge: 10080`** (in `pnpm-workspace.yaml`). pnpm refuses to install any package version published less than **10080 minutes (7 days)** ago. This blunts the most common npm supply-chain attack: a compromised maintainer account (or hijacked publish token) pushing a malicious patch release that automated dependency bots install within minutes. By the time a quarantined version is eligible to install, the community has usually flagged and yanked a malicious release. The weekly `check_packages_versions.yml` upgrade bot therefore won't pull a brand-new release until the window passes.
+
+2. **Package-manager pinning via Corepack — `"packageManager": "pnpm@11.1.2"`**. The exact pnpm version is pinned in `package.json` and provisioned by **Corepack** (`corepack enable`). Every contributor and every CI job runs the **same** pnpm binary, so a developer can't accidentally (or maliciously) run an old/forked pnpm that ignores the lockfile or the hardening settings. The pinned version is itself a reviewable, lockfile-committed decision.
+
+3. **Install-script allow-list — `allowBuilds: { esbuild: true }`** (in `pnpm-workspace.yaml`). By default pnpm v11 **does not run lifecycle/install scripts** (`preinstall`/`install`/`postinstall`) for dependencies — a major attack vector, since a malicious postinstall script runs with full developer/CI privileges at install time. Only packages on the explicit allow-list may run their build scripts; here that is just `esbuild` (Vite's bundler needs its platform-specific binary). Any new dependency that wants to run an install script must be **deliberately added** to `allowBuilds`, which is a security review checkpoint.
+
+Together these mean: a freshly published, install-script-bearing malicious dependency can't silently execute on a developer's machine or in CI, won't be installed for a week regardless, and runs under a pnpm binary everyone agrees on.
+
+When bumping pnpm itself, update both `"packageManager"` in `package.json` and any CI Corepack step in lockstep, and keep `pnpm-workspace.yaml`'s `minimumReleaseAge` / `allowBuilds` settings intact across the bump.
 
 ---
 
@@ -182,13 +196,13 @@ If an automation token can't satisfy 2FA (typically the case), use an "automatio
 
 The package is built by Vite (library mode, esbuild minify) from TypeScript source, with declarations emitted by `tsc`. Build is deterministic for a given:
 
-- Node version (CI: Node 24)
-- npm lockfile state (note: no lockfile committed; see [`.gitignore`](../.gitignore))
+- Node version (CI: Node 24, pinned to 24.16.0)
+- pnpm lockfile state (`pnpm-lock.yaml` **is** committed; CI installs with `pnpm install --frozen-lockfile` for exact reproducibility)
 - Source tree
 
-Running `npm install && npm run build` on different machines produces byte-identical `dist/index.js`... mostly. Vite's esbuild minification is deterministic, and `@twemoji/parser` is inlined from a pinned version; the JSON catalog is checked-in source.
+Running `pnpm install && pnpm run build` on different machines produces byte-identical `dist/index.js`... mostly. Vite's esbuild minification is deterministic, and `@twemoji/parser` is inlined from a pinned version; the JSON catalog is checked-in source.
 
-If you ever need to verify a published version against source: `npm pack` locally, diff against the published tarball.
+If you ever need to verify a published version against source: `pnpm pack` locally, diff against the published tarball.
 
 ### Tarball contents
 
@@ -207,10 +221,10 @@ Included:
 Excluded:
   src/, test/, docker/, .github/, docs/, .agents/, .claude/, .vscode/, .devcontainer/
   *.config.js, vite.config.ts, vitest.config.ts, biome.json, .editorconfig, tsconfig.json
-  package-lock.json, *.txt
+  pnpm-lock.yaml, pnpm-workspace.yaml, *.txt
 ```
 
-Verify before publishing: `npm pack --dry-run`.
+Verify before publishing: `pnpm pack --dry-run`.
 
 ---
 

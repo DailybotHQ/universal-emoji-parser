@@ -7,10 +7,12 @@ A step-by-step guide for setting up a Universal Emoji Parser development environ
 
 By the end of this guide you will be able to:
 
-- Install dependencies (`npm install`)
-- Run the test suite (`npm test`)
-- Build the production bundle (`npm run build`)
-- Run lint + format checks (`npm run biome:check`)
+- Install dependencies (`pnpm install`)
+- Run the test suite (`pnpm test`)
+- Build the production bundle (`pnpm run build`)
+- Run lint + format checks (`pnpm run biome:check`)
+
+> This repo uses **pnpm** (pinned to `pnpm@11.1.2` via `package.json`'s `packageManager` field and provisioned by **Corepack**). You don't install pnpm globally — run `corepack enable` once and the pinned version is used automatically.
 
 > Already set up? Skip to [Running Tests](RUNNING_TESTS.md).
 > Hit a problem? Check [Troubleshooting](TROUBLESHOOTING.md).
@@ -21,7 +23,7 @@ By the end of this guide you will be able to:
 
 ### 1. Install Node.js
 
-The package requires **Node.js ≥ 22.0.0**. CI runs on **Node 24**. Use Active LTS, Current, or the same major as CI.
+The package requires **Node.js ≥ 22.0.0**. CI runs on **Node 24** (pinned to 24.16.0 via `.node-version`/`.nvmrc`). Use Active LTS, Current, or the same major as CI.
 
 #### macOS / Linux (recommended: nvm)
 
@@ -50,7 +52,8 @@ Use [nvm-windows](https://github.com/coreybutler/nvm-windows) or download the in
 
 ```bash
 node --version       # should report v24.x (or any v22+)
-npm --version        # comes with Node; should be 10.x+
+corepack enable      # provisions the pinned pnpm@11.1.2 (one-time)
+pnpm --version       # should report 11.1.2 (from package.json's packageManager)
 ```
 
 ### 3. Clone the repo
@@ -63,7 +66,7 @@ cd universal-emoji-parser
 ### 4. Install dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 First install takes ~30 seconds and pulls in (all devDependencies — the published package has **zero runtime dependencies**, since `@twemoji/parser` is inlined into the bundle at build time):
@@ -74,16 +77,18 @@ First install takes ~30 seconds and pulls in (all devDependencies — the publis
 - Biome (lint + format)
 - `emojilib`, `unicode-emoji-json`, `@types/*` (regenerator + types)
 
+> pnpm does not run dependency install scripts by default. This repo allow-lists only `esbuild` (via `allowBuilds` in `pnpm-workspace.yaml`) so Vite's bundler binary builds; everything else is blocked. See [Security → Supply-chain hardening (pnpm)](../SECURITY.md#supply-chain-hardening-pnpm). pnpm also quarantines brand-new package versions for 7 days (`minimumReleaseAge`), which only affects dependency upgrades, not a normal install from the committed `pnpm-lock.yaml`.
+
 ### 5. Smoke test
 
 ```bash
-npm test
+pnpm test
 ```
 
 Expected: ~5 seconds, all green. If it fails, see [Troubleshooting](TROUBLESHOOTING.md).
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 Expected: `dist/index.js` created (~403 KB minified CJS, with `@twemoji/parser` inlined).
@@ -126,7 +131,7 @@ VS Code prompts: _Reopen in Container_. Click it.
 
 First time takes ~3 minutes:
 
-- Pulls `node:24.14.0-trixie-slim`
+- Pulls `node:24.16.0-trixie-slim`
 - Installs `git`, `curl`, `gh` (GitHub CLI), `chromium`
 - Installs Claude Code CLI, Codex CLI, Cursor CLI as the `node` user
 - Configures persistent volumes for AI CLI auth
@@ -157,11 +162,11 @@ Useful commands:
 ### 5. Install dependencies + test
 
 ```bash
-npm install
-npm test
+pnpm install
+pnpm test
 ```
 
-Same as native.
+Same as native. (Corepack is already enabled inside the container, and a `/usr/local/bin/npm` wrapper routes any stray `npm …` call to `corepack pnpm`.)
 
 ### 6. Optional: AI CLI auth
 
@@ -188,12 +193,12 @@ The container's `~/.bashrc` sources `docker/custom_commands.sh`, which provides:
 | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `help`                                                                                  | Reprint the welcome banner                                               |
 | `check_devcontainer`                                                                    | Print whether you are running inside Docker / Dev Containers             |
-| `check`                                                                                 | `npm run biome:check`                                                    |
-| `fix`                                                                                   | `npm run biome:fix`                                                      |
-| `test`                                                                                  | `npm test`                                                               |
-| `build`                                                                                 | `npm run build`                                                          |
+| `check`                                                                                 | `corepack pnpm run biome:check`                                          |
+| `fix`                                                                                   | `corepack pnpm run biome:fix`                                            |
+| `test`                                                                                  | `corepack pnpm test`                                                     |
+| `build`                                                                                 | `corepack pnpm run build`                                                |
 | `codecheck`                                                                             | `check`, then `build`, then `test` (full local gate)                     |
-| `install`                                                                               | `npm install`                                                            |
+| `install`                                                                               | `corepack pnpm install`                                                  |
 | `claudex`                                                                               | `claude --dangerously-skip-permissions` (full-permission Claude session) |
 | `claudex -c`                                                                            | Continue last Claude session                                             |
 | `claudex -r [<id>]`                                                                     | Resume Claude session                                                    |
@@ -203,7 +208,7 @@ The container's `~/.bashrc` sources `docker/custom_commands.sh`, which provides:
 | `cursorx -l` / `-r`                                                                     | Cursor session controls                                                  |
 | `gs` / `ga` / `gc` / `gp` / `gpl` / `gl` / `gd` / `gb` / `gco` / `gcob` / `gbd` / `grc` | Git aliases                                                              |
 
-These exist only in the container. Native users use the underlying `npm` and `git` commands directly.
+These exist only in the container. Native users use the underlying `pnpm` and `git` commands directly.
 
 ### Mounting your host SSH and git config
 
@@ -221,7 +226,7 @@ docker compose up -d uemojiparservscode
 docker exec -it uemojiparser bash
 ```
 
-Then proceed as in Path B step 5 (`npm install && npm test`).
+Then proceed as in Path B step 5 (`pnpm install && pnpm test`).
 
 To stop:
 
@@ -243,11 +248,12 @@ Run these and confirm each succeeds before moving on:
 
 ```bash
 node --version                       # ≥ 22.0.0
-npm --version                        # ≥ 10
-npm install                          # No errors
-npm run biome:check                  # No lint or format errors
-npm test                             # All specs pass
-npm run build                        # dist/index.js created
+corepack enable                      # provision pinned pnpm@11.1.2 (one-time)
+pnpm --version                       # 11.1.2
+pnpm install                         # No errors
+pnpm run biome:check                 # No lint or format errors
+pnpm test                            # All specs pass
+pnpm run build                       # dist/index.js created
 ls -lh dist/index.js                 # ~403 KB
 ```
 

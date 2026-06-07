@@ -296,7 +296,7 @@ export default defineConfig({
 })
 ```
 
-Single-entry, single-output. Vite compiles TypeScript with esbuild. Because `@twemoji/parser` is left as a normal (non-`external`) import, Vite bundles it into `dist/index.js`, so the published package has **zero runtime dependencies**. Type declarations are produced separately by `tsc` (`npm run build:types`), not by Vite.
+Single-entry, single-output. Vite compiles TypeScript with esbuild. Because `@twemoji/parser` is left as a normal (non-`external`) import, Vite bundles it into `dist/index.js`, so the published package has **zero runtime dependencies**. Type declarations are produced separately by `tsc` (`pnpm run build:types`), not by Vite.
 
 ### TypeScript (`tsconfig.json`)
 
@@ -310,14 +310,14 @@ Highlights:
 - `lib: ['es6', 'dom']` — includes DOM types because consumers may use this in the browser
 - `resolveJsonModule: true` — required to `import emojiLibJson from './lib/emoji-lib.json'`
 
-Vite emits the runtime bundle; `tsc` is used only to emit type declarations (`npm run build:types`) and as a `--noEmit` type-check gate (`npm run build:tsc`).
+Vite emits the runtime bundle; `tsc` is used only to emit type declarations (`pnpm run build:types`) and as a `--noEmit` type-check gate (`pnpm run build:tsc`).
 
-### npm scripts
+### pnpm scripts
 
 | Script                            | Runs                                                                  | Purpose                       |
 | --------------------------------- | -------------------------------------------------------------------- | ----------------------------- |
 | `dev`                             | `nodemon --exec tsx src/index.ts`                                    | Watch-run a smoke script      |
-| `build`                           | `vite build && npm run build:types`                                  | Production bundle + `.d.ts`    |
+| `build`                           | `vite build && tsc -p tsconfig.build.json --emitDeclarationOnly`     | Production bundle + `.d.ts`    |
 | `build:dev`                       | `vite build --mode development`                                      | Unminified bundle             |
 | `build:types`                     | `tsc -p tsconfig.build.json --emitDeclarationOnly`                  | Emit `.d.ts` declarations      |
 | `build:tsc`                       | `tsc -p tsconfig.build.json --noEmit`                              | Type-check only (no output)   |
@@ -325,7 +325,7 @@ Vite emits the runtime bundle; `tsc` is used only to emit type declarations (`np
 | `test:watch`                      | `vitest`                                                            | TDD inner loop (watch mode)   |
 | `biome:check`                     | `biome check`                                                       | Lint + format (CI gate)       |
 | `biome:fix` / `biome:fix:unsafe`  | `biome check --write` / `--write --unsafe`                          | Auto-fix lint + format        |
-| `release`                         | `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` | Bump version (CI-only)        |
+| `release`                         | `bash .github/scripts/prepare_release.sh` (Node patch bump + commit + tag) | Bump version (CI-only)  |
 | `ncu:check` / `ncu:upgrade`       | `npm-check-updates`                                                 | Dep upgrade pipeline          |
 
 ## CI/CD pipeline
@@ -342,25 +342,25 @@ check_pr_size_label   (XS / S / M / L / XL / XXL based on lines changed)
 notify_on_channel_start  (DailyBot Slack-like notification)
        │
        ▼
-deploy_setup            (npm install with cache)
+deploy_setup            (corepack pnpm install with cache)
        │
        ▼
-deploy_validate_linters_and_code_format   (npm run biome:check)
+deploy_validate_linters_and_code_format   (corepack pnpm run biome:check)
        │
        ▼
-deploy_tests            (npm test → vitest run)
+deploy_tests            (corepack pnpm test → vitest run)
        │
        ▼
-build                   (npm run build → vite + tsc declarations → dist/)
+build                   (corepack pnpm run build → vite + tsc declarations → dist/)
        │
        ▼
-release_and_publish     (npm version patch + push tag + create GH release + npm publish)
+release_and_publish     (prepare_release.sh bump + push tag + create GH release + pnpm publish)
        │
        ▼
 cleanup_caches  +  notify_on_channel_end
 ```
 
-Every job runs on `ubuntu-latest` with Node 24 and aggressive caching of `~/.npm` and `node_modules`. The release job uses `secrets.AUTOMATION_GITHUB_TOKEN` (push + tag) and `secrets.NPM_TOKEN` (npm publish). The DailyBot identity (`🤖 DailyBot <ops@dailybot.com>`) is hardcoded.
+Every job runs on `ubuntu-latest` with Node 24 (pinned 24.16.0) and Corepack-provisioned pnpm 11.1.2, with aggressive caching of the pnpm store and `node_modules`. The release job uses `secrets.AUTOMATION_GITHUB_TOKEN` (push + tag) and `secrets.NPM_TOKEN` (npm publish). The DailyBot identity (`🤖 DailyBot <ops@dailybot.com>`) is hardcoded.
 
 Detailed walkthrough: **[Build & Deploy](BUILD_DEPLOY.md)**.
 
@@ -371,4 +371,4 @@ Detailed walkthrough: **[Build & Deploy](BUILD_DEPLOY.md)**.
 3. **Zero runtime dependencies.** `@twemoji/parser` is inlined into the bundle by Vite, so consumers install nothing transitively. Adding a real runtime dependency (or externalizing the inlined one) requires justification — it ships to consumer bundles.
 4. **Dual ESM/CommonJS shape.** The `module.exports` reattachment at the bottom of `src/index.ts` is non-negotiable.
 5. **HTML output is a contract.** `<img class="emoji" alt="<unicode>" src="<url>"/>` — exactly that shape, forever (until a major bump).
-6. **CI owns the release.** Humans never run `npm version` or `npm publish`. The merge to `main` is the release trigger.
+6. **CI owns the release.** Humans never run `pnpm run release` or `pnpm publish`. The merge to `main` is the release trigger.

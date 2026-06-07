@@ -401,7 +401,7 @@ When in doubt about whether a change is breaking, **assume it is** and let a rev
 
 Current version: see `package.json` `"version"`. The CI release pipeline auto-patches every PR merge to `main` — see [Build & Deploy](BUILD_DEPLOY.md).
 
-To skip the auto-bump for a non-patch release, edit `package.json` `"version"` manually in the same PR. The CI's `npm version patch` will then bump from your minor/major to its `+1` patch — fine.
+To skip the auto-bump for a non-patch release, edit `package.json` `"version"` manually in the same PR. The CI's patch bump (`.github/scripts/prepare_release.sh`) will then bump from your minor/major to its `+1` patch — fine.
 
 ---
 

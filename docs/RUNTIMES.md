@@ -60,9 +60,9 @@ This means **both** `require('universal-emoji-parser').parse(...)` and `import u
 
 ### Engines
 
-`package.json` sets `engines.node: ">=22.0.0"`. npm warns (does not error) when installing on older Node versions; the runtime may still work on Node 20 (EOL April 2026) but those versions are unsupported — security patches stopped landing on them.
+`package.json` sets `engines.node: ">=22.0.0"`. Package managers warn (npm) or can be configured to error (pnpm via `engine-strict`) when installing on older Node versions; the runtime may still work on Node 20 (EOL April 2026) but those versions are unsupported — security patches stopped landing on them.
 
-CI runs on **Node 24**. If a Node version-specific bug surfaces, that's the reference version to debug against.
+CI runs on **Node 24** (pinned to 24.16.0 via `.node-version`/`.nvmrc`). If a Node version-specific bug surfaces, that's the reference version to debug against.
 
 ### Memory
 
@@ -211,7 +211,7 @@ Standard Node Lambda — works as a regular `npm install`. Catalog lives in memo
 
 ## TypeScript users
 
-The package ships `.d.ts` files (built by `npm run build:types` — `tsc -p tsconfig.build.json --emitDeclarationOnly`):
+The package ships `.d.ts` files (built by `pnpm run build:types` — `tsc -p tsconfig.build.json --emitDeclarationOnly`):
 
 ```
 dist/

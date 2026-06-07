@@ -9,7 +9,7 @@ Whether you're Claude Code, Cursor, Codex, Gemini, GitHub Copilot, or any other 
 3. **Two files matter most:** `src/index.ts` (the parser) and `src/lib/emoji-lib.json` (the catalog)
 4. **Don't hand-edit `emoji-lib.json`.** Regenerate via `prepareEmojiLibJson.test.ts` (see [`/regenerate-emoji-lib`](../.agents/commands/regenerate-emoji-lib.md))
 5. **The HTML output template is a contract.** `<img class="emoji" alt="..." src="..."/>` — exactly that shape, forever (until a major bump)
-6. **Inner loop:** `npm run test:watch` while editing `src/index.ts`
+6. **Inner loop:** `pnpm run test:watch` while editing `src/index.ts` (the repo uses **pnpm**, pinned via Corepack — `corepack enable` once)
 7. **`tmp/` is git-ignored scratch space** — put throw-away files there, never anywhere else
 
 ## In ten minutes (recommended pre-task reading)
@@ -23,7 +23,7 @@ Whether you're Claude Code, Cursor, Codex, Gemini, GitHub Copilot, or any other 
 1. **Identify what's changing.** Public API? Internal helper? Catalog? Build infrastructure? Each has its own playbook
 2. **Check if a skill matches.** See [`.agents/README.md`](../.agents/README.md). If yes, follow its procedure file step-by-step
 3. **Plan briefly.** What files will you touch? Will you need to regenerate the catalog? What's the test strategy?
-4. **Pick the inner loop.** Code change to `src/`? `npm run test:watch`. Catalog change? Open `prepareEmojiLibJson.test.ts`. Build/CI change? Probably no fast loop — make small commits and check CI
+4. **Pick the inner loop.** Code change to `src/`? `pnpm run test:watch`. Catalog change? Open `prepareEmojiLibJson.test.ts`. Build/CI change? Probably no fast loop — make small commits and check CI
 
 ## During the task
 
@@ -38,10 +38,10 @@ Whether you're Claude Code, Cursor, Codex, Gemini, GitHub Copilot, or any other 
 Run the pre-commit checklist from `AGENTS.md`:
 
 - [ ] All code, comments, and identifiers in English
-- [ ] `npm run biome:check` passes (lint + format)
-- [ ] `npm test` passes
-- [ ] `npm run build` succeeds (Vite produces `dist/index.js`; `build:types` emits the `.d.ts` files)
-- [ ] `npm run build:tsc` succeeds (types type-check)
+- [ ] `pnpm run biome:check` passes (lint + format)
+- [ ] `pnpm test` passes
+- [ ] `pnpm run build` succeeds (Vite produces `dist/index.js`; `build:types` emits the `.d.ts` files)
+- [ ] `pnpm run build:tsc` succeeds (types type-check)
 - [ ] If you regenerated `emoji-lib.json`, the `TOTAL_EMOJIS` constant in `emojiLibJson.test.ts` is updated
 - [ ] If you changed the public API, `docs/API_REFERENCE.md` and `README.md` are updated
 - [ ] No `console.*` calls in `src/`
@@ -66,9 +66,9 @@ Run the pre-commit checklist from `AGENTS.md`:
    import uEmojiParser from '../src/index'
    console.log(uEmojiParser.parse('the input that breaks'))
    ```
-2. `npx vite-node tmp/repro.ts` — confirm the bug
+2. `pnpm dlx vite-node tmp/repro.ts` — confirm the bug
 3. Add a failing test in `test/main.test.ts` that asserts the _expected_ output. Paste the broken input verbatim
-4. `npm run test:watch` — watch it fail
+4. `pnpm run test:watch` — watch it fail
 5. Fix `src/index.ts`
 6. Test passes — commit fix + test together with `fix: <description>`
 
@@ -93,10 +93,10 @@ Skill: [`/add-special-case`](../.agents/commands/add-special-case.md).
 
 ### Bumping a dependency
 
-1. `npm run ncu:check` — confirm an upgrade is available
+1. `pnpm run ncu:check` — confirm an upgrade is available
 2. Read release notes for breaking changes
-3. Edit `package.json`, run `npm install`
-4. `npm test && npm run build`
+3. Edit `package.json`, run `pnpm install`
+4. `pnpm test && pnpm run build`
 5. PR with `chore: bump <library> to <version>` (or `fix:` / `feat:` if appropriate)
 
 Skill: [`/bump-deps`](../.agents/commands/bump-deps.md).
@@ -104,9 +104,9 @@ Skill: [`/bump-deps`](../.agents/commands/bump-deps.md).
 ### Diagnosing a build failure
 
 1. Read the actual error output, not just the symptom
-2. Check Biome first (most failures are lint/format, not build): `npm run biome:check`
-3. If TypeScript: `npm run build:tsc` for clearer error messages
-4. If the Vite bundle: `npm run build:dev` (development mode, no minification) for readable output
+2. Check Biome first (most failures are lint/format, not build): `pnpm run biome:check`
+3. If TypeScript: `pnpm run build:tsc` for clearer error messages
+4. If the Vite bundle: `pnpm run build:dev` (development mode, no minification) for readable output
 
 Skill: [`/fix-build`](../.agents/commands/fix-build.md).
 
@@ -133,7 +133,7 @@ What kind of change is it?
 | Tool         | Use                                     |
 | ------------ | --------------------------------------- |
 | Read         | Read code or docs to understand context |
-| Bash         | Run `npm run *`, `git`, `find`, `grep`  |
+| Bash         | Run `pnpm run *`, `git`, `find`, `grep` |
 | Edit / Write | Modify files                            |
 | Grep / Find  | Locate code by pattern                  |
 
@@ -144,7 +144,7 @@ Before bulk changes, read the relevant section of `AGENTS.md` and the doc it lin
 - **Hand-editing `emoji-lib.json`** — feels faster but the next regeneration overwrites it. Always go through `EMOJIS_SPECIAL_CASES`
 - **Adding a runtime dependency** — every byte ships to consumer bundles. Justify with measurement
 - **Changing the HTML output template** — breaks every consumer's snapshot tests; major version
-- **Major bumps to test or lint tooling** — Vitest 4 + Biome 2.4 are the current baseline; still read release notes and run `npm test` + `npm run biome:check` + `npm run build` before merging
+- **Major bumps to test or lint tooling** — Vitest 4 + Biome 2.4 are the current baseline; still read release notes and run `pnpm test` + `pnpm run biome:check` + `pnpm run build` before merging
 - **Skipping the `it.skip` on the regenerator test** — if you forget to re-skip it, the next CI run regenerates the catalog into `emoji-lib-output.json` (which is gitignored, so it's a wasted run, not a leak)
 
 ## Asking for clarification

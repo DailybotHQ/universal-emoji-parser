@@ -124,7 +124,7 @@ const arr = ['a', 'b', 'c']
 fn('a', 'b', 'c') // ✅ no trailing comma in function call (es5)
 ```
 
-Auto-fix with `npm run biome:fix`. CI fails on `npm run biome:check`, so always run before committing.
+Auto-fix with `pnpm run biome:fix`. CI fails on `pnpm run biome:check`, so always run before committing.
 
 ### Line length
 
@@ -142,7 +142,7 @@ Auto-fix with `npm run biome:fix`. CI fails on `npm run biome:check`, so always 
 
 Semicolons (`semicolons: "asNeeded"`) and quote style are enforced by the formatter, not as separate lint rules. `.agents/skills/deepworkplan/` is excluded from formatting.
 
-Run `npm run biome:check` before committing; auto-fix is `npm run biome:fix` (or `npm run biome:fix:unsafe` for fixes Biome flags as unsafe — review that diff).
+Run `pnpm run biome:check` before committing; auto-fix is `pnpm run biome:fix` (or `pnpm run biome:fix:unsafe` for fixes Biome flags as unsafe — review that diff).
 
 ## Comments
 
@@ -256,13 +256,13 @@ The package follows **Semantic Versioning** loosely:
 - **Minor** (`2.0.x` → `2.1.0`) — new methods on `uEmojiParser`, new options, new catalog fields (rare). **Bump manually** before merging
 - **Major** (`2.x` → `3.0`) — HTML output template change, default option flip, removed/renamed method, dual-export break, dropped Node version. Reserved for intentional breakage
 
-CI's `npm version patch` is the right default. If a change deserves minor or major, edit `package.json` version manually in the same PR and the workflow's `npm version patch` will fail loudly (you'll need to skip the auto-bump for that release — open an issue in the workflow at that point).
+CI's patch bump (`.github/scripts/prepare_release.sh`) is the right default. If a change deserves minor or major, edit `package.json` version manually in the same PR and the workflow's patch bump will go from your minor/major to its `+1` patch (you'll need to skip the auto-bump for that release if that isn't what you want — open an issue in the workflow at that point).
 
 ## Build hygiene
 
 - Don't commit `dist/` (gitignored)
 - Don't commit `node_modules/` (gitignored)
-- Don't commit `package-lock.json` — gitignored intentionally; CI rebuilds from `package.json` + cached `node_modules`. _(If you have strong feelings, open an issue and discuss before changing.)_
+- **Do** commit `pnpm-lock.yaml` — it is the source of truth for reproducible installs; CI installs with `pnpm install --frozen-lockfile`. (The old `package-lock.json` was removed in the pnpm migration.)
 - Don't commit `.env` files — gitignored
 - Don't commit `git_logs.txt`, `git_logs_output.txt`, `packages_upgrades.txt`, `packages_upgrades_output.txt` — gitignored CI scratch
 - Don't commit `src/lib/emoji-lib-output.json` — gitignored
@@ -277,16 +277,16 @@ CI's `npm version patch` is the right default. If a change deserves minor or maj
 - ❌ Use `!!x` for boolean coercion in option parsing — use `Boolean(x)` (matches existing style)
 - ❌ Add semicolons (Biome strips them and errors on them)
 - ❌ Use double quotes (`"..."`)
-- ❌ Skip `npm run biome:check` before committing
+- ❌ Skip `pnpm run biome:check` before committing
 - ❌ Modify `EmojiType` shape without regenerating the catalog and bumping consumer-visible types
 
 ## Do
 
-- ✅ Run `npm run test:watch` while editing `src/`
+- ✅ Run `pnpm run test:watch` while editing `src/`
 - ✅ Add a regression test for every parsing fix; paste the failing input verbatim
-- ✅ Use `npm run biome:fix` before committing
+- ✅ Use `pnpm run biome:fix` before committing
 - ✅ Annotate exported function return types explicitly
 - ✅ Use `Object.getOwnPropertyDescriptor` for option-merge "explicit-undefined" detection
 - ✅ Update `EMOJIS_SPECIAL_CASES` for keyword overrides; never mutate the catalog at runtime
-- ✅ Bump deps via `npm run ncu:upgrade` (respects `.ncurc.json`)
+- ✅ Bump deps via `pnpm run ncu:upgrade` (respects `.ncurc.json`)
 - ✅ Write conventional commit messages (`feat:`, `fix:`, `chore:`, etc.)

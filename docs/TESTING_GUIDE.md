@@ -18,17 +18,17 @@ There is no separation by source-file ↔ test-file pairing — `main.test.ts` c
 ## Running tests
 
 ```bash
-npm test                         # Everything (vitest run)
-npm run test:watch               # Re-runs on file change (TDD inner loop — vitest)
+pnpm test                        # Everything (vitest run)
+pnpm run test:watch              # Re-runs on file change (TDD inner loop — vitest)
 
 # Single file
-npx vitest run test/main.test.ts
+pnpm dlx vitest run test/main.test.ts
 
 # Filter by name (-t / --testNamePattern)
-npx vitest run test/main.test.ts -t "should parse"
+pnpm dlx vitest run test/main.test.ts -t "should parse"
 
 # Single it()
-npx vitest run test/main.test.ts -t "should throw error with not string parameter"
+pnpm dlx vitest run test/main.test.ts -t "should throw error with not string parameter"
 ```
 
 Vitest is configured in `vitest.config.ts`. Most specs finish in milliseconds; the only slow path is the regenerator's O(n²) dedup loop (and it's `it.skip`-guarded by default).
@@ -138,7 +138,7 @@ The deep-equal checks pin the shape of specific emojis (🤣, 😎). Update thes
 
 This is the **only** way to rebuild `src/lib/emoji-lib.json`. Key facts:
 
-- **`it.skip(...)`** — disabled by default; running `npm test` does not regenerate
+- **`it.skip(...)`** — disabled by default; running `pnpm test` does not regenerate
 - Imports `emojilib` and `unicode-emoji-json` (devDependencies) and merges them
 - Applies `EMOJIS_SPECIAL_CASES` overrides (include/exclude per emoji)
 - Runs an O(n²) dedup loop to ensure each keyword appears on at most one emoji (the most-canonical one)
@@ -147,12 +147,12 @@ This is the **only** way to rebuild `src/lib/emoji-lib.json`. Key facts:
 Procedure to regenerate:
 
 1. Edit `it.skip(...)` → `it(...)` in `prepareEmojiLibJson.test.ts`
-2. `npm test` — the test runs and writes the output file
+2. `pnpm test` — the test runs and writes the output file
 3. `diff src/lib/emoji-lib.json src/lib/emoji-lib-output.json` — review changes
 4. `cp src/lib/emoji-lib-output.json src/lib/emoji-lib.json` if happy
 5. Update `TOTAL_EMOJIS` in `emojiLibJson.test.ts` if the count changed
 6. **Restore `it.skip`** in `prepareEmojiLibJson.test.ts`
-7. `npm test` (without `.skip` reverted, this would re-run; with skip it's safe)
+7. `pnpm test` (without `.skip` reverted, this would re-run; with skip it's safe)
 8. Commit all four files together: `prepareEmojiLibJson.test.ts`, `emoji-lib.json`, `emojiLibJson.test.ts`, and any test changes that motivated the regen
 
 Full walkthrough: [`/regenerate-emoji-lib`](../.agents/commands/regenerate-emoji-lib.md).
@@ -188,7 +188,7 @@ When fixing a parsing bug:
      expect(result).toMatch('alt="⭐️"')
    })
    ```
-3. Run `npm run test:watch`; watch the new test fail
+3. Run `pnpm run test:watch`; watch the new test fail
 4. Fix `src/index.ts` until it passes
 5. Commit fix + test together with a `fix:` conventional message
 
@@ -207,13 +207,13 @@ When adding a new snapshot-style assertion, manually run the input through the c
 There is **no coverage tool wired**. Vitest has first-class coverage support, so adding it is one dev dependency:
 
 ```bash
-npm install --save-dev @vitest/coverage-v8
+pnpm add -D @vitest/coverage-v8
 ```
 
 Then run with the flag, or wire a script:
 
 ```bash
-npx vitest run --coverage
+pnpm dlx vitest run --coverage
 ```
 
 ```json
@@ -228,7 +228,7 @@ Configure includes/excludes under `test.coverage` in `vitest.config.ts`. Coverag
 
 ## Speed tips
 
-- `npm run test:watch` is the fastest loop — sub-second after the initial Vitest startup
+- `pnpm run test:watch` is the fastest loop — sub-second after the initial Vitest startup
 - Filter aggressively with `-t "<name>"` when iterating on a single behavior
 - The regenerator test (`prepareEmojiLibJson.test.ts`) is **slow** when un-skipped — O(n²) over 1914 emojis takes ~10 seconds. Don't enable it just to "see what happens"
 
@@ -239,9 +239,9 @@ The package has no external services — everything is in-memory data + a synchr
 ## Pre-push checklist
 
 ```bash
-npm run biome:check
-npm test
-npm run build
+pnpm run biome:check
+pnpm test
+pnpm run build
 ```
 
 All three must succeed. CI runs the same set on every PR.

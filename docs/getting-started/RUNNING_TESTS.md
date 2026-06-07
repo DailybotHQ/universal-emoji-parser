@@ -4,7 +4,7 @@ How to run, watch, filter, and debug Vitest specs in Universal Emoji Parser. Eac
 
 If you haven't installed dependencies yet, start with [Environment Setup](ENVIRONMENT_SETUP.md). For full Vitest conventions see [`../TESTING_GUIDE.md`](../TESTING_GUIDE.md).
 
-What healthy output looks like — `npm test`:
+What healthy output looks like — `pnpm test`:
 
 ```
   Test emoji parser
@@ -32,7 +32,7 @@ Total: ~5 seconds for the full suite.
 ## 1. Run all tests
 
 ```bash
-npm test
+pnpm test
 ```
 
 Internally: `vitest run` (config in `vitest.config.ts`). **Vitest** transpiles `.ts` on the fly via esbuild — no separate compile step.
@@ -48,7 +48,7 @@ Tests live in `test/*.test.ts`. There are three files:
 ## 2. Watch mode (TDD inner loop)
 
 ```bash
-npm run test:watch
+pnpm run test:watch
 ```
 
 Runs `vitest` (watch mode), re-running affected specs on every save in `src/` or `test/`. ~1 second per re-run after the first compile. **This is the recommended default loop** for any code change.
@@ -60,7 +60,7 @@ To stop: `Ctrl+C` (or `q` in Vitest's interactive watch).
 ## 3. Run a single file
 
 ```bash
-npx vitest run test/main.test.ts
+pnpm dlx vitest run test/main.test.ts
 ```
 
 Useful when iterating on `main.test.ts` and you don't care about catalog tests.
@@ -73,13 +73,13 @@ Vitest's `-t` (`--testNamePattern`) matches against the concatenated `describe` 
 
 ```bash
 # Run only "should parse emojis from unicode"
-npx vitest run test/main.test.ts -t "should parse emojis from unicode"
+pnpm dlx vitest run test/main.test.ts -t "should parse emojis from unicode"
 
 # Run all tests in the "Using default options" describe block
-npx vitest run test/main.test.ts -t "Using default options"
+pnpm dlx vitest run test/main.test.ts -t "Using default options"
 
 # Run anything mentioning "shortcode"
-npx vitest run test/main.test.ts -t "shortcode"
+pnpm dlx vitest run test/main.test.ts -t "shortcode"
 ```
 
 ---
@@ -101,7 +101,7 @@ $EDITOR test/prepareEmojiLibJson.test.ts
 # 2. Change `it.skip(` to `it(`
 
 # 3. Run tests
-npm test
+pnpm test
 # This time the regenerator runs (~10 seconds for the O(n²) dedup) and writes:
 #   src/lib/emoji-lib-output.json
 
@@ -118,7 +118,7 @@ $EDITOR test/prepareEmojiLibJson.test.ts
 # Change `it(` back to `it.skip(`
 
 # 8. Verify the test pass with the new catalog
-npm test
+pnpm test
 
 # 9. Commit
 git add src/lib/emoji-lib.json test/prepareEmojiLibJson.test.ts test/emojiLibJson.test.ts
@@ -135,7 +135,7 @@ Full procedure: [`/regenerate-emoji-lib`](../../.agents/commands/regenerate-emoj
 
 ### Quick inspection — `console.log`
 
-Tests are exempt from the `no-console` Biome rule that targets `src/` library code. Drop a `console.log` in the test, run `npm test`, look at the output.
+Tests are exempt from the `no-console` Biome rule that targets `src/` library code. Drop a `console.log` in the test, run `pnpm test`, look at the output.
 
 ```ts
 it('should parse :smile:', () => {
@@ -151,7 +151,7 @@ Don't commit the `console.log` — but during dev, no problem.
 
 ```bash
 # Run tests with the inspector enabled, paused at start
-npx vitest run test/main.test.ts --inspect-brk --no-file-parallelism
+pnpm dlx vitest run test/main.test.ts --inspect-brk --no-file-parallelism
 ```
 
 Then in Chrome: `chrome://inspect` → "Open dedicated DevTools for Node" → set breakpoints in `src/index.ts` (TypeScript with source maps via **Vitest**/esbuild).
@@ -163,8 +163,8 @@ VS Code users: configure a launch config:
   "type": "node",
   "request": "launch",
   "name": "Vitest tests",
-  "runtimeExecutable": "npx",
-  "runtimeArgs": ["vitest", "run", "test/main.test.ts", "--no-file-parallelism"],
+  "runtimeExecutable": "pnpm",
+  "runtimeArgs": ["dlx", "vitest", "run", "test/main.test.ts", "--no-file-parallelism"],
   "console": "integratedTerminal",
   "internalConsoleOptions": "neverOpen"
 }
@@ -184,7 +184,7 @@ const result = uEmojiParser.parse('hello :smile: 🚀', { parseToHtml: false, pa
 console.log(JSON.stringify(result))
 EOF
 
-npx vite-node tmp/repro.ts
+pnpm dlx vite-node tmp/repro.ts
 ```
 
 `tmp/` is gitignored, so it's safe for throwaway scripts. (`vite-node` ships with Vitest and runs `.ts` directly.)
@@ -196,13 +196,13 @@ npx vite-node tmp/repro.ts
 To match what the CI does on a PR:
 
 ```bash
-npm install                          # Or skip if node_modules is current
-npm run biome:check                  # Lint + format (single Biome step)
-npm test                             # Vitest
-npm run build                        # Vite — only if you want full CI parity (the PR `code_check.yml` doesn't build)
+pnpm install                         # Or skip if node_modules is current
+pnpm run biome:check                 # Lint + format (single Biome step)
+pnpm test                            # Vitest
+pnpm run build                       # Vite — only if you want full CI parity (the PR `code_check.yml` doesn't build)
 ```
 
-The release workflow does the same plus `npm run build` and `npm version patch`. See [Build & Deploy](../BUILD_DEPLOY.md).
+The release workflow does the same plus `pnpm run build` and the patch bump via `.github/scripts/prepare_release.sh`. See [Build & Deploy](../BUILD_DEPLOY.md).
 
 ---
 
@@ -238,12 +238,12 @@ Conventions in [`../TESTING_GUIDE.md`](../TESTING_GUIDE.md). Skill: [`/write-tes
 
 | Goal                 | Command                                                                |
 | -------------------- | --------------------------------------------------------------------- |
-| Run all tests        | `npm test`                                                            |
-| Watch mode (TDD)     | `npm run test:watch`                                                  |
-| Run a single file    | `npx vitest run test/main.test.ts`                                    |
-| Filter by name       | `npx vitest run -t "<pattern>"`                                       |
-| Debug with inspector | `npx vitest run test/main.test.ts --inspect-brk --no-file-parallelism` |
-| Quick repro          | `npx vite-node tmp/repro.ts`                                          |
-| CI parity            | `npm install && npm run biome:check && npm test && npm run build`     |
+| Run all tests        | `pnpm test`                                                           |
+| Watch mode (TDD)     | `pnpm run test:watch`                                                 |
+| Run a single file    | `pnpm dlx vitest run test/main.test.ts`                              |
+| Filter by name       | `pnpm dlx vitest run -t "<pattern>"`                                 |
+| Debug with inspector | `pnpm dlx vitest run test/main.test.ts --inspect-brk --no-file-parallelism` |
+| Quick repro          | `pnpm dlx vite-node tmp/repro.ts`                                    |
+| CI parity            | `pnpm install && pnpm run biome:check && pnpm test && pnpm run build` |
 
 If a test doesn't run, check [Troubleshooting](TROUBLESHOOTING.md) — every issue we've actually hit is in there.

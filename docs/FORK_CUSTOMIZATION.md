@@ -68,7 +68,7 @@ Replace [`README.md`](../README.md) with:
 - New product name and one-line value prop
 - Fork attribution: "This is a fork of [universal-emoji-parser](https://github.com/DailyBotHQ/universal-emoji-parser)"
 - Updated badges (CI status, license, npm version, downloads pointing at the new package)
-- Install command using the new name: `npm install @acme/emoji-parser`
+- Install command using the new name, shown for each package manager: `npm install @acme/emoji-parser` / `pnpm add @acme/emoji-parser` / `yarn add @acme/emoji-parser`
 - Usage examples updated to import from the new name
 
 ## Step 4 — License and ownership
@@ -95,12 +95,12 @@ Edit `.github/workflows/release_and_publish.yml`:
 4. **Secrets** — replace `secrets.AUTOMATION_GITHUB_TOKEN`, `secrets.NPM_TOKEN`, `secrets.DAILYBOT_API_KEY` with your own; add them in GitHub repo Settings → Secrets and variables → Actions
 5. **Vars** — replace `vars.DAILYBOT_DEPLOYMENT_NOTIFICATION_CHANNEL`, `vars.USERS_TO_NOTIFY` with your own (or remove if not using notifications)
 
-### `package.json` `release` script
+### Release commit message / bot identity
 
-Edit:
+The `release` script runs `bash .github/scripts/prepare_release.sh`, which hardcodes the release commit message. Edit the `RELEASE_MESSAGE` line in that script:
 
-```json
-"release": "npm version patch -m \"[🤖 Acme-Bot] New release to v%s launched 🚀\""
+```bash
+RELEASE_MESSAGE="[🤖 Acme-Bot] New release to ${TAG} launched 🚀"
 ```
 
 The bot identity in the commit message must match the regex in `get_github_release_log.sh` so release notes pick the right boundary.
@@ -176,10 +176,10 @@ git push -u origin main
 ## Step 10 — Sanity check
 
 ```bash
-npm install
-npm run biome:check
-npm test
-npm run build
+pnpm install
+pnpm run biome:check
+pnpm test
+pnpm run build
 
 # Verify the package name made it through
 node -e "console.log(require('./package.json').name)"   # should be your new name
@@ -200,7 +200,7 @@ git push -u origin first-release
 # Watch the release_and_publish workflow run
 ```
 
-If npm publish fails with "package not found", the package name is new — npm needs you to add `--access public` for the first publish (or `"publishConfig": { "access": "public" }` in `package.json`). The CI workflow's `npm publish` doesn't pass `--access` by default; either add it or pre-publish manually once.
+If publishing fails with "package not found", the package name is new — the registry needs `--access public` for the first publish (or `"publishConfig": { "access": "public" }` in `package.json`). The CI workflow's `pnpm publish --no-git-checks` doesn't pass `--access` by default; either add it or pre-publish manually once.
 
 ## Step 12 — After you're done
 
@@ -209,7 +209,7 @@ Once the rebrand is solid, audit the docs:
 - Remove sections that no longer apply (e.g., if you don't use DailyBot, strip those workflow steps)
 - Update `docs/TECHNOLOGIES.md` to reflect any stack swaps
 - Update `AGENTS.md` "Project Overview" with your fork's product description
-- Update [`AGENTS.md`](../AGENTS.md) command examples in the "Quick Commands" section if you've changed npm script names
+- Update [`AGENTS.md`](../AGENTS.md) command examples in the "Quick Commands" section if you've changed any package.json script names
 
 ## Checklist
 

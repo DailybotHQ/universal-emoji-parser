@@ -12,7 +12,7 @@ When and how to update the docs that live in this repo. The goal is to keep `AGE
 | `docs/ARCHITECTURE.md`         | Module layout, data flow, regenerator pipeline                                       | New module, new data source, new pipeline stage                        |
 | `docs/TECHNOLOGIES.md`         | Stack with versions and roles                                                        | A library is added, removed, or major-bumped                           |
 | `docs/STANDARDS.md`            | Coding rules                                                                         | A convention is decided or changes                                     |
-| `docs/DEVELOPMENT_COMMANDS.md` | npm script reference                                                                 | A new script is wired or a workflow changes                            |
+| `docs/DEVELOPMENT_COMMANDS.md` | pnpm script reference                                                                | A new script is wired or a workflow changes                            |
 | `docs/TESTING_GUIDE.md`        | Test framework, conventions, regenerator workflow                                    | Test framework changes, new test scenario added                        |
 | `docs/RUNTIMES.md`             | Per-runtime notes (Node, browsers, edge)                                             | A new runtime is supported or a runtime-specific gotcha is found       |
 | `docs/BUILD_DEPLOY.md`         | Vite output, npm publish, CI workflows                                               | Build steps, signing, CI pipeline changes                              |
@@ -38,7 +38,7 @@ When and how to update the docs that live in this repo. The goal is to keep `AGE
 - A new dependency added to `package.json`
 - The HTML output template changes
 - `DEFAULT_EMOJI_CDN` value changes
-- A new npm script is wired
+- A new pnpm script is wired
 - A CI workflow is added or substantively changed
 - The Node `engines` constraint changes
 - A new entry is added to `EMOJIS_SPECIAL_CASES`
@@ -87,7 +87,7 @@ Each fact lives in **one** file. If you find yourself copying a paragraph, repla
 Examples of "owned by":
 
 - Coding conventions → `docs/STANDARDS.md`
-- npm scripts → `docs/DEVELOPMENT_COMMANDS.md`
+- pnpm scripts → `docs/DEVELOPMENT_COMMANDS.md`
 - Stack versions → `docs/TECHNOLOGIES.md` (and pinned in `package.json`)
 - HTML output contract → `docs/API_REFERENCE.md#html-output-contract` (referenced from `STANDARDS.md` and `SECURITY.md`)
 - Regenerator workflow → `docs/ARCHITECTURE.md#the-regeneration-pipeline` + `.agents/commands/regenerate-emoji-lib.md` (link from one to the other; no copy-paste)
@@ -116,7 +116,7 @@ When this repo is forked into a new product, the **first commit on the fork** sh
 
 When reviewing a PR that touches code, ask:
 
-- Did this change add/remove a method, dep, npm script, or pattern? → Doc update required
+- Did this change add/remove a method, dep, pnpm script, or pattern? → Doc update required
 - Did this change touch a path mentioned in the docs? → Verify the docs still reflect reality
 - Did the PR description say "I'll document this later"? → It rarely happens — block on docs in the same PR
 - Does the change affect the HTML output? → `docs/API_REFERENCE.md`, `docs/SECURITY.md`, and `AGENTS.md` all need review
@@ -125,7 +125,7 @@ When reviewing a PR that touches code, ask:
 
 Drift you should fix on sight:
 
-- A doc describing an npm script that no longer exists
+- A doc describing a pnpm script that no longer exists
 - A `EmojiType` field listed in the docs but missing from `src/lib/type.ts`
 - A dependency version in the docs older than `package.json`
 - A skill file referencing a procedure that's changed

@@ -6,15 +6,18 @@ Real problems hit while setting up and developing Universal Emoji Parser, with t
 
 ---
 
-## `npm install` fails with engine incompatibility
+## `pnpm install` fails with engine incompatibility
 
 **Symptom:**
 
 ```
-npm error EBADENGINE Unsupported engine
-npm error EBADENGINE   required: { node: '>=22.0.0' }
-npm error EBADENGINE   current: { node: 'v18.x.x' }
+ ERR_PNPM_UNSUPPORTED_ENGINE  Unsupported environment (bad pnpm and/or Node.js version)
+Your Node version is incompatible with "universal-emoji-parser".
+Expected version: >=22.0.0
+Got: v18.x.x
 ```
+
+(npm emits the analogous `EBADENGINE` warning.)
 
 **Cause:** Node version is below the `engines.node: ">=22.0.0"` constraint in `package.json`.
 
@@ -24,7 +27,8 @@ npm error EBADENGINE   current: { node: 'v18.x.x' }
 nvm install 24
 nvm use 24
 node --version    # confirm v24.x (or any v22+)
-npm install
+corepack enable   # provision the pinned pnpm@11.1.2
+pnpm install
 ```
 
 Or use Volta / asdf / your favorite version manager.
@@ -39,7 +43,7 @@ Or use Volta / asdf / your favorite version manager.
 Error: Cannot find module '@twemoji/parser'
 ```
 
-…during `npm test` or `npm run build`.
+…during `pnpm test` or `pnpm run build`.
 
 **Cause:** `node_modules` is stale or partial. Common after switching branches that have different `package.json`.
 
@@ -47,15 +51,15 @@ Error: Cannot find module '@twemoji/parser'
 
 ```bash
 rm -rf node_modules
-npm install
-npm test
+pnpm install
+pnpm test
 ```
 
-If that doesn't help, also clear npm cache:
+If that doesn't help, also prune the pnpm store:
 
 ```bash
-npm cache clean --force
-npm install
+pnpm store prune
+pnpm install
 ```
 
 ---
@@ -76,11 +80,11 @@ src/index.ts:1:1 - error TS6053: File 'src/index.ts' not found.
 1. Check `tsconfig.json` `"include": ["src/**/*"]` is intact
 2. Verify `src/index.ts` exists
 3. If you've been editing `tsconfig.json`, revert and try again
-4. As a last resort, `rm -rf node_modules && npm install` (reinstalls `vitest` + `typescript`)
+4. As a last resort, `rm -rf node_modules && pnpm install` (reinstalls `vitest` + `typescript`)
 
 ---
 
-## `npm run build` produces no `dist/index.js`
+## `pnpm run build` produces no `dist/index.js`
 
 **Symptom:** Vite production build finishes but `dist/index.js` is missing or empty.
 
@@ -90,11 +94,11 @@ src/index.ts:1:1 - error TS6053: File 'src/index.ts' not found.
 
 ```bash
 rm -rf node_modules dist
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
 
-`npm run build` runs `vite build && npm run build:types` — the second step (`tsc -p tsconfig.build.json --emitDeclarationOnly`) emits `dist/index.d.ts` + `dist/lib/type.d.ts`. If only the `.d.ts` files are missing, run `npm run build:types` on its own to isolate the type-emit step.
+`pnpm run build` runs `vite build && tsc -p tsconfig.build.json --emitDeclarationOnly` — the second step emits `dist/index.d.ts` + `dist/lib/type.d.ts`. If only the `.d.ts` files are missing, run `pnpm run build:types` on its own to isolate the type-emit step.
 
 If still broken, check `vite.config.ts` library mode:
 
@@ -128,7 +132,7 @@ Cannot read file '/app/tsconfig.json'
 
 ```bash
 cd /app   # or wherever the repo root is
-npm run biome:check
+pnpm run biome:check
 ```
 
 ---
@@ -149,15 +153,15 @@ Found N errors / warnings — formatter or linter issues
 
 1. Run the safe autofix:
    ```bash
-   npm run biome:fix
+   pnpm run biome:fix
    ```
 2. For lint rules that need riskier rewrites, use the unsafe fixer and review every change:
    ```bash
-   npm run biome:fix:unsafe
+   pnpm run biome:fix:unsafe
    ```
 3. Re-run the gate:
    ```bash
-   npm run biome:check
+   pnpm run biome:check
    ```
 
 ---
@@ -170,23 +174,23 @@ Found N errors / warnings — formatter or linter issues
 
 1. **Different Node version** — local Node ≠ CI Node 24. Match locally with `nvm use 24` (or satisfy `engines.node` ≥ 22)
 2. **Different timezone / locale** — unlikely in this package (no date/locale handling) but possible if you've added time-sensitive logic
-3. **Race condition** — Vitest tests aren't supposed to interact, but if they share state, ordering can matter. Run `npm test` repeatedly locally; if it ever fails, you have a flake
+3. **Race condition** — Vitest tests aren't supposed to interact, but if they share state, ordering can matter. Run `pnpm test` repeatedly locally; if it ever fails, you have a flake
 4. **Env-var dependency** — code that reads `process.env.X` may behave differently with/without the var. The package shouldn't read env vars; check recent changes if it does
 5. **Stale CI cache** — re-run the workflow with cache disabled (push an empty commit, or add `--no-cache` to the cache key)
 
 ---
 
-## "Unauthorized" on `npm publish` (manual release)
+## "Unauthorized" on `pnpm publish` (manual release)
 
 **Symptom:**
 
 ```
-npm error 401 Unauthorized - PUT https://registry.npmjs.org/universal-emoji-parser
+ERR_PNPM  401 Unauthorized - PUT https://registry.npmjs.org/universal-emoji-parser
 ```
 
 **Cause:** You're not logged in, or your token doesn't have publish permission for this package.
 
-**Fix:**
+**Fix:** pnpm reads the same `~/.npmrc` registry auth as npm, so the npm registry auth commands apply:
 
 ```bash
 # For interactive login
@@ -195,6 +199,9 @@ npm login
 # For token-based auth
 npm whoami        # confirm you're logged in
 npm access list packages    # confirm you have publish access
+
+# Then retry the publish
+corepack pnpm publish --no-git-checks
 ```
 
 Manual releases by humans are rare — the CI does this. If CI is failing with this error, `secrets.NPM_TOKEN` is expired or wrong-scoped.
@@ -282,7 +289,7 @@ Then use HTTPS git remotes (which `gh` will sign for you).
 
 ## Vite build is suspiciously small
 
-**Symptom:** `dist/index.js` is < 100 KB after `npm run build`. Catalog is missing.
+**Symptom:** `dist/index.js` is < 100 KB after `pnpm run build`. Catalog is missing.
 
 **Cause:** `tsconfig.json`'s `resolveJsonModule: true` got disabled, or `vite.config.ts` is excluding the JSON catalog from the bundle.
 
@@ -323,7 +330,7 @@ node -e "console.log(Object.keys(require('./dist/index.js').emojiLibJsonData).le
 
 ## Test runner hangs or times out
 
-**Symptom:** `npm test` runs for a long time and fails with a timeout error.
+**Symptom:** `pnpm test` runs for a long time and fails with a timeout error.
 
 **Cause:** The regenerator was accidentally enabled (`it.skip` reverted to `it`).
 
@@ -396,7 +403,7 @@ img.emoji {
 2. Run the sanity-check commands from [Environment Setup → Final sanity checklist](ENVIRONMENT_SETUP.md#final-sanity-checklist) to isolate which layer is broken
 3. Try the dev container — it eliminates "but it works on my machine" issues
 4. File an issue with:
-   - Output of `node --version`, `npm --version`
+   - Output of `node --version`, `pnpm --version`
    - Output of the failing command with `--verbose` or `--stacktrace` if available
    - Your OS and shell
    - What you've already tried
