@@ -1,7 +1,7 @@
-import { expect } from 'chai'
 import emojilib from 'emojilib'
 import * as fs from 'fs'
 import unicodeEmojiJson from 'unicode-emoji-json'
+import { describe, expect, it } from 'vitest'
 import type { EmojiLibJsonType, EmojiType, ObjectType } from '../src/lib/type'
 
 describe('Prepare emoji parser assets', () => {
@@ -142,6 +142,6 @@ describe('Prepare emoji parser assets', () => {
      */
     const filePath: string = 'src/lib/emoji-lib-output.json'
     fs.writeFileSync(filePath, JSON.stringify(emojiLibJson, null, 2))
-    expect(fs.existsSync(filePath)).to.be.true
+    expect(fs.existsSync(filePath)).toBe(true)
   })
 })
