@@ -8,9 +8,9 @@ packages:
 # See https://xergioalex.com/blog/supply-chain-attacks-ai-era/ for the rationale.
 minimumReleaseAge: 10080
 
-# Install/build scripts pnpm 10+ refuses to run unless explicitly allowed.
-# This is the curated allow-list for this repo's dev toolchain. Add or remove
-# entries based on the warnings emitted by `corepack pnpm install`.
-onlyBuiltDependencies:
-  - esbuild
-  - '@biomejs/biome'
+# Install/build scripts pnpm 11+ refuses to run unless explicitly allowed.
+# This is the curated allow-list for this repo's dev toolchain. Add entries
+# based on the [ERR_PNPM_IGNORED_BUILDS] warnings emitted by `corepack pnpm install`.
+# Only esbuild (pulled in by Vite) needs to run its install script here.
+allowBuilds:
+  esbuild: true

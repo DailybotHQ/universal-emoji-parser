@@ -37,7 +37,7 @@
     "release": "npm version patch -m \"[🤖 DailyBot] New release to v%s launched 🚀\"",
     "start": "node dist/index.js",
     "dev": "nodemon --exec tsx src/index.ts",
-    "build": "vite build && npm run build:types",
+    "build": "vite build && tsc -p tsconfig.build.json --emitDeclarationOnly",
     "build:dev": "vite build --mode development",
     "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
     "build:tsc": "tsc -p tsconfig.build.json --noEmit",
