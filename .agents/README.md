@@ -73,6 +73,7 @@ Richer, longer procedures that explain conventions and pipelines. Use these when
 | `emoji-data-pipeline`      | Step-by-step regeneration of the catalog from upstream            | [skills/emoji-data-pipeline.md](skills/emoji-data-pipeline.md)           |
 | `npm-publish-walkthrough`  | Full release flow including GitHub Actions internals              | [skills/npm-publish-walkthrough.md](skills/npm-publish-walkthrough.md)   |
 | `typescript-strict-style`  | TS rules enforced by `tsconfig.json` + Biome                      | [skills/typescript-strict-style.md](skills/typescript-strict-style.md)   |
+| `pnpm-migration`           | Playbook for migrating npm → pnpm (Corepack, supply-chain guards, npm→pnpm routing, pnpm publish + tarball parity) | [skills/pnpm-migration.md](skills/pnpm-migration.md) |
 
 Skills don't have a slash-command form. They're read by agents as reference material.
 

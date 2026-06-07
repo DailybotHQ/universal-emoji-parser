@@ -376,6 +376,7 @@ This repository ships with a `.agents/` directory (symlinked as `.claude/`) cont
 - `emoji-data-pipeline` — Step-by-step regeneration of the catalog from upstream
 - `npm-publish-walkthrough` — Full release flow including GitHub Actions internals
 - `typescript-strict-style` — TS rules enforced by `tsconfig.json` + Biome
+- `pnpm-migration` — Playbook for migrating npm → pnpm (Corepack pin, supply-chain guards, npm→pnpm routing, pnpm publish + tarball parity)
 
 **Subagents (`.agents/agents/`):**
 
