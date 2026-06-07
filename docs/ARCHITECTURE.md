@@ -47,7 +47,7 @@ universal-emoji-parser/
 ├── CLAUDE.md → AGENTS.md              # Symlink (do not edit directly)
 ├── README.md                          # Human-facing intro and usage docs
 ├── LICENSE                            # MIT
-├── package.json                       # Scripts, deps, version, engines.node ≥ 20.19
+├── package.json                       # Scripts, deps, version, engines.node ≥ 22
 ├── tsconfig.json                      # Strict TS config; tests + src
 ├── tsconfig.build.json                # `tsc`: emit declarations from `src/` only (`rootDir`)
 ├── vite.config.ts                     # Library mode, CommonJS output, esbuild minify; inlines @twemoji/parser

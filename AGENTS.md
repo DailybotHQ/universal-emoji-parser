@@ -36,14 +36,14 @@ The package targets:
 
 - Twitter, GitHub, Slack, Discord, Google Chat, and Microsoft Teams shortcode dialects (single dictionary, normalized to one canonical slug per emoji)
 - Both **CommonJS** (`require('universal-emoji-parser')`) and **ES modules** (`import uEmojiParser from 'universal-emoji-parser'`)
-- Server-side (Node ≥ 20.19) and browser environments (consumers bundle via webpack/rollup/vite)
+- Server-side (Node ≥ 22) and browser environments (consumers bundle via webpack/rollup/vite)
 
 > **Forking this?** The package name (`universal-emoji-parser`), the npm scope, the maintainer block in `package.json`, the GitHub remote, and the DailyBot release-bot identity are the renameable identifiers. Walk [Fork Customization](docs/FORK_CUSTOMIZATION.md) before merging product code.
 
 **Technology Stack** (full list with versions: [Technologies](docs/TECHNOLOGIES.md))
 
 - **TypeScript 6** — strict-null source language, compiles to `dist/index.js` + `dist/index.d.ts` (see `package.json` for exact semver)
-- **Node.js ≥ 20.19.0** — `engines.node` constraint enforced by package.json (CI and the dev container use Node 24)
+- **Node.js ≥ 22.0.0** — `engines.node` constraint enforced by package.json (CI and the dev container use Node 24)
 - **`@twemoji/parser` 17.0.1 (pinned, inlined)** — finds emoji entities in text and produces CDN URLs; bundled into `dist/index.js` so the package ships with **zero runtime dependencies**. Pinned to exactly `17.0.1` (see `.ncurc.json` `reject`) — `17.0.2` regresses U+FE0F variation-selector handling
 - **emojilib 4 + unicode-emoji-json** (build/test only) — sources used to regenerate `src/lib/emoji-lib.json`
 - **Vite 8 (library mode)** — production bundler via `vite.config.ts` (CJS library build, esbuild minify); emits a single CommonJS entry at `dist/index.js`. Type declarations come from `tsc --emitDeclarationOnly`

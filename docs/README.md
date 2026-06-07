@@ -7,7 +7,7 @@ truth for mandatory rules; the files here go deep on individual topics.
 **Universal Emoji Parser** is a TypeScript library that parses emoji unicodes and
 shortcodes in text and converts them to Twemoji-backed HTML `<img>` tags, or
 between unicode and shortcode forms. It ships dual CommonJS + ESM entry points
-and targets Node ≥ 20.19 and bundled browser environments.
+and targets Node ≥ 22 and bundled browser environments.
 
 ## Product
 

@@ -21,7 +21,7 @@ By the end of this guide you will be able to:
 
 ### 1. Install Node.js
 
-The package requires **Node.js ≥ 20.19.0**. CI runs on **Node 24**. Use Active LTS, Current, or the same major as CI.
+The package requires **Node.js ≥ 22.0.0**. CI runs on **Node 24**. Use Active LTS, Current, or the same major as CI.
 
 #### macOS / Linux (recommended: nvm)
 
@@ -49,7 +49,7 @@ Use [nvm-windows](https://github.com/coreybutler/nvm-windows) or download the in
 ### 2. Verify
 
 ```bash
-node --version       # should report v24.x (or any v20.19+)
+node --version       # should report v24.x (or any v22+)
 npm --version        # comes with Node; should be 10.x+
 ```
 
@@ -242,7 +242,7 @@ docker compose down --volumes
 Run these and confirm each succeeds before moving on:
 
 ```bash
-node --version                       # ≥ 20.19.0
+node --version                       # ≥ 22.0.0
 npm --version                        # ≥ 10
 npm install                          # No errors
 npm run biome:check                  # No lint or format errors

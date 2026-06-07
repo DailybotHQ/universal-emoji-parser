@@ -6,7 +6,7 @@ Per-environment reference for Universal Emoji Parser: where it runs, how it's lo
 
 | Runtime                                         | Loading                                                 | Notes                                                                                        |
 | ----------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Node.js (≥ 20.19)                               | `require('universal-emoji-parser')` or `import`         | Primary target; CI runs on Node 24                                                           |
+| Node.js (≥ 22)                               | `require('universal-emoji-parser')` or `import`         | Primary target; CI runs on Node 24                                                           |
 | Browsers (modern)                               | Bundled via webpack/rollup/vite/esbuild by the consumer | Catalog adds ~543 KB raw to consumer bundles — see [Performance](PERFORMANCE.md#bundle-size) |
 | Deno                                            | `npm:universal-emoji-parser`                            | Untested but expected to work — Deno 1.28+ supports `npm:` specifiers                        |
 | Bun                                             | `bun add universal-emoji-parser`                        | Untested but expected to work — Bun is Node-compatible                                       |
@@ -60,7 +60,7 @@ This means **both** `require('universal-emoji-parser').parse(...)` and `import u
 
 ### Engines
 
-`package.json` sets `engines.node: ">=20.19.0"`. npm warns (does not error) when installing on older Node versions; the runtime will likely still work down to Node 18, but unsupported.
+`package.json` sets `engines.node: ">=22.0.0"`. npm warns (does not error) when installing on older Node versions; the runtime may still work on Node 20 (EOL April 2026) but those versions are unsupported — security patches stopped landing on them.
 
 CI runs on **Node 24**. If a Node version-specific bug surfaces, that's the reference version to debug against.
 

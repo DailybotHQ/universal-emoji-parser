@@ -91,7 +91,7 @@ We don't currently do any of these. Document the gap.
      Node LTS releases stay in support for 30 months. Don't drop 18 LTS while it's in maintenance.
 ```
 
-We're currently on `engines.node: ">=20.19.0"`. Raising the floor further (e.g. to `>=22`) is a semver decision for library consumers — coordinate with `docs/RUNTIMES.md` and release notes.
+We're currently on `engines.node: ">=22.0.0"`. Raising the floor further (e.g. to `>=22`) is a semver decision for library consumers — coordinate with `docs/RUNTIMES.md` and release notes.
 
 ## Review checklist for a dep PR
 

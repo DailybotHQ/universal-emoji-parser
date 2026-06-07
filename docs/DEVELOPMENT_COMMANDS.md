@@ -260,7 +260,7 @@ npm test
 npm run build
 ```
 
-If all three pass locally, the PR will pass CI (modulo Node version drift — CI uses Node 24; ensure your local Node satisfies `engines.node` ≥ 20.19).
+If all three pass locally, the PR will pass CI (modulo Node version drift — CI uses Node 24; ensure your local Node satisfies `engines.node` ≥ 22).
 
 ## Reference: every npm script in `package.json`
 

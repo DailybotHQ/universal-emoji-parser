@@ -201,7 +201,7 @@ Vite drives the production bundle (library mode, CJS output, esbuild minify). A 
 
 ### `vitest` major bumps
 
-Vitest occasionally drops Node version support. Verify our `engines.node` (`>=20.19`) is still compatible. Specs import `{ describe, it, expect }` from `vitest` — a major bump rarely touches those.
+Vitest occasionally drops Node version support. Verify our `engines.node` (`>=22`) is still compatible. Specs import `{ describe, it, expect }` from `vitest` — a major bump rarely touches those.
 
 ### `node-version` in CI workflows
 

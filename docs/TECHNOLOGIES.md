@@ -7,7 +7,7 @@ A complete inventory of every tool, library, and configuration shipped with Univ
 | Tool       | Version                        | Role                                                                                                   |
 | ---------- | ------------------------------ | ------------------------------------------------------------------------------------------------------ |
 | TypeScript | **6.0.3**                      | Source language; compiled by Vite/esbuild at bundle time and by `tsc` for `.d.ts` (`build:types`)      |
-| Node.js    | **≥ 20.19.0** (`engines.node`) | Runtime for tests, build, CI; CI and the dev container use **Node 24**                                 |
+| Node.js    | **≥ 22.0.0** (`engines.node`) | Runtime for tests, build, CI; CI and the dev container use **Node 24**                                 |
 | Vite       | **8.0.16**                     | Production bundler — **library mode**, single-entry, CommonJS output, esbuild minify                   |
 | Vitest     | **4.x**                        | Test runner — runs `.ts` specs directly (ESM-native, esbuild-powered, no separate compile step)        |
 | Biome      | **2.4.16**                     | Single tool for both lint and format — one config (`biome.json`), no ESLint/Prettier                   |
