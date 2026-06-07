@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import uEmojiParser, { DEFAULT_EMOJI_CDN, emojiLibJsonData } from '../src/index'
 
 const EXPECTED_METHODS: ReadonlyArray<keyof typeof uEmojiParser> = [
@@ -88,8 +88,15 @@ describe('Public exports surface', () => {
   })
 
   describe.skipIf(skipReason !== null)('Built bundle (dist/index.js, CommonJS consumer shape)', () => {
-    const require = createRequire(import.meta.url)
-    const dist = require(distPath) as Record<string, unknown>
+    // `require(distPath)` MUST run inside a hook, not at describe-collection time.
+    // The describe callback executes when Vitest collects tests, even when `skipIf`
+    // marks the inner tests as skipped — so loading `dist/` here would throw
+    // `MODULE_NOT_FOUND` in CI (where the suite runs before the build job).
+    let dist: Record<string, unknown>
+    beforeAll(() => {
+      const require = createRequire(import.meta.url)
+      dist = require(distPath) as Record<string, unknown>
+    })
 
     it('reattaches DEFAULT_EMOJI_CDN onto module.exports for require() consumers', () => {
       expect(dist.DEFAULT_EMOJI_CDN).toBeTypeOf('string')
