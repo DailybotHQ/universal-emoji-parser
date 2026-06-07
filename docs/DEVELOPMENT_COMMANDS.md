@@ -4,32 +4,31 @@ Reference for every npm script and shell command you'll run during day-to-day wo
 
 ## Inner-loop favorites
 
-| Goal              | Command                                      | Notes                                                                                              |
-| ----------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| TDD inner loop    | `npm run test:watch`                         | Re-runs Mocha on every save in `src/` or `test/`                                                   |
-| One-off smoke run | `npm run dev`                                | Runs `nodemon src/index.ts` — useful when adding a `console.log` (test-only) for ad hoc inspection |
-| Type check        | `npm run build:tsc`                          | `tsc --build`, emits `.d.ts` into `dist/`                                                          |
-| Lint check        | `npm run eslint:check`                       | CI gate                                                                                            |
-| Format check      | `npm run prettier:check`                     | CI gate                                                                                            |
-| Fix everything    | `npm run eslint:fix && npm run prettier:fix` | Auto-fix lint + format                                                                             |
+| Goal               | Command                | Notes                                                                                                |
+| ------------------ | ---------------------- | --------------------------------------------------------------------------------------------------- |
+| TDD inner loop     | `npm run test:watch`   | Runs Vitest in watch mode — re-runs on every save in `src/` or `test/`                               |
+| One-off smoke run  | `npm run dev`          | Runs `nodemon --exec tsx src/index.ts` — useful when adding a `console.log` (test-only) for ad hoc inspection |
+| Type check         | `npm run build:tsc`    | `tsc -p tsconfig.build.json --noEmit` — type-check only, emits nothing                               |
+| Lint + format check | `npm run biome:check` | CI gate — Biome covers both lint and format in one pass                                              |
+| Fix everything     | `npm run biome:fix`    | Auto-fix lint + format (`biome check --write`)                                                       |
 
 ## Testing
 
 ```bash
-npm test                              # All Mocha specs, tsx (no compile step)
-npm run test:watch                    # Same, with --watch on src/ + test/
+npm test                              # All Vitest specs (vitest run), no compile step
+npm run test:watch                    # Vitest watch mode on src/ + test/
 
 # Run a single file
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors
+npx vitest run test/main.test.ts
 
-# Run a single describe / it (Mocha grep)
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should parse emojis from unicode" --colors
+# Run a single describe / it (Vitest name filter)
+npx vitest run test/main.test.ts -t "should parse emojis from unicode"
 
-# Run with extra debug
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --reporter spec --colors
+# Run with the verbose reporter
+npx vitest run test/main.test.ts --reporter verbose
 ```
 
-The default `mocha` config lives in the `test` script: `--timeout 25000 --colors`. Tests are slow only because of the Twemoji parse — the catalog ops are sub-millisecond.
+Vitest is configured in `vitest.config.ts`. Tests are slow only because of the Twemoji parse — the catalog ops are sub-millisecond.
 
 ### Running the regenerator (the `it.skip` test)
 
@@ -46,24 +45,22 @@ See [`/regenerate-emoji-lib`](../.agents/commands/regenerate-emoji-lib.md) for t
 
 ## Linting and formatting
 
-```bash
-npm run eslint:check         # ESLint over .ts files (respects .gitignore for excludes)
-npm run eslint:fix           # Auto-fix what ESLint can fix
+Biome is a single tool for both lint and format. One config (`biome.json`), one pass.
 
-npm run prettier:check       # Check formatting on .css/.html/.js/.ts/.json/.md/.yaml/.yml (excludes package.json)
-npm run prettier:fix         # Auto-format
+```bash
+npm run biome:check          # Lint + format check (CI gate) — biome check
+npm run biome:fix            # Auto-fix lint + format — biome check --write
+npm run biome:fix:unsafe     # Same, but also applies "unsafe" fixes (review the diff)
 ```
 
-Prettier intentionally excludes `package.json` from formatting (`'!package.json'`) because reformatting it triggers `npm` to rewrite version pin styles in unhelpful ways.
-
-ESLint uses `--ignore-path .gitignore` so anything gitignored is also lint-ignored (no need for a separate sweep).
+Style enforced by `biome.json`: single quotes, no semicolons, trailing comma `es5`, lineWidth 120. `noConsole` is an error in `src/` only (tests may log freely). `.agents/skills/deepworkplan/` is excluded from formatting.
 
 ### Pre-commit recommendation
 
 Run before every commit:
 
 ```bash
-npm run prettier:fix && npm run eslint:fix && npm test
+npm run biome:fix && npm test
 ```
 
 There's no Husky / pre-commit hook installed — the gate is CI. But running locally avoids "fix lint" loops in PR feedback.
@@ -71,18 +68,20 @@ There's no Husky / pre-commit hook installed — the gate is CI. But running loc
 ## Building
 
 ```bash
-npm run build              # Webpack production: dist/index.js (minified, single file)
-npm run build:dev          # Webpack development: dist/index.js (unminified, source maps)
-npm run build:tsc          # tsc --build → dist/index.d.ts (and a duplicate dist/index.js — Webpack overwrites)
+npm run build              # Vite production bundle + tsc declarations → full dist/
+npm run build:dev          # Vite development bundle (unminified, --mode development)
+npm run build:types        # tsc -p tsconfig.build.json --emitDeclarationOnly → dist/index.d.ts + dist/lib/type.d.ts
+npm run build:tsc          # tsc -p tsconfig.build.json --noEmit (type-check only, no output)
 ```
 
-The webpack-produced `dist/index.js` is the runtime; the tsc-produced `dist/index.d.ts` is the type declaration. Both are needed for npm consumers — the `package.json` `main` and `types` fields point at them.
+`npm run build` chains `vite build && npm run build:types`, so one command produces both the runtime bundle and the type declarations. The Vite-produced `dist/index.js` is the runtime; the tsc-produced `dist/index.d.ts` is the type declaration. Both are needed for npm consumers — the `package.json` `main` and `types` fields point at them.
 
 ```bash
 ls -la dist/
-# dist/index.js          ← Webpack output (consumed at runtime)
+# dist/index.js          ← Vite output (consumed at runtime)
 # dist/index.d.ts        ← tsc output (consumed by TypeScript users)
-# dist/*.map             ← source maps (production = none, dev = inline-ish)
+# dist/lib/type.d.ts     ← re-exported interface types
+# dist/*.map             ← source maps
 ```
 
 `dist/` is gitignored. CI rebuilds it before publishing.
@@ -95,7 +94,7 @@ node -e "console.log(require('./dist/index.js').parse('hello :smile:'))"   # Smo
 
 # Catalog size dominates the bundle
 ls -lh src/lib/emoji-lib.json                      # ~543 KB raw
-ls -lh dist/index.js                                # ~600 KB minified (catalog inlined)
+ls -lh dist/index.js                                # ~403 KB minified (catalog + @twemoji/parser inlined)
 ```
 
 ## Maintenance
@@ -106,13 +105,12 @@ npm run ncu:upgrade                # Apply upgrades to package.json
 npm install                        # Refresh node_modules with the new versions
 
 # After upgrading
-npm run prettier:check             # Sanity check
-npm run eslint:check
+npm run biome:check                # Sanity check (lint + format)
 npm test
 npm run build
 ```
 
-`.ncurc.json` rejects upgrades to `chai` (still on 4.x) and `eslint` (still on 8.x). Lifting either pin is a multi-PR effort — see [Technologies → Pinned exclusions](TECHNOLOGIES.md#pinned-exclusions).
+`.ncurc.json` rejects upgrades to `@twemoji/parser` (pinned to 17.0.1 — 17.0.2 regressed U+FE0F handling). Every other dependency tracks latest. See [Technologies → Pinned exclusions](TECHNOLOGIES.md#pinned-exclusions).
 
 ### Cleaning
 
@@ -120,7 +118,7 @@ npm run build
 rm -rf node_modules dist            # Nuclear option
 npm install                         # Re-bootstrap
 
-# Just dist/ (Webpack does this automatically on production builds via CleanWebpackPlugin)
+# Just dist/ (Vite empties it on each build anyway)
 rm -rf dist/
 ```
 
@@ -173,7 +171,7 @@ These all assume `dist/index.js` exists; run `npm run build` first if not.
    '🚀': { include: ['rocket_ship', 'launch'] },
    ```
 3. Regenerate (see "Running the regenerator" above)
-4. Verify in tests: `npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "rocket_ship"`
+4. Verify in tests: `npx vitest run test/main.test.ts -t "rocket_ship"`
 5. Re-skip the regenerator test
 6. Commit `src/lib/emoji-lib.json` + `prepareEmojiLibJson.test.ts` together
 
@@ -186,7 +184,7 @@ Walkthrough: [`/add-special-case`](../.agents/commands/add-special-case.md).
    import uEmojiParser from '../src/index'
    console.log(uEmojiParser.parse('the input that breaks'))
    ```
-2. `npx ts-node tmp/repro.ts`
+2. `npx tsx tmp/repro.ts`
 3. Once you've isolated it, add a test in `test/main.test.ts` that asserts the _expected_ output, watch it fail
 4. Fix `src/index.ts`
 5. Test passes — commit fix + test together
@@ -203,7 +201,7 @@ Walkthrough: [`/add-special-case`](../.agents/commands/add-special-case.md).
 ### Reset a stuck setup
 
 ```bash
-rm -rf node_modules dist .eslintcache
+rm -rf node_modules dist
 npm install
 npm test
 ```
@@ -221,11 +219,11 @@ When working inside the VS Code Dev Container (or `docker compose up uemojiparse
 
 ```bash
 help                # Reprint the welcome banner
-check               # → npm run eslint:check && npm run prettier:check
-fix                 # → npm run eslint:fix && npm run prettier:fix
+check               # → npm run biome:check
+fix                 # → npm run biome:fix
 test                # → npm run test
-build               # → npm run build:tsc && npm run build
-codecheck           # → check + test + build (full local gate)
+build               # → npm run build
+codecheck           # → biome + build + test (full local gate)
 install             # → npm install
 check_devcontainer  # Verify you are inside the dev container
 
@@ -247,7 +245,7 @@ The CI pipeline (`.github/workflows/code_check.yml`) runs on every PR:
 
 ```
 setup
-  ├── validate_linters_and_code_format    (npm run eslint:check + prettier:check)
+  ├── validate_linters_and_code_format    (npm run biome:check)
   └── tests                                (npm run test)
 ```
 
@@ -257,29 +255,28 @@ For local CI parity:
 
 ```bash
 npm install
-npm run eslint:check
-npm run prettier:check
+npm run biome:check
 npm test
 npm run build
 ```
 
-If all four pass locally, the PR will pass CI (modulo Node version drift — CI uses Node 24; ensure your local Node satisfies `engines.node` ≥ 20.19).
+If all three pass locally, the PR will pass CI (modulo Node version drift — CI uses Node 24; ensure your local Node satisfies `engines.node` ≥ 22).
 
 ## Reference: every npm script in `package.json`
 
-| Script           | What it runs                                                                                                                    |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `eslint:check`   | `eslint .`                                                                                                                      |
-| `eslint:fix`     | `eslint . --fix`                                                                                                                |
-| `prettier:check` | `prettier -c --ignore-path .gitignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'`                                 |
-| `prettier:fix`   | Same with `--write`                                                                                                             |
-| `test`           | `tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors`                                                 |
-| `test:watch`     | `tsx ./node_modules/mocha/bin/mocha.js -w --watch-extensions ts --watch-files src,test 'test/**/*.ts' --timeout 25000 --colors` |
-| `release`        | `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"`                                                           |
-| `start`          | `node dist/index.js` (rare — this package is a library, not an app)                                                             |
-| `dev`            | `nodemon src/index.ts`                                                                                                          |
-| `build`          | `webpack --mode production --progress`                                                                                          |
-| `build:dev`      | `webpack --mode development --progress`                                                                                         |
-| `build:tsc`      | `tsc --build tsconfig.build.json`                                                                                               |
-| `ncu:check`      | `ncu`                                                                                                                           |
-| `ncu:upgrade`    | `ncu -u`                                                                                                                        |
+| Script             | What it runs                                                          |
+| ------------------ | -------------------------------------------------------------------- |
+| `biome:check`      | `biome check` (lint + format check — CI gate)                        |
+| `biome:fix`        | `biome check --write` (auto-fix lint + format)                       |
+| `biome:fix:unsafe` | `biome check --write --unsafe` (also applies unsafe fixes)          |
+| `test`             | `vitest run`                                                         |
+| `test:watch`       | `vitest` (watch mode)                                                |
+| `release`          | `npm version patch -m "[🤖 DailyBot] New release to v%s launched 🚀"` |
+| `start`            | `node dist/index.js` (rare — this package is a library, not an app)  |
+| `dev`              | `nodemon --exec tsx src/index.ts`                                    |
+| `build`            | `vite build && npm run build:types`                                  |
+| `build:dev`        | `vite build --mode development`                                      |
+| `build:types`      | `tsc -p tsconfig.build.json --emitDeclarationOnly`                   |
+| `build:tsc`        | `tsc -p tsconfig.build.json --noEmit` (type-check only)             |
+| `ncu:check`        | `ncu`                                                                |
+| `ncu:upgrade`      | `ncu -u`                                                             |

@@ -1,6 +1,7 @@
-import { existsSync, readFileSync, statSync, readdirSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { join, resolve } from 'node:path'
-import { expect } from 'chai'
+import { beforeAll, describe, expect, it } from 'vitest'
 import uEmojiParser, { DEFAULT_EMOJI_CDN, emojiLibJsonData } from '../src/index'
 
 const EXPECTED_METHODS: ReadonlyArray<keyof typeof uEmojiParser> = [
@@ -29,26 +30,42 @@ function newestMtimeUnder(dir: string): number {
   return newest
 }
 
+// The built-bundle suite needs an up-to-date dist/index.js. Compute staleness up front
+// and skip the suite (with a hint) when dist/ is missing or older than src/, so
+// `npm test` never fails spuriously before a build.
+function bundleSkipReason(): string | null {
+  if (!existsSync(distPath)) return 'dist/index.js not built — run `npm run build`'
+  if (statSync(distPath).mtimeMs < newestMtimeUnder(resolve(repoRoot, 'src'))) {
+    return 'dist/index.js is older than src/ — run `npm run build`'
+  }
+  return null
+}
+
+const skipReason = bundleSkipReason()
+if (skipReason) {
+  console.log(`       (skipping bundle suite: ${skipReason})`)
+}
+
 describe('Public exports surface', () => {
   describe('Source (src/index.ts)', () => {
     it('exposes the documented methods on the default export', () => {
       for (const method of EXPECTED_METHODS) {
-        expect(uEmojiParser[method], `default.${method}`).to.be.a('function')
+        expect(uEmojiParser[method], `default.${method}`).toBeTypeOf('function')
       }
     })
 
     it('exposes DEFAULT_EMOJI_CDN as a non-empty string', () => {
-      expect(DEFAULT_EMOJI_CDN).to.be.a('string')
-      expect(DEFAULT_EMOJI_CDN.length).to.be.greaterThan(0)
+      expect(DEFAULT_EMOJI_CDN).toBeTypeOf('string')
+      expect(DEFAULT_EMOJI_CDN.length).toBeGreaterThan(0)
     })
 
     it('exposes emojiLibJsonData with the curated catalog', () => {
-      expect(emojiLibJsonData).to.be.an('object')
-      expect(Object.keys(emojiLibJsonData).length).to.be.greaterThan(1500)
+      expect(emojiLibJsonData).toBeTypeOf('object')
+      expect(Object.keys(emojiLibJsonData).length).toBeGreaterThan(1500)
     })
 
     /**
-     * Webpack's `commonjs2` output assigns `module.exports = uEmojiParser`, which wipes the
+     * Vite's library `commonjs` output assigns `module.exports = uEmojiParser`, which wipes the
      * named exports. Every `export const` in src/index.ts must therefore be reattached on
      * `module.exports` manually, or it will arrive as `undefined` to `require()` consumers
      * (and `import`'s named-export interop will also fail in Node ESM).
@@ -66,50 +83,41 @@ describe('Public exports surface', () => {
         missing,
         `These named exports must be reattached at the bottom of src/index.ts:\n` +
           missing.map((name) => `  module.exports.${name} = ${name}`).join('\n')
-      ).to.deep.equal([])
+      ).toEqual([])
     })
   })
 
-  describe('Built bundle (dist/index.js, CommonJS consumer shape)', () => {
-    let dist: Record<string, unknown> | null = null
-
-    before(function () {
-      if (!existsSync(distPath)) {
-        // eslint-disable-next-line no-console
-        console.log('       (skipping bundle suite: dist/index.js not built — run `npm run build`)')
-        this.skip()
-      }
-      const distMtime = statSync(distPath).mtimeMs
-      const newestSrcMtime = newestMtimeUnder(resolve(repoRoot, 'src'))
-      if (distMtime < newestSrcMtime) {
-        // eslint-disable-next-line no-console
-        console.log('       (skipping bundle suite: dist/index.js is older than src/ — run `npm run build`)')
-        this.skip()
-      }
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
+  describe.skipIf(skipReason !== null)('Built bundle (dist/index.js, CommonJS consumer shape)', () => {
+    // `require(distPath)` MUST run inside a hook, not at describe-collection time.
+    // The describe callback executes when Vitest collects tests, even when `skipIf`
+    // marks the inner tests as skipped — so loading `dist/` here would throw
+    // `MODULE_NOT_FOUND` in CI (where the suite runs before the build job).
+    let dist: Record<string, unknown>
+    beforeAll(() => {
+      const require = createRequire(import.meta.url)
       dist = require(distPath) as Record<string, unknown>
     })
 
     it('reattaches DEFAULT_EMOJI_CDN onto module.exports for require() consumers', () => {
-      expect(dist).to.have.property('DEFAULT_EMOJI_CDN').that.is.a('string')
-      expect((dist!.DEFAULT_EMOJI_CDN as string).length).to.be.greaterThan(0)
-      expect(dist!.DEFAULT_EMOJI_CDN).to.equal(DEFAULT_EMOJI_CDN)
+      expect(dist.DEFAULT_EMOJI_CDN).toBeTypeOf('string')
+      expect((dist.DEFAULT_EMOJI_CDN as string).length).toBeGreaterThan(0)
+      expect(dist.DEFAULT_EMOJI_CDN).toBe(DEFAULT_EMOJI_CDN)
     })
 
     it('reattaches emojiLibJsonData onto module.exports for require() consumers', () => {
-      expect(dist).to.have.property('emojiLibJsonData').that.is.an('object')
-      expect(Object.keys(dist!.emojiLibJsonData as object).length).to.equal(Object.keys(emojiLibJsonData).length)
+      expect(dist.emojiLibJsonData).toBeTypeOf('object')
+      expect(Object.keys(dist.emojiLibJsonData as object).length).toBe(Object.keys(emojiLibJsonData).length)
     })
 
     it('exposes all documented methods via require()', () => {
       for (const method of EXPECTED_METHODS) {
-        expect(dist![method], `require()['${method}']`).to.be.a('function')
+        expect(dist[method], `require()['${method}']`).toBeTypeOf('function')
       }
     })
 
     it('parse() works through the require() entry point', () => {
       const html = (dist as { parse: (text: string) => string }).parse(':rocket:')
-      expect(html).to.match(/<img class="emoji" alt="🚀" src="https:\/\/.+1f680\.svg"\/>/)
+      expect(html).toMatch(/<img class="emoji" alt="🚀" src="https:\/\/.+1f680\.svg"\/>/)
     })
   })
 })

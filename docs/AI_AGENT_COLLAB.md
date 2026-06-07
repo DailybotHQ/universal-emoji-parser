@@ -24,9 +24,9 @@ The repo defines specialized subagents (see [`.agents/agents/`](../.agents/agent
 | -------------------- | --------------------------------------------------------------- | ---------------------------------- |
 | `parser-architect`   | Public API shape, source-file placement, dual-export discipline | Routine bug fixes                  |
 | `emoji-data-curator` | The catalog, `EMOJIS_SPECIAL_CASES`, regeneration pipeline      | Code that doesn't touch emoji data |
-| `test-author`        | Mocha/Chai specs, regression tests, regenerator handling        | Production code                    |
+| `test-author`        | Vitest specs, regression tests, regenerator handling            | Production code                    |
 | `dependency-auditor` | `package.json` changes, `.ncurc.json`, license/CVE checks       | Application logic                  |
-| `release-engineer`   | Webpack config, GitHub Actions, npm publish, GitHub releases    | Day-to-day feature work            |
+| `release-engineer`   | Vite config, GitHub Actions, npm publish, GitHub releases       | Day-to-day feature work            |
 | `doc-writer`         | Keeping `AGENTS.md`, `docs/`, and `README.md` synchronized      | Code changes                       |
 
 ## Skill / command invocation
@@ -96,7 +96,7 @@ If your host supports memory (Claude Code does, Cursor does, others vary):
 When taking work from another agent:
 
 - Read the diff, don't trust the summary
-- Re-run the full pre-commit checklist on your machine (`npm run eslint:check && npm run prettier:check && npm test && npm run build`)
+- Re-run the full pre-commit checklist on your machine (`npm run biome:check && npm test && npm run build`)
 - If tests fail, the work isn't done — even if the previous agent claimed otherwise
 
 ## Updating these rules

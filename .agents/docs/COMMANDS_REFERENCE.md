@@ -9,8 +9,8 @@
 | ----------------------- | ----------------------------------------------------------------------------------- |
 | `/regenerate-emoji-lib` | Regenerate `src/lib/emoji-lib.json` from upstream `emojilib` + `unicode-emoji-json` |
 | `/add-special-case`     | Add a keyword include/exclude override to `EMOJIS_SPECIAL_CASES`                    |
-| `/write-tests`          | Author Mocha + Chai tests for a parsing bug or new feature                          |
-| `/fix-build`            | Diagnose a failing TypeScript / Webpack / Mocha build                               |
+| `/write-tests`          | Author Vitest tests for a parsing bug or new feature                                |
+| `/fix-build`            | Diagnose a failing TypeScript / Vite / Vitest build                                 |
 | `/bump-deps`            | Update one or more npm dependencies safely (respects `.ncurc.json`)                 |
 | `/release-npm`          | Walk through a manual release if CI is unavailable                                  |
 | `/check-html-output`    | Verify the HTML output contract for a given input                                   |

@@ -6,27 +6,26 @@ A complete inventory of every tool, library, and configuration shipped with Univ
 
 | Tool       | Version                        | Role                                                                                                   |
 | ---------- | ------------------------------ | ------------------------------------------------------------------------------------------------------ |
-| TypeScript | **6.0.3**                      | Source language, compiles to JS via `ts-loader` (Webpack) or `tsc` (`build:tsc`)                       |
-| Node.js    | **≥ 20.19.0** (`engines.node`) | Runtime for tests, build, CI; CI and the dev container use **Node 24**                                 |
-| Webpack    | **5.106.2**                    | Production bundler, single-entry, `commonjs2` output                                                   |
-| Mocha      | **11.7.5**                     | Test runner — launched via **tsx** so `.ts` specs load with Chai 6 (ESM)                               |
-| Chai       | **6.2.2**                      | Assertion library (ESM package; tests use `tsx` + Mocha, not plain `ts-node/register`)                 |
-| ESLint     | **10.3.0**                     | Linter — **flat config** in `eslint.config.mjs` with `typescript-eslint`                               |
-| Prettier   | **3.8.3**                      | Formatter (also wired into ESLint via `eslint-plugin-prettier`)                                        |
-| tsx        | **4.21.0**                     | Runs Mocha against `.ts` specs in an ESM-aware pipeline                                                |
-| ts-node    | **10.9.2**                     | Still used for ad-hoc `npx ts-node` repro snippets / agent commands                                    |
-| nodemon    | **3.1.14**                     | Watcher behind `npm run dev`                                                                           |
+| TypeScript | **6.0.3**                      | Source language; compiled by Vite/esbuild at bundle time and by `tsc` for `.d.ts` (`build:types`)      |
+| Node.js    | **≥ 22.0.0** (`engines.node`) | Runtime for tests, build, CI; CI and the dev container use **Node 24**                                 |
+| Vite       | **8.0.16**                     | Production bundler — **library mode**, single-entry, CommonJS output, esbuild minify                   |
+| Vitest     | **4.x**                        | Test runner — runs `.ts` specs directly (ESM-native, esbuild-powered, no separate compile step)        |
+| Biome      | **2.4.16**                     | Single tool for both lint and format — one config (`biome.json`)                                       |
+| tsx        | **4.22.4**                     | Runs `.ts` entrypoints directly (`npm run dev`, ad-hoc repro snippets)                                 |
+| nodemon    | **3.1.14**                     | Watcher behind `npm run dev` (`nodemon --exec tsx`)                                                    |
 | npm        | (Node-bundled)                 | Package manager — `package-lock.json` is excluded by `.gitignore` (CI relies on cached `node_modules`) |
 
 ## Runtime dependencies
 
-The package's `dependencies` (what every consumer pulls in transitively):
+The package has **zero runtime dependencies**. `package.json` declares no `dependencies` block at all.
 
-| Library           | Version    | Role                                                                                 |
-| ----------------- | ---------- | ------------------------------------------------------------------------------------ |
-| `@twemoji/parser` | **17.0.1** | Finds emoji entities in text and produces Twemoji CDN URLs. The **only** runtime dep |
+`@twemoji/parser` (the emoji-entity finder + CDN URL producer) is **inlined into the bundle** at build time by Vite, so it ships as part of `dist/index.js` rather than as a transitive install. It therefore lives in `devDependencies` (pinned to **17.0.1** — see [Pinned exclusions](#pinned-exclusions)), not in `dependencies`.
 
-That's it. Adding another runtime dependency is a major decision — every byte ships to consumer bundles. If a feature can be implemented without a new dep, do that.
+| Library           | Version    | Role                                                                              |
+| ----------------- | ---------- | -------------------------------------------------------------------------------- |
+| `@twemoji/parser` | **17.0.1** | Finds emoji entities in text and produces Twemoji CDN URLs. **Inlined** by Vite — no runtime dep |
+
+Keep it this way. Adding a real runtime dependency (or marking one `external` so it stops being inlined) is a major decision — every byte ships to consumer bundles, and zero-runtime-deps is a headline property of this package. If a feature can be implemented without a new dep, do that.
 
 ## Build/test/dev dependencies
 
@@ -45,28 +44,31 @@ Neither is imported by `src/index.ts`. They are merged into `src/lib/emoji-lib.j
 
 | Library        | Version     | Role                                                            |
 | -------------- | ----------- | --------------------------------------------------------------- |
-| `@types/chai`  | **5.2.3**   | Chai type defs — Chai 6 types are re-exported from this package |
-| `@types/mocha` | **10.0.10** | Mocha types                                                     |
-| `@types/node`  | **25.6.0**  | Node types — used to type `fs` in the regenerator               |
+| `@types/node` | **25.9.2** | Node types — used to type `fs` in the regenerator |
 
 ### Linting / formatting
 
-| Library                  | Version    | Role                                                                         |
-| ------------------------ | ---------- | ---------------------------------------------------------------------------- |
-| `@eslint/js`             | **10.0.1** | Core ESLint recommended preset for flat config                               |
-| `typescript-eslint`      | **8.59.1** | Meta-package: `@typescript-eslint/parser` + `eslint-plugin` + shared configs |
-| `eslint-plugin-prettier` | **5.5.5**  | Run Prettier as an ESLint rule                                               |
-| `eslint-config-prettier` | **10.1.8** | Disables ESLint rules that fight Prettier                                    |
+| Library          | Version     | Role                                                              |
+| ---------------- | ----------- | ---------------------------------------------------------------- |
+| `@biomejs/biome` | **2.4.16**  | Single tool for lint **and** format                              |
 
-### Webpack
+Biome is configured by one file, `biome.json`, and covers both lint and format in a single fast pass.
 
-| Library                 | Version     | Role                                                                                 |
-| ----------------------- | ----------- | ------------------------------------------------------------------------------------ |
-| `webpack`               | **5.106.2** | Bundler                                                                              |
-| `webpack-cli`           | **7.0.2**   | CLI                                                                                  |
-| `ts-loader`             | **9.5.7**   | Compile `.ts` during bundling (`tsconfig.build.json`)                                |
-| `clean-webpack-plugin`  | **4.0.0**   | Wipe `dist/` on production builds                                                    |
-| `eslint-webpack-plugin` | **6.0.0**   | Optional ESLint pass during build (declared, not yet wired into `webpack.config.js`) |
+### Bundler
+
+| Library | Version    | Role                                                                  |
+| ------- | ---------- | -------------------------------------------------------------------- |
+| `vite`  | **8.0.16** | Library-mode bundler — single entry, CommonJS output, esbuild minify |
+
+Vite compiles `src/index.ts` via esbuild and inlines `@twemoji/parser`. Vite empties `dist/` on each build (no extra plugins needed). `.d.ts` files are emitted separately by `tsc` (`build:types`).
+
+### Testing
+
+| Library  | Version  | Role                                                                          |
+| -------- | -------- | ---------------------------------------------------------------------------- |
+| `vitest` | **4.x**  | Test runner — runs `.ts` specs directly (ESM-native, esbuild, no compile step) |
+
+Specs import `{ describe, it, expect } from 'vitest'` and use the `expect().toBe()` / `.toEqual()` family. The runner is configured by `vitest.config.ts`.
 
 ### Maintenance
 
@@ -79,27 +81,30 @@ Neither is imported by `src/index.ts`. They are merged into `src/lib/emoji-lib.j
 ```json
 {
   "upgrade": true,
-  "reject": []
+  "reject": ["@twemoji/parser"]
 }
 ```
 
-Add package names to `reject` only when an upgrade needs deliberate follow-up work (breaking migrations, ecosystem lag). There are **no** permanent repo-wide pins today.
+### Pinned exclusions
+
+`@twemoji/parser` is pinned to **17.0.1** via the `reject` list. Version **17.0.2 regressed U+FE0F (variation selector) handling**, breaking emoji that depend on the VS-16 modifier. Until upstream fixes it, `ncu:upgrade` must not bump this package — lifting the pin requires verifying every VS-16 case still parses.
+
+Every other dependency tracks **latest**. Add a name to `reject` only when an upgrade needs deliberate follow-up work (breaking migrations, ecosystem lag, upstream regressions like this one).
 
 ## Configuration files
 
-| File                  | Purpose                                                                                                                                                                                        |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `package.json`        | Scripts, deps, engines, version, repository metadata                                                                                                                                           |
-| `tsconfig.json`       | TS compiler config — strict, includes `src/**/*` and `test/**/*`, loads `@types/mocha` for specs                                                                                               |
-| `tsconfig.build.json` | `tsc --build` + `ts-loader`: emit declarations/JS from `src/` only (`rootDir: ./src`)                                                                                                          |
-| `webpack.config.js`   | Bundler — single entry, `commonjs2`, `ts-loader` → `tsconfig.build.json`, prod-only `CleanWebpackPlugin`                                                                                       |
-| `eslint.config.mjs`   | ESLint **flat** config — `eslint.configs.recommended` + `typescript-eslint` + `eslint-plugin-prettier/recommended`; ignores `dist/`, `node_modules/`, `tmp/`, …                                |
-| `.prettierrc`         | `semi: false`, `singleQuote: true`, `trailingComma: 'es5'`                                                                                                                                     |
-| `.editorconfig`       | 2-space indent, LF, max 120 cols, trim trailing whitespace                                                                                                                                     |
-| `.babelrc`            | Legacy — `@babel/preset-env` + `transform-runtime` + `transform-modules-commonjs`. **Not used by Webpack or tests**; kept for downstream tools that opt in. Safe to delete in a future cleanup |
-| `.npmignore`          | Trims `src/`, `test/`, configs, etc. from the published tarball — only `dist/`, `package.json`, `README.md`, `LICENSE` ship                                                                    |
-| `.gitignore`          | Excludes `node_modules/`, `dist/`, `.env`, `tmp/*`, `package-lock.json`, `emoji-lib-output.json`, etc.                                                                                         |
-| `.ncurc.json`         | npm-check-updates config — optional per-package `reject` list                                                                                                                                  |
+| File                  | Purpose                                                                                                                                            |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `package.json`        | Scripts, deps, engines, version, repository metadata                                                                                              |
+| `tsconfig.json`       | TS compiler config — strict, includes `src/**/*` and `test/**/*`                                                                                  |
+| `tsconfig.build.json` | `tsc -p ... --emitDeclarationOnly` (and `--noEmit` for `build:tsc`): emit declarations from `src/` only (`rootDir: ./src`)                          |
+| `vite.config.ts`      | Bundler — library mode, CommonJS output, esbuild minify; inlines `@twemoji/parser`, empties `dist/` on build                                       |
+| `vitest.config.ts`    | Test runner config — discovers `test/**/*.test.ts`, ESM-native                                                                                     |
+| `biome.json`          | Biome lint **and** format — single quotes, no semicolons, trailing comma `es5`, lineWidth 120; `noConsole` error in `src/` only; excludes `.agents/skills/deepworkplan/` from formatting |
+| `.editorconfig`       | 2-space indent, LF, max 120 cols, trim trailing whitespace                                                                                        |
+| `.npmignore`          | Trims `src/`, `test/`, configs, etc. from the published tarball — only `dist/`, `package.json`, `README.md`, `LICENSE` ship                        |
+| `.gitignore`          | Excludes `node_modules/`, `dist/`, `.env`, `tmp/*`, `package-lock.json`, `emoji-lib-output.json`, etc.                                            |
+| `.ncurc.json`         | npm-check-updates config — `reject` pins `@twemoji/parser` to 17.0.1                                                                               |
 
 ## CI/CD platform
 
@@ -115,7 +120,7 @@ Workflows:
 
 | File                                       | Trigger                               | Purpose                                          |
 | ------------------------------------------ | ------------------------------------- | ------------------------------------------------ |
-| `code_check.yml`                           | PR opened/sync/reopen → `main`        | Lint + format + test gate                        |
+| `code_check.yml`                           | PR opened/sync/reopen → `main`        | Biome check + test gate                           |
 | `pull_request_check.yml`                   | PR opened/sync/edit → `main`          | Title/body length + size labels                  |
 | `release_and_publish.yml`                  | PR merged to `main`                   | Bump version, build, npm publish, GitHub release |
 | `check_packages_versions.yml`              | Cron `0 15 * * 2` (Tue 15:00 UTC)     | Open auto-PR with `ncu:upgrade` results          |
@@ -129,11 +134,11 @@ Notifications go to a DailyBot Slack-like channel via `https://api.dailybot.com/
 
 `.devcontainer/devcontainer.json` points at `docker/local/docker-compose.yaml`, which builds `docker/local/uemojiparser/Dockerfile`:
 
-- Base: **`node:24-trixie-slim`** (floating patch on Node 24 LTS)
+- Base: **`node:24.16.0-trixie-slim`** (pinned patch on Node 24 LTS — CI uses the same exact version for deterministic builds)
 - System packages: `git`, `curl`, `gh` (GitHub CLI), `chromium` (for Lighthouse audits — declared, not wired)
 - AI CLIs pre-installed for `node` user: **Claude Code**, **Codex**, **Cursor**
 - Persistent volumes for each AI CLI's auth/data so re-builds don't lose sessions
-- Custom shell helpers (`docker/custom_commands.sh`) added to `~/.bashrc`: `check`, `fix`, `test`, `build`, `codecheck`, `install`, `claudex`, `codexx`, `cursorx` (full-permission wrappers), plus git aliases (`gs`, `ga`, `gc`, `gp`, etc.)
+- Custom shell helpers (`docker/custom_commands.sh`) added to `~/.bashrc`: `check` (→ `npm run biome:check`), `fix` (→ `npm run biome:fix`), `test`, `build`, `codecheck` (biome + build + test), `install`, `claudex`, `codexx`, `cursorx` (full-permission wrappers), plus git aliases (`gs`, `ga`, `gc`, `gp`, etc.)
 
 VS Code Dev Containers users get this out of the box. Manual users can `cd docker/local && docker compose up -d uemojiparservscode` and `docker exec -it uemojiparser bash`.
 
@@ -152,9 +157,9 @@ If you find yourself wanting any of the above, either build it as a separate pac
 
 ## Upgrading dependencies
 
-1. **Routine bumps:** `npm run ncu:check` shows what's available; `npm run ncu:upgrade` applies them; `npm install` to refresh `node_modules`. The CI workflow `check_packages_versions.yml` does this automatically every Tuesday and opens a PR.
-2. **One library at a time** when something might break (Webpack majors, TypeScript majors). Multi-bumps mask the breaking change.
-3. **Bump `@twemoji/parser` alone** when Twemoji adds new emojis or moves CDN URL format — the package picks up new emojis transparently.
+1. **Routine bumps:** `npm run ncu:check` shows what's available; `npm run ncu:upgrade` applies them (it skips the `@twemoji/parser` pin via `.ncurc.json`); `npm install` to refresh `node_modules`. The CI workflow `check_packages_versions.yml` does this automatically every Tuesday and opens a PR.
+2. **One library at a time** when something might break (Vite majors, TypeScript majors). Multi-bumps mask the breaking change.
+3. **`@twemoji/parser` is pinned to 17.0.1** — do not bump it until the 17.0.2 U+FE0F regression is resolved upstream (see [Pinned exclusions](#pinned-exclusions)). When you do lift the pin, re-run every VS-16 parsing test before merging.
 4. **Major TypeScript bumps** can change `.d.ts` shape; verify consumers' projects still type-check by running `npm pack` and installing the tarball locally.
 5. **Major Node bumps** are rare — only update `engines.node` when a new Node feature is needed and the dev container / CI Node line supports it (see `actions/setup-node` + `docker/local/uemojiparser/Dockerfile`).
 
@@ -162,4 +167,4 @@ Walk through **[`/bump-deps`](../.agents/commands/bump-deps.md)** for a structur
 
 ## Version stamp
 
-Current package version: see `package.json` `"version"` (last seen: 2.0.79). Major version 2 was the migration to Twemoji v17. Patch versions are released automatically on every PR merge.
+Current package version: see `package.json` `"version"` (last seen: 2.1.7). Major version 2 was the migration to Twemoji v17. Patch versions are released automatically on every PR merge.

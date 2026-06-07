@@ -1,20 +1,20 @@
-import { expect } from 'chai'
+import { describe, expect, it } from 'vitest'
 import { emojiLibJsonData } from '../src/index'
-import { EmojiType } from '../src/lib/type'
+import type { EmojiType } from '../src/lib/type'
 
 describe('Test emoji lib json data', () => {
   describe('Validate json data', () => {
     it('should contains emojis objects metadata', () => {
       // (1) Check emojiLibJsonData keys
       const emojiLibJsonDataKeys: Array<string> = Object.keys(emojiLibJsonData)
-      expect(emojiLibJsonDataKeys).to.be.an('array')
+      expect(Array.isArray(emojiLibJsonDataKeys)).toBe(true)
       const TOTAL_EMOJIS: number = 1914
-      expect(emojiLibJsonDataKeys.length).to.be.equal(TOTAL_EMOJIS)
+      expect(emojiLibJsonDataKeys.length).toBe(TOTAL_EMOJIS)
 
       // (2) Check emojiLibJsonData values
       let emojiObjectValue: EmojiType = emojiLibJsonData['🤣']
-      expect(emojiObjectValue).to.be.an('object')
-      expect(emojiObjectValue).to.be.deep.equal({
+      expect(emojiObjectValue).toBeTypeOf('object')
+      expect(emojiObjectValue).toEqual({
         name: 'rolling on the floor laughing',
         slug: 'rolling_on_the_floor_laughing',
         group: 'Smileys & Emotion',
@@ -27,8 +27,8 @@ describe('Test emoji lib json data', () => {
 
       // (3) Check emojiLibJsonData values
       emojiObjectValue = emojiLibJsonData['😎']
-      expect(emojiObjectValue).to.be.an('object')
-      expect(emojiObjectValue).to.be.deep.equal({
+      expect(emojiObjectValue).toBeTypeOf('object')
+      expect(emojiObjectValue).toEqual({
         name: 'smiling face with sunglasses',
         slug: 'smiling_face_with_sunglasses',
         group: 'Smileys & Emotion',

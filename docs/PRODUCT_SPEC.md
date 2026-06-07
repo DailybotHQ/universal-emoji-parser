@@ -44,7 +44,7 @@ consume it** — and the end users they serve:
 - **Content and CMS pipelines** that transform text to HTML and want emoji to
   survive that transformation cleanly.
 - **Both runtimes:** Node.js services (server-side rendering, message
-  processing) and browser apps (it bundles via webpack/rollup/vite), with dual
+  processing) and browser apps (it bundles via Vite/rollup/esbuild), with dual
   CommonJS and ES Module entry points.
 
 ## Why they choose it
@@ -56,7 +56,8 @@ consume it** — and the end users they serve:
 - **Accessibility & copy-paste preserved** — rendered images keep the real
   unicode emoji in their `alt` text.
 - **Drop-in and tiny surface** — a small, stable API (`parse`, `parseToHtml`,
-  `parseToUnicode`, `parseToShortcode`, …) and a single runtime dependency.
+  `parseToUnicode`, `parseToShortcode`, …) and zero runtime dependencies (the
+  Twemoji parser is inlined into the published bundle).
 - **Configurable CDN** — point emoji images at a custom/self-hosted CDN when
   needed.
 

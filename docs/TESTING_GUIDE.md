@@ -1,6 +1,6 @@
 # Testing Guide
 
-How to write and run tests in Universal Emoji Parser. The package uses **Mocha + Chai 6** with **tsx** so specs run as `.ts` directly — no separate compile step (Chai 6 is ESM-first; the test script uses `tsx` + Mocha).
+How to write and run tests in Universal Emoji Parser. The package uses **Vitest** — specs run as `.ts` directly with no separate compile step (Vitest is ESM-native and esbuild-powered). Configuration lives in `vitest.config.ts`.
 
 ## Where tests live
 
@@ -9,7 +9,8 @@ All specs live in `test/*.test.ts`:
 | File                               | Coverage                                                                                                               |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | `test/main.test.ts`                | The public API: `parse`, `parseToHtml`, `parseToUnicode`, `parseToShortcode`, plus error cases and option permutations |
-| `test/emojiLibJson.test.ts`        | Catalog metadata: total count (`TOTAL_EMOJIS = 1906`), shape of `EmojiType` entries, presence of canonical emojis      |
+| `test/emojiLibJson.test.ts`        | Catalog metadata: total count (`TOTAL_EMOJIS = 1914`), shape of `EmojiType` entries, presence of canonical emojis      |
+| `test/exports.test.ts`             | Dual-export contract: static check of `src/index.ts`, plus a `dist/index.js` bundle smoke test via `createRequire` + `describe.skipIf` |
 | `test/prepareEmojiLibJson.test.ts` | The regenerator — `it.skip`-guarded; runs only when explicitly enabled to rebuild `src/lib/emoji-lib.json`             |
 
 There is no separation by source-file ↔ test-file pairing — `main.test.ts` covers everything in `src/index.ts` because the API is small.
@@ -17,20 +18,20 @@ There is no separation by source-file ↔ test-file pairing — `main.test.ts` c
 ## Running tests
 
 ```bash
-npm test                         # Everything
-npm run test:watch               # Re-runs on file change (TDD inner loop)
+npm test                         # Everything (vitest run)
+npm run test:watch               # Re-runs on file change (TDD inner loop — vitest)
 
 # Single file
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --colors
+npx vitest run test/main.test.ts
 
-# Filter by name
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should parse" --colors
+# Filter by name (-t / --testNamePattern)
+npx vitest run test/main.test.ts -t "should parse"
 
 # Single it()
-npx tsx ./node_modules/mocha/bin/mocha.js test/main.test.ts --grep "should throw error with not string parameter" --colors
+npx vitest run test/main.test.ts -t "should throw error with not string parameter"
 ```
 
-Mocha config is inline in the `test` script: `--timeout 25000 --colors`. The 25-second timeout exists for one slow path (the regenerator's O(n²) dedup loop); regular specs finish in milliseconds.
+Vitest is configured in `vitest.config.ts`. Most specs finish in milliseconds; the only slow path is the regenerator's O(n²) dedup loop (and it's `it.skip`-guarded by default).
 
 ## Conventions
 
@@ -77,7 +78,7 @@ it('should parse emojis from shortcode', () => {
   const result: string = uEmojiParser.parse(text)
 
   // Assert — verify the output
-  expect(result).to.be.equal(
+  expect(result).toBe(
     '<img class="emoji" alt="🙂" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@latest/assets/svg/1f642.svg"/>'
   )
 })
@@ -85,42 +86,48 @@ it('should parse emojis from shortcode', () => {
 
 Most existing tests use a single statement style (no comment markers); the explicit AAA blocks above are recommended for new tests where the sections aren't obvious. The existing tests **don't** use blank-line section separators — keep that style for consistency.
 
-## Chai assertion idioms used in this repo
+## Vitest assertion idioms used in this repo
 
 ```ts
-import { expect } from 'chai'
+import { describe, it, expect } from 'vitest'
 
 // Equality (primitives)
-expect(result).to.be.equal('expected')
-expect(count).to.be.equal(1906)
+expect(result).toBe('expected')
+expect(count).toBe(1914)
 
 // Deep equality (objects, arrays)
-expect(emojiObject).to.be.deep.equal({ name: '...', slug: '...', ... })
+expect(emojiObject).toEqual({ name: '...', slug: '...', ... })
 
 // Type checks
-expect(arr).to.be.an('array')
-expect(obj).to.be.an('object')
-expect(str).to.be.a('string')
+expect(arr).toBeTypeOf('object')        // arrays are typeof 'object'
+expect(str).toBeTypeOf('string')
+expect(Array.isArray(arr)).toBe(true)   // when you specifically need "is an array"
 
 // Length
-expect(emojiLibJsonDataKeys.length).to.be.equal(TOTAL_EMOJIS)
+expect(emojiLibJsonDataKeys.length).toBe(TOTAL_EMOJIS)
+
+// Numeric comparisons
+expect(count).toBeGreaterThan(0)
 
 // Throws
-expect(() => { uEmojiParser.parse(text) }).to.throw(Error)
+expect(() => { uEmojiParser.parse(text) }).toThrow(Error)
+
+// Substring / pattern
+expect(result).toMatch('alt="⭐️"')
 
 // File system existence
-expect(fs.existsSync(filePath)).to.be.true     // requires // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+expect(fs.existsSync(filePath)).toBe(true)
 ```
 
-> **Note**: Chai's `expect(x).to.be.true` style is a "no-op expression" by ESLint rules. Suppress with `// eslint-disable-next-line @typescript-eslint/no-unused-expressions` immediately above the line.
+`expect(x).toBe(true)` is a normal call expression, so no special lint suppression is needed for boolean assertions.
 
 ## Catalog tests (`emojiLibJson.test.ts`)
 
 This file validates the curated catalog. Every assertion is **deterministic** — the catalog is committed JSON, so the count and entries are exact:
 
 ```ts
-const TOTAL_EMOJIS: number = 1906
-expect(emojiLibJsonDataKeys.length).to.be.equal(TOTAL_EMOJIS)
+const TOTAL_EMOJIS: number = 1914
+expect(emojiLibJsonDataKeys.length).toBe(TOTAL_EMOJIS)
 ```
 
 If you regenerate the catalog and the count changes, **update `TOTAL_EMOJIS`** in this file as part of the same commit. The PR diff makes the count change reviewable.
@@ -178,7 +185,7 @@ When fixing a parsing bug:
    it('should parse :star: even with VS-16 (regression #123)', () => {
      const text: string = ':star:️' // note the trailing variation selector
      const result: string = uEmojiParser.parse(text)
-     expect(result).to.contain('alt="⭐️"')
+     expect(result).toMatch('alt="⭐️"')
    })
    ```
 3. Run `npm run test:watch`; watch the new test fail
@@ -197,37 +204,33 @@ When adding a new snapshot-style assertion, manually run the input through the c
 
 ## Coverage
 
-There is **no coverage tool wired**. To add one (Istanbul / nyc):
+There is **no coverage tool wired**. Vitest has first-class coverage support, so adding it is one dev dependency:
 
 ```bash
-npm install --save-dev nyc
+npm install --save-dev @vitest/coverage-v8
 ```
 
-Update `package.json`:
+Then run with the flag, or wire a script:
+
+```bash
+npx vitest run --coverage
+```
 
 ```json
 {
   "scripts": {
-    "test": "nyc tsx ./node_modules/mocha/bin/mocha.js 'test/**/*.ts' --timeout 25000 --colors",
-    "coverage": "nyc report --reporter=text-summary"
-  },
-  "nyc": {
-    "extension": [".ts"],
-    "include": ["src/**/*.ts"],
-    "exclude": ["**/*.test.ts"],
-    "reporter": ["text", "html"],
-    "all": true
+    "coverage": "vitest run --coverage"
   }
 }
 ```
 
-Then `npm test` produces a coverage report and `coverage/` (add to `.gitignore`). Document the addition in [Technologies](TECHNOLOGIES.md) and update this file.
+Configure includes/excludes under `test.coverage` in `vitest.config.ts`. Coverage output lands in `coverage/` (add to `.gitignore`). Document the addition in [Technologies](TECHNOLOGIES.md) and update this file.
 
 ## Speed tips
 
-- `npm run test:watch` is the fastest loop — sub-second after the initial Mocha startup
-- Filter aggressively with `--grep` when iterating on a single behavior
-- The regenerator test (`prepareEmojiLibJson.test.ts`) is **slow** when un-skipped — O(n²) over 1906 emojis takes ~10 seconds. Don't enable it just to "see what happens"
+- `npm run test:watch` is the fastest loop — sub-second after the initial Vitest startup
+- Filter aggressively with `-t "<name>"` when iterating on a single behavior
+- The regenerator test (`prepareEmojiLibJson.test.ts`) is **slow** when un-skipped — O(n²) over 1914 emojis takes ~10 seconds. Don't enable it just to "see what happens"
 
 ## Mocking
 
@@ -236,10 +239,9 @@ The package has no external services — everything is in-memory data + a synchr
 ## Pre-push checklist
 
 ```bash
-npm run eslint:check
-npm run prettier:check
+npm run biome:check
 npm test
 npm run build
 ```
 
-All four must succeed. CI runs the same set on every PR.
+All three must succeed. CI runs the same set on every PR.

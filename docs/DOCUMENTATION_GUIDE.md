@@ -15,7 +15,7 @@ When and how to update the docs that live in this repo. The goal is to keep `AGE
 | `docs/DEVELOPMENT_COMMANDS.md` | npm script reference                                                                 | A new script is wired or a workflow changes                            |
 | `docs/TESTING_GUIDE.md`        | Test framework, conventions, regenerator workflow                                    | Test framework changes, new test scenario added                        |
 | `docs/RUNTIMES.md`             | Per-runtime notes (Node, browsers, edge)                                             | A new runtime is supported or a runtime-specific gotcha is found       |
-| `docs/BUILD_DEPLOY.md`         | Webpack output, npm publish, CI workflows                                            | Build steps, signing, CI pipeline changes                              |
+| `docs/BUILD_DEPLOY.md`         | Vite output, npm publish, CI workflows                                               | Build steps, signing, CI pipeline changes                              |
 | `docs/EMOJI_PROVIDERS.md`      | Twemoji CDN, dialect support, special-case overrides                                 | A dialect is added, a CDN is swapped, an override changes              |
 | `docs/PERFORMANCE.md`          | Hot paths, bundle size, profiling                                                    | A performance decision is made (caching, lazy-load, bundle split)      |
 | `docs/API_REFERENCE.md`        | Every export, method, type, option                                                   | The public API changes (additions, signatures, defaults)               |
@@ -61,9 +61,9 @@ When and how to update the docs that live in this repo. The goal is to keep `AGE
 
 1. **Lead with the rule.** "All output emojis use `class='emoji'`" — not "We typically use a class attribute…"
 2. **Show one canonical example.** A code snippet that's the answer, not three options
-3. **Explain _why_ when it's non-obvious.** "The `__` prefix means internal — Webpack's `commonjs2` exposes everything, so this is a naming convention, not a hard private"
+3. **Explain _why_ when it's non-obvious.** "The `__` prefix means internal — Vite's CJS library output exposes everything, so this is a naming convention, not a hard private"
 4. **Cross-link.** Mentioning a topic? Link to the dedicated doc instead of duplicating content. Repetition leads to drift
-5. **Date-tag exceptions.** "Until we adopt ESLint 9, we stay on 8.x" — easy to clean up later
+5. **Date-tag exceptions.** "Until U+FE0F handling is fixed upstream, `@twemoji/parser` stays pinned at 17.0.1" — easy to clean up later
 6. **Keep the file under 500 lines.** Past that, split
 
 ## Cross-linking

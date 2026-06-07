@@ -18,9 +18,9 @@ For typical inputs (a chat message with 1–10 emojis), the whole pipeline runs 
 
 ### `parseToShortcode` is the slowest
 
-It builds a single regex from `Object.keys(emojiLibJsonData).join('|')` — a 1906-alternation pattern — and runs `text.matchAll` over it. Two costs:
+It builds a single regex from `Object.keys(emojiLibJsonData).join('|')` — a 1914-alternation pattern — and runs `text.matchAll` over it. Two costs:
 
-1. **RegExp construction** is O(M) and happens **on every call**. With 1906 alternates and the keycap escape, this is the dominant cost for short inputs
+1. **RegExp construction** is O(M) and happens **on every call**. With 1914 alternates and the keycap escape, this is the dominant cost for short inputs
 2. **Matching** is O(N · M) in the worst case (alternation regexes don't backtrack as efficiently as character classes)
 
 If a consumer calls `parseToShortcode` in a hot loop, **the regex construction dominates**. Caching it would help but introduces stateful behavior — currently the package recreates it every call.
@@ -58,16 +58,16 @@ If a consumer benchmarks a real workload and finds these to be the bottleneck, f
 
 ## Bundle size
 
-The package adds ~600 KB minified (~543 KB JSON catalog + ~50 KB code + Twemoji) to consumer bundles. This dominates everything:
+The package adds ~403 KB minified (the catalog dominates; the code + inlined Twemoji parser are small after esbuild minification) to consumer bundles. This dominates everything:
 
 ```bash
-ls -lh dist/index.js                          # ~600 KB minified
+ls -lh dist/index.js                          # ~403 KB minified CJS (Twemoji inlined)
 ls -lh src/lib/emoji-lib.json                  # ~543 KB raw
 ```
 
 ### Why so big?
 
-The catalog has 1906 entries × average ~250 bytes per entry (name, slug, group, version, char, keywords array). Most of the size is keyword arrays and the `name` field.
+The catalog has 1914 entries × average ~250 bytes per entry (name, slug, group, version, char, keywords array). Most of the size is keyword arrays and the `name` field.
 
 ### What we won't drop
 
@@ -93,7 +93,7 @@ async function parseLazy(text: string): Promise<string> {
 }
 ```
 
-Webpack/Vite/Rollup turn this into a code-split chunk — the catalog only ships when first needed. Trade-off: first call awaits a network fetch.
+Vite/rollup/esbuild turn this into a code-split chunk — the catalog only ships when first needed. Trade-off: first call awaits a network fetch.
 
 ### Tree-shaking
 
@@ -138,7 +138,7 @@ When adding a new method or feature:
 - [ ] **No catalog mutation.** `emojiLibJsonData` must remain a reference-stable, deep-frozen-by-convention object
 - [ ] **Cache RegExp where possible.** If a regex doesn't depend on the input, build it once at module init, not per call
 - [ ] **No iteration of the catalog** if a direct lookup will do. `emojiLibJsonData[slug]` is always faster than `Object.keys(...).find(...)`
-- [ ] **No new fields on `EmojiType`** without measuring the bundle-size delta. Each field × 1906 entries × every consumer's bundle adds up
+- [ ] **No new fields on `EmojiType`** without measuring the bundle-size delta. Each field × 1914 entries × every consumer's bundle adds up
 - [ ] **Test with realistic input.** `:smile:` is fine for unit tests; don't optimize for the trivial case at the cost of long inputs
 
 ## Profiling

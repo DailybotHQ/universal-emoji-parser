@@ -10,7 +10,7 @@ By the end of this guide you will be able to:
 - Install dependencies (`npm install`)
 - Run the test suite (`npm test`)
 - Build the production bundle (`npm run build`)
-- Run lint + format checks (`npm run eslint:check`, `npm run prettier:check`)
+- Run lint + format checks (`npm run biome:check`)
 
 > Already set up? Skip to [Running Tests](RUNNING_TESTS.md).
 > Hit a problem? Check [Troubleshooting](TROUBLESHOOTING.md).
@@ -21,7 +21,7 @@ By the end of this guide you will be able to:
 
 ### 1. Install Node.js
 
-The package requires **Node.js ≥ 20.19.0**. CI runs on **Node 24**. Use Active LTS, Current, or the same major as CI.
+The package requires **Node.js ≥ 22.0.0**. CI runs on **Node 24**. Use Active LTS, Current, or the same major as CI.
 
 #### macOS / Linux (recommended: nvm)
 
@@ -49,7 +49,7 @@ Use [nvm-windows](https://github.com/coreybutler/nvm-windows) or download the in
 ### 2. Verify
 
 ```bash
-node --version       # should report v24.x (or any v20.19+)
+node --version       # should report v24.x (or any v22+)
 npm --version        # comes with Node; should be 10.x+
 ```
 
@@ -66,12 +66,12 @@ cd universal-emoji-parser
 npm install
 ```
 
-First install takes ~30 seconds and pulls in:
+First install takes ~30 seconds and pulls in (all devDependencies — the published package has **zero runtime dependencies**, since `@twemoji/parser` is inlined into the bundle at build time):
 
-- `@twemoji/parser` (runtime)
-- TypeScript, Mocha, Chai, tsx (test runner), ts-node (ad-hoc scripts)
-- Webpack, ts-loader (build)
-- ESLint + Prettier + plugins (lint/format)
+- `@twemoji/parser` (inlined into `dist/index.js` at build; pinned to `17.0.1`)
+- TypeScript, Vitest (test runner + `vite-node` for ad-hoc scripts)
+- Vite (build), `tsc` (declaration emit)
+- Biome (lint + format)
 - `emojilib`, `unicode-emoji-json`, `@types/*` (regenerator + types)
 
 ### 5. Smoke test
@@ -86,15 +86,15 @@ Expected: ~5 seconds, all green. If it fails, see [Troubleshooting](TROUBLESHOOT
 npm run build
 ```
 
-Expected: `dist/index.js` created (~600 KB).
+Expected: `dist/index.js` created (~403 KB minified CJS, with `@twemoji/parser` inlined).
 
 ### 6. Optional: editor integration
 
-The repo ships `.editorconfig`, `eslint.config.mjs`, `.prettierrc`. Most editors auto-detect:
+The repo ships `.editorconfig` and `biome.json`. Most editors auto-detect:
 
-- **VS Code** — install the recommended extensions (see `.devcontainer/devcontainer.json` `customizations.vscode.extensions` for the list — same list applies to native VS Code)
-- **WebStorm / IntelliJ** — File → Settings → Languages → JavaScript → Code Quality Tools → ESLint and Prettier; point at the project's `eslint.config.mjs` and `.prettierrc`
-- **Vim / Neovim** — `coc-eslint` + `coc-prettier`, or LSP equivalents
+- **VS Code** — install the recommended extensions (see `.devcontainer/devcontainer.json` `customizations.vscode.extensions` for the list — same list applies to native VS Code); the Biome extension handles both lint and format
+- **WebStorm / IntelliJ** — install the Biome plugin and point it at the project's `biome.json`
+- **Vim / Neovim** — Biome's LSP (`biome lsp-proxy`) via your LSP client
 
 ---
 
@@ -188,11 +188,11 @@ The container's `~/.bashrc` sources `docker/custom_commands.sh`, which provides:
 | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
 | `help`                                                                                  | Reprint the welcome banner                                               |
 | `check_devcontainer`                                                                    | Print whether you are running inside Docker / Dev Containers             |
-| `check`                                                                                 | `npm run eslint:check` + `npm run prettier:check`                        |
-| `fix`                                                                                   | `npm run eslint:fix` + `npm run prettier:fix`                            |
+| `check`                                                                                 | `npm run biome:check`                                                    |
+| `fix`                                                                                   | `npm run biome:fix`                                                      |
 | `test`                                                                                  | `npm test`                                                               |
-| `build`                                                                                 | `npm run build:tsc` + `npm run build`                                    |
-| `codecheck`                                                                             | `check`, then `test`, then `build` (full local gate)                     |
+| `build`                                                                                 | `npm run build`                                                          |
+| `codecheck`                                                                             | `check`, then `build`, then `test` (full local gate)                     |
 | `install`                                                                               | `npm install`                                                            |
 | `claudex`                                                                               | `claude --dangerously-skip-permissions` (full-permission Claude session) |
 | `claudex -c`                                                                            | Continue last Claude session                                             |
@@ -242,14 +242,13 @@ docker compose down --volumes
 Run these and confirm each succeeds before moving on:
 
 ```bash
-node --version                       # ≥ 20.16.0
+node --version                       # ≥ 22.0.0
 npm --version                        # ≥ 10
 npm install                          # No errors
-npm run eslint:check                 # No lint errors
-npm run prettier:check               # No format errors
+npm run biome:check                  # No lint or format errors
 npm test                             # All specs pass
 npm run build                        # dist/index.js created
-ls -lh dist/index.js                 # ~600 KB
+ls -lh dist/index.js                 # ~403 KB
 ```
 
 If everything passes, you're ready to [run the test suite](RUNNING_TESTS.md) or start coding.

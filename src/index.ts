@@ -1,6 +1,6 @@
-import { EmojiLibJsonType, EmojiParseOptionsType, EmojiType, TwemojiEntity, UEmojiParserType } from './lib/type'
-import emojiLibJson from './lib/emoji-lib.json'
 import { parse } from '@twemoji/parser'
+import emojiLibJson from './lib/emoji-lib.json'
+import type { EmojiLibJsonType, EmojiParseOptionsType, EmojiType, TwemojiEntity, UEmojiParserType } from './lib/type'
 
 /**
  * Constances
@@ -130,7 +130,16 @@ const uEmojiParser: UEmojiParserType = {
 
 export default uEmojiParser
 
-// Exporting for CommonJS modules (require)
-module.exports = uEmojiParser
-module.exports.emojiLibJsonData = emojiLibJsonData
-module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
+// CommonJS interop. In the published CJS bundle (Vite library build) this makes
+// `require('universal-emoji-parser')` return the parser itself and reattaches the named
+// exports, so `require(...).parse(...)`, `.emojiLibJsonData` and `.DEFAULT_EMOJI_CDN` all
+// work. Wrapped in try/catch because under a pure-ESM transform (e.g. Vitest importing
+// this .ts directly) `module.exports` is a read-only namespace — there the ESM `export
+// default` + named exports above already cover consumers, so the throw is safely ignored.
+try {
+  module.exports = uEmojiParser
+  module.exports.emojiLibJsonData = emojiLibJsonData
+  module.exports.DEFAULT_EMOJI_CDN = DEFAULT_EMOJI_CDN
+} catch {
+  /* ESM context (no writable module.exports) — named/default ESM exports apply. */
+}

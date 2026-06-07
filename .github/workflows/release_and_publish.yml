@@ -112,7 +112,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '24.16.0'
       - name: Step 0 - 📁 Cache node modules
         uses: actions/cache@v5
         id: cache-npm
@@ -137,7 +137,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '24.16.0'
       - name: Step 0 - 📁 Cache node modules
         uses: actions/cache@v5
         id: cache-npm
@@ -150,10 +150,8 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 1 - 🧪 Run eslint linter
-        run: npm run eslint:check
-      - name: Step 2 - 🧪🧪 Run prettier
-        run: npm run prettier:check
+      - name: Step 1 - 🧪 Run Biome (lint + format check)
+        run: npm run biome:check
 
   deploy_tests:
     needs: deploy_validate_linters_and_code_format
@@ -163,7 +161,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '24.16.0'
       - name: Step 0 - 📁 Cache node modules
         uses: actions/cache@v5
         id: cache-npm
@@ -187,7 +185,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '24.16.0'
       - name: Step 0 - 📁 Cache node modules
         uses: actions/cache@v5
         id: cache-npm
@@ -228,7 +226,7 @@ jobs:
           token: ${{ secrets.AUTOMATION_GITHUB_TOKEN }}
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
+          node-version: '24.16.0'
           registry-url: https://registry.npmjs.org/
       - name: Step 0 - 📁 Cache node modules
         uses: actions/cache@v5

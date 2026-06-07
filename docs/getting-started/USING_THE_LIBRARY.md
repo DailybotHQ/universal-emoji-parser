@@ -16,7 +16,7 @@ yarn add universal-emoji-parser
 pnpm add universal-emoji-parser
 ```
 
-The package has **one runtime dependency** (`@twemoji/parser`) and ships TypeScript declarations.
+The package has **zero runtime dependencies** (`@twemoji/parser` is inlined into the bundle at build time) and ships TypeScript declarations.
 
 ## Hello world
 
@@ -127,7 +127,7 @@ uEmojiParser.getEmojiObjectByShortcode('not_a_real_emoji') // undefined
 import { emojiLibJsonData } from 'universal-emoji-parser'
 
 const allEmojis = Object.values(emojiLibJsonData)
-console.log(`Catalog has ${allEmojis.length} emojis`) // → 1906
+console.log(`Catalog has ${allEmojis.length} emojis`) // → 1914
 
 // Filter by group
 const smileys = allEmojis.filter((e) => e.group === 'Smileys & Emotion')

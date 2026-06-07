@@ -1,11 +1,11 @@
 ---
 name: typescript-strict-style
-description: TypeScript strictness rules enforced by tsconfig.json + ESLint, plus the patterns the existing code follows
+description: TypeScript strictness rules enforced by tsconfig.json (strict) + Biome (biome.json), plus the patterns the existing code follows
 ---
 
 # Skill: `typescript-strict-style`
 
-A reference for the TypeScript style enforced in Universal Emoji Parser. Read this when adding new code to `src/` or when ESLint complains about something you didn't expect.
+A reference for the TypeScript style enforced in Universal Emoji Parser. Read this when adding new code to `src/` or when Biome complains about something you didn't expect.
 
 For the prose version (rules + rationale), see [`docs/STANDARDS.md`](../../docs/STANDARDS.md). This skill focuses on patterns and idioms.
 
@@ -35,7 +35,7 @@ Implications for new code:
 | `strictNullChecks: true`                | Every nullable union (`T \| undefined`) must be handled with `?.`, `??`, narrowing, or explicit type guard |
 | `noImplicitAny: true`                   | Every parameter/return must be annotated or inferable                                                      |
 | `noUnusedLocals` / `noUnusedParameters` | Dead code fails the build. Prefix unused params with `_` if you must keep them (rare)                      |
-| `declaration: true`                     | `tsc --build` emits `.d.ts` for every public export — keep return types stable                             |
+| `declaration: true`                     | `build:types` (`tsc -p tsconfig.build.json --emitDeclarationOnly`) emits `.d.ts` for every public export — keep return types stable |
 | `resolveJsonModule: true`               | `import emojiLibJson from './lib/emoji-lib.json'` works                                                    |
 | `removeComments: true`                  | Comments in `dist/index.js` are stripped at build time. JSDoc still appears in `.d.ts`                     |
 
@@ -201,7 +201,7 @@ keywords: Array<string>
 const entitiesFound: Array<string> = []
 ```
 
-ESLint `@typescript-eslint/array-type` could enforce one or the other. Currently it's not configured, so both work. **For consistency, use `Array<T>` in new code** — it matches the existing style.
+Biome's `useConsistentArrayType` could enforce one or the other. It's not enabled, so both work. **For consistency, use `Array<T>` in new code** — it matches the existing style.
 
 ### Optional fields with `?:`
 
@@ -216,40 +216,45 @@ The `?:` makes the field optional in the interface. This emits the field as `key
 
 Use sparingly — every optional field is a value the consumer has to handle.
 
-## ESLint rules in detail
+## Biome rules in detail
 
-`eslint.config.mjs` composes `@eslint/js` recommended + `typescript-eslint` recommended + `eslint-plugin-prettier/recommended`.
+Lint and format are unified under **Biome 2.4.x** with a single config, `biome.json`. Run:
 
-Custom rules:
+```bash
+npm run biome:check        # biome check — lint + format check (CI gate)
+npm run biome:fix          # biome check --write — safe auto-fix
+npm run biome:fix:unsafe   # biome check --write --unsafe — includes unsafe fixes
+```
 
-```json
+Notable rule configuration in `biome.json`:
+
+```jsonc
 {
-  "no-console": 2,
-  "@typescript-eslint/no-inferrable-types": "off",
-  "@typescript-eslint/no-non-null-assertion": "off",
-  "@typescript-eslint/ban-ts-comment": "off",
-  "semi": [2, "never"]
+  // lint
+  "noConsole": "error",     // src/ only — overridden off in test/**
+  "noCommonJs": "off",      // the dual-export module.exports tail is intentional
+  "noExplicitAny": "off",   // `any` allowed where justified
+  // formatter
+  "semicolons": "asNeeded", // no trailing semicolons
+  "quoteStyle": "single",
+  "trailingCommas": "es5",
+  "lineWidth": 120
 }
 ```
 
-### `no-console: 2`
+### `noConsole: error` (src only, off in `test/**`)
 
 `console.*` is an error in `src/`. The package is a library — calling `console.log` from inside it leaks log lines into every consumer's output.
 
-`test/` is linted too. If you need to debug a test, use `console.log` temporarily and remove it before committing — ESLint enforces `no-console` there as well.
+Biome scopes this with an override: `noConsole` is **off in `test/**`**, so tests can use `console.log` freely for debugging. Still, remove throw-away logging before committing.
 
-### `@typescript-eslint/no-inferrable-types: 'off'`
+### `noExplicitAny: off`
 
-Some rules consider `const x: number = 5` redundant ("the type can be inferred"). We allow it because:
+`any` is allowed. Use sparingly — it bypasses the type system. When you must use it, leave a comment explaining why. Biome won't flag it, but reviewers will ask.
 
-- Public exports always annotate types explicitly (stability)
-- Even local annotations can clarify intent for human readers
+### Non-null assertion (`x!`) allowed
 
-Not turning this on means you decide case-by-case.
-
-### `@typescript-eslint/no-non-null-assertion: 'off'`
-
-`x!` (non-null assertion) is allowed. Use sparingly — it bypasses the type system. The current codebase uses it in the regenerator's dedup loop:
+Biome doesn't forbid the non-null assertion. Use sparingly — it bypasses the type system. The current codebase uses it in the regenerator's dedup loop:
 
 ```ts
 emojiLibJson[emojiObjectFound.char].keywords.splice(emojiObjectFound.keyword_index_found!, 1)
@@ -262,47 +267,53 @@ For new code, **prefer `?.` and `??`** over `!`. Reach for `!` only when:
 - The invariant is genuinely guaranteed by surrounding logic
 - Adding a runtime check would obscure the algorithm
 
-### `@typescript-eslint/ban-ts-comment: 'off'`
+### `// @ts-*` comments
 
 `// @ts-ignore`, `// @ts-expect-error`, `// @ts-nocheck` are allowed. Don't abuse them — they're for unavoidable interop, not for silencing real type errors.
 
-### `semi: [2, 'never']`
+### Inferrable type annotations
 
-No semicolons. This reinforces Prettier's `semi: false`. Examples:
+Biome doesn't flag `const x: number = 5` as redundant. We keep explicit annotations because:
+
+- Public exports always annotate types explicitly (stability)
+- Even local annotations can clarify intent for human readers
+
+You decide case-by-case.
+
+### `noCommonJs: off`
+
+The dual-export tail in `src/index.ts` assigns to `module.exports` directly. Biome's `noCommonJs` would normally flag this, so it's turned **off** — the CommonJS reattachment is load-bearing (see [`emoji-parser-conventions`](emoji-parser-conventions.md)).
+
+### Suppressing a Biome rule inline
+
+Use a `// biome-ignore` comment with the rule path and a reason:
 
 ```ts
-const x = 1                    // ✅
-const y = 2                    // ✅
-
-;[x, y].forEach(n => ...)      // ✅ — leading semi when ASI hazard
-
-import x from 'a'              // ✅
-const y = 2                    // ✅
+// biome-ignore lint/suspicious/noExplicitAny: upstream type is untyped
+function f(x: any): void { ... }
 ```
 
-Prettier inserts the leading `;` automatically when needed (e.g., before a line starting with `(`, `[`, or `+`). Don't add semicolons by hand.
+The reason after the colon is mandatory — Biome errors on a `biome-ignore` without one.
 
-## Prettier rules
+## Formatter (semicolons, quotes, trailing commas)
 
-`.prettierrc`:
+Biome's formatter is configured in `biome.json`:
 
-```json
-{
-  "semi": false,
-  "singleQuote": true,
-  "trailingComma": "es5"
-}
-```
-
-| Rule                   | Effect                                                                     |
+| Setting                | Effect                                                                     |
 | ---------------------- | -------------------------------------------------------------------------- |
-| `semi: false`          | No trailing semicolons                                                     |
-| `singleQuote: true`    | `'...'` for strings, `\`...\``for templates. Never`"..."`                  |
-| `trailingComma: 'es5'` | Trailing comma in multi-line arrays/objects, but **not** in function calls |
+| `semicolons: asNeeded` | No trailing semicolons (Biome inserts a leading `;` only on ASI hazard)   |
+| `quoteStyle: single`   | `'...'` for strings, `` `...` `` for templates. Never `"..."`              |
+| `trailingCommas: es5`  | Trailing comma in multi-line arrays/objects, but **not** in function calls |
+| `lineWidth: 120`       | Reflows past 120 columns                                                   |
 
 Examples:
 
 ```ts
+const x = 1                    // ✅ no semicolons
+const y = 2                    // ✅
+
+;[x, y].forEach(n => ...)      // ✅ — leading semi when ASI hazard
+
 const arr = [
   'a',
   'b',
@@ -317,6 +328,8 @@ const obj = {
 fn('a', 'b', 'c') // ✅ no trailing comma in function call (es5 rule)
 ```
 
+Biome inserts the leading `;` automatically when needed (e.g., before a line starting with `(`, `[`, or `+`). Don't add semicolons by hand.
+
 `.editorconfig` adds:
 
 ```
@@ -326,9 +339,9 @@ end_of_line = lf
 max_line_length = 120
 ```
 
-Prettier respects the 120 limit when reflowing.
+Biome respects the 120 limit when reflowing.
 
-## Common ESLint / TypeScript fixes
+## Common Biome / TypeScript fixes
 
 ### "TS6133: 'X' is declared but its value is never read"
 
@@ -379,13 +392,13 @@ function f(x: unknown): void {
 }
 ```
 
-### "no-console" violation
+### "noConsole" violation
 
-Remove the `console.log`. If you really need logging, the package doesn't ship a logger. Open an issue if the use case is real.
+Remove the `console.log`. If you really need logging, the package doesn't ship a logger. Open an issue if the use case is real. (Reminder: `noConsole` is off in `test/**`, so this only fires in `src/`.)
 
-### "prettier/prettier" violation
+### Formatter violation
 
-Run `npm run prettier:fix`. If the auto-fix produces something you don't like, the disagreement is between your editor and Prettier; configure your editor to match Prettier.
+Run `npm run biome:fix`. If the auto-fix produces something you don't like, the disagreement is between your editor and Biome; configure your editor to use the Biome formatter.
 
 ## Type-driven refactors
 
@@ -428,8 +441,8 @@ This is a breaking change in the `.d.ts`. Treat as a major bump unless:
 If you wanted to harden the TypeScript setup further:
 
 - Enable full `strict: true` (would also activate `strictFunctionTypes`, `strictPropertyInitialization`, `alwaysStrict`)
-- Enable `@typescript-eslint/strict-boolean-expressions` (forces explicit nullish checks instead of truthy/falsy)
-- Enable `@typescript-eslint/no-explicit-any` as `error` instead of off
-- Add `@typescript-eslint/explicit-module-boundary-types` to require explicit return types on every exported function
+- Turn on Biome's `noExplicitAny` as `error` instead of off
+- Enable additional Biome correctness/suspicious rules beyond the recommended set
+- Require explicit return types on every exported function via a Biome rule or a stricter `tsconfig` boundary check
 
 These are nice-to-have but not necessary for the current code's quality. If you adopt any, expect a ~50-line diff in `src/index.ts` to clean up.

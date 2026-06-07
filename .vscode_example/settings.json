@@ -8,15 +8,14 @@
     "sideBar.background": "#4a4700",
     "sideBar.foreground": "#e2e8f0"
   },
-  "mocha.files.glob": "./test/**/*.ts",
-  "mochaExplorer.files": "test/**/*.ts",
-  "mochaExplorer.nodeArgv": ["--import", "tsx"],
-  "mochaExplorer.timeout": 60000,
-  "mochaExplorer.logpanel": true,
+  "vitest.enable": true,
   "files.trimTrailingWhitespace": true,
-  "prettier.singleQuote": true,
-  "prettier.semi": false,
+  "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
   "cSpell.words": [
     "activar",
     "AUTOINCREMENT",

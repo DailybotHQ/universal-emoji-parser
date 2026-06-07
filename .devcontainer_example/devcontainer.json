@@ -13,16 +13,9 @@
       "extensions": [
         "eamodio.gitlens",
         "VisualStudioExptTeam.vscodeintellicode",
-        "swyphcosmo.spellchecker",
-        "streetsidesoftware.code-spell-checker",
-        "donjayamanne.githistory",
         "vscode-icons-team.vscode-icons",
-        "shardulm94.trailing-spaces",
-        "esbenp.prettier-vscode",
-        "ms-vscode.vscode-typescript-tslint-plugin",
-        "compulim.vscode-mocha",
-        "hbenl.vscode-mocha-test-adapter",
-        "dbaeumer.vscode-eslint",
+        "biomejs.biome",
+        "vitest.explorer",
         "EditorConfig.EditorConfig"
       ]
     }

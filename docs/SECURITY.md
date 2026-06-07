@@ -119,12 +119,12 @@ A malicious entry in the catalog (e.g., a slug with HTML special characters) wou
 ### Runtime dependency footprint
 
 ```json
-"dependencies": {
-  "@twemoji/parser": "17.0.1"
-}
+"dependencies": {}
 ```
 
-**One** runtime dependency. Adding a second is a major decision — it ships to every consumer.
+**Zero** runtime dependencies. `@twemoji/parser` is the only library the runtime needs, and the Vite library-mode build **inlines** it into `dist/index.js` at build time — so the published package declares no `dependencies` at all. This is the smallest possible supply-chain surface for consumers: installing the package pulls in nothing transitive.
+
+Adding a real runtime dependency (one that is *not* inlined) is a major decision — it would ship to every consumer's install tree.
 
 ### `@twemoji/parser` trust
 
@@ -132,13 +132,15 @@ A malicious entry in the catalog (e.g., a slug with HTML special characters) wou
 - License: MIT
 - No native dependencies (pure JS)
 - Used by Twitter/X, Discord, and many other major products
-- We pin to an exact version; bumping is a deliberate `chore: bump @twemoji/parser` PR
+- Pinned to an exact version (`17.0.1`) as a `devDependency` and inlined at build time; `.ncurc.json` rejects `17.0.2` because it regressed U+FE0F handling. Bumping is a deliberate `chore: bump @twemoji/parser` PR after verifying the regression is resolved
 
 ### Dev-only dependencies
 
-`emojilib` and `unicode-emoji-json` are `devDependencies` — they only run during `prepareEmojiLibJson.test.ts` regeneration. They never ship to npm consumers.
+Everything is a `devDependency` — including the toolchain (`biome`, `vite`, `vitest`), the regeneration sources (`emojilib`, `unicode-emoji-json`), and `@twemoji/parser` (inlined at build). None of them ship to npm consumers as install-time dependencies.
 
-If either project becomes unmaintained or compromised, the impact is limited to catalog regeneration — we'd switch to a fork or fall back to the previously committed catalog.
+If a build- or test-only tool (Biome, Vite, Vitest) becomes compromised, the impact is limited to the build/test pipeline — it cannot reach a consumer's install tree, because the published tarball carries only the bundled `dist/`.
+
+If `emojilib` or `unicode-emoji-json` becomes unmaintained or compromised, the impact is limited to catalog regeneration — we'd switch to a fork or fall back to the previously committed catalog.
 
 ### CI-side security
 
@@ -154,7 +156,7 @@ CI workflows check out the repo with `actions/checkout@v4` (pinned major version
 
 Mitigations:
 
-- `.ncurc.json` rejects bumps for `chai` and `eslint` (specific versions we want to control)
+- `.ncurc.json` rejects bumps for `@twemoji/parser` (pinned to `17.0.1` — `17.0.2` regressed U+FE0F handling)
 - The auto-merge workflow can be disabled if a high-profile supply-chain incident hits
 
 To harden further, consider:
@@ -178,13 +180,13 @@ If an automation token can't satisfy 2FA (typically the case), use an "automatio
 
 ### Reproducible builds
 
-The package is built by Webpack from TypeScript source. Build is deterministic for a given:
+The package is built by Vite (library mode, esbuild minify) from TypeScript source, with declarations emitted by `tsc`. Build is deterministic for a given:
 
 - Node version (CI: Node 24)
 - npm lockfile state (note: no lockfile committed; see [`.gitignore`](../.gitignore))
 - Source tree
 
-Running `npm install && npm run build` on different machines produces byte-identical `dist/index.js`... mostly. Webpack's chunk IDs and minification are deterministic; the JSON catalog is checked-in source.
+Running `npm install && npm run build` on different machines produces byte-identical `dist/index.js`... mostly. Vite's esbuild minification is deterministic, and `@twemoji/parser` is inlined from a pinned version; the JSON catalog is checked-in source.
 
 If you ever need to verify a published version against source: `npm pack` locally, diff against the published tarball.
 
@@ -204,7 +206,7 @@ Included:
 
 Excluded:
   src/, test/, docker/, .github/, docs/, .agents/, .claude/, .vscode/, .devcontainer/
-  *.config.js, eslint.config.mjs, .prettierrc, .editorconfig, .babelrc, tsconfig.json
+  *.config.js, vite.config.ts, vitest.config.ts, biome.json, .editorconfig, tsconfig.json
   package-lock.json, *.txt
 ```
 
@@ -250,7 +252,7 @@ For maintainers of this package:
 
 - [ ] No `console.log`, no `eval`, no `Function` constructor in `src/`
 - [ ] No `dangerously*` patterns; output template is fixed
-- [ ] `package.json` `dependencies` has only `@twemoji/parser`; verify on every PR
+- [ ] `package.json` `dependencies` stays empty (zero runtime deps; `@twemoji/parser` is a `devDependency`, inlined at build); verify on every PR
 - [ ] CI's `secrets.NPM_TOKEN` is scoped to this package
 - [ ] npm 2FA is `auth-and-writes`
 - [ ] Major Twemoji bumps go through manual review (don't auto-merge `@twemoji/parser` updates without reading release notes)

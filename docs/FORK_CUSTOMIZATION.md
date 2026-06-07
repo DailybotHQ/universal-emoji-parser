@@ -147,7 +147,7 @@ Replace with your fork's identifiers. This grep should return zero hits when you
 Audit specifically:
 
 - `AGENTS.md` Project Overview section
-- `docs/TECHNOLOGIES.md` "Pinned exclusions" — your fork might lift the chai/eslint pins
+- `docs/TECHNOLOGIES.md` "Pinned exclusions" — your fork might lift the `@twemoji/parser` 17.0.1 pin once U+FE0F handling is fixed upstream
 - `docs/BUILD_DEPLOY.md` — the entire CI section is about DailyBot; rewrite for your CI
 - `docs/SECURITY.md` — npm 2FA recommendation, vulnerability email
 - `.agents/README.md` and individual skills — references to the bot identity
@@ -177,8 +177,7 @@ git push -u origin main
 
 ```bash
 npm install
-npm run eslint:check
-npm run prettier:check
+npm run biome:check
 npm test
 npm run build
 

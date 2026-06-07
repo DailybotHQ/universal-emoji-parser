@@ -11,7 +11,7 @@ test
 .travis.yml
 package-lock.json
 tsconfig.json
-webpack.config.js
+vite.config.ts
 docker
 .github
 .eslintignore

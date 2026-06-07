@@ -53,15 +53,19 @@ it('create emojis lib json file', () => {
 
 ### 4. Run the regenerator
 
+The dedup loop is O(n²) and takes ~27 seconds, but Vitest's default `testTimeout` is 5s — pass a longer timeout so the test doesn't abort mid-write:
+
 ```bash
-npm test
+npx vitest run test/prepareEmojiLibJson.test.ts --testTimeout=60000
 ```
 
 Expected:
 
-- ~10 seconds total (the dedup loop is O(n²))
-- One spec file (`prepareEmojiLibJson.test.ts`) passes
+- ~27 seconds total (the dedup loop is O(n²))
+- `prepareEmojiLibJson.test.ts` passes (1 test)
 - `src/lib/emoji-lib-output.json` is written (gitignored — that's expected)
+
+> Note: the regenerator writes the file via `fs.writeFileSync` before the final `expect(fs.existsSync(filePath)).toBe(true)` assertion. Even if the test times out, the file is still on disk — but a clean pass is what you want before promoting.
 
 ### 5. Diff against the committed catalog
 
@@ -69,7 +73,7 @@ Expected:
 diff src/lib/emoji-lib.json src/lib/emoji-lib-output.json | head -100
 ```
 
-Or for a structured view:
+Or for a structured view (recommended — it ignores whitespace/indent differences in the file):
 
 ```bash
 node -e "
@@ -79,32 +83,39 @@ const aKeys = new Set(Object.keys(a));
 const bKeys = new Set(Object.keys(b));
 const added = [...bKeys].filter(k => !aKeys.has(k));
 const removed = [...aKeys].filter(k => !bKeys.has(k));
+let changed = 0;
+for (const k of aKeys) if (bKeys.has(k) && JSON.stringify(a[k]) !== JSON.stringify(b[k])) changed++;
 console.log('Added emojis:', added.length, added.slice(0, 10));
 console.log('Removed emojis:', removed.length, removed.slice(0, 10));
+console.log('Changed entries:', changed);
 console.log('Total before:', aKeys.size, '-> after:', bKeys.size);
+console.log('Compact size (whitespace-free):', JSON.stringify(a).length, '->', JSON.stringify(b).length);
 "
 ```
 
 Sanity-check the diff:
 
+- **No-op result** — if `added=0`, `removed=0`, `changed=0`, and the compact sizes match, the upstreams have not produced any actual changes (whitespace-only `diff` on disk doesn't count). Skip step 6 and re-skip the test (step 8).
 - **Expected count change** matches what you anticipated
 - **Special-case overrides** show up in the modified emoji's `keywords` array
 - **No accidental wholesale changes** — if every emoji shows a diff, something went wrong (e.g., dedup ordering changed)
 
 ### 6. Promote the output
 
-If the diff is sane:
+**This is the manual review gate.** If the structured diff looks right (expected counts, expected keyword changes, no wholesale rewrites), copy the gitignored output over the committed catalog:
 
 ```bash
 cp src/lib/emoji-lib-output.json src/lib/emoji-lib.json
 ```
+
+If anything looks off, investigate first (rebuild upstream deps, inspect `EMOJIS_SPECIAL_CASES`, re-run with a smaller test set, etc.). Never promote a catalog you don't trust — every entry ships to consumer bundles.
 
 ### 7. Update `TOTAL_EMOJIS` if needed
 
 Open `test/emojiLibJson.test.ts`. If the count changed:
 
 ```ts
-const TOTAL_EMOJIS: number = 1906 // ← update this number to match
+const TOTAL_EMOJIS: number = 1914 // ← update this number to match
 ```
 
 ### 8. Re-skip the regenerator

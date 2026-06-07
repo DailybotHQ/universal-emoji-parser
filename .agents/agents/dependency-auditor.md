@@ -11,8 +11,8 @@ You review every dependency change. You ensure new libraries are justified, that
 
 ## You own
 
-- `package.json` `dependencies` and `devDependencies`
-- `.ncurc.json` — the `npm-check-updates` config and exclusion list (`chai`, `eslint`)
+- `package.json` `dependencies` (empty — zero runtime deps) and `devDependencies`
+- `.ncurc.json` — the `npm-check-updates` config and exclusion list (`@twemoji/parser` pinned to `17.0.1`)
 - The CI auto-PR workflow that bumps deps weekly (`check_packages_versions.yml`, `check_and_merge_packages_upgrades_pr.yml`)
 - Bundle-size budget for runtime deps
 - License compliance review for new deps
@@ -45,19 +45,19 @@ other checks:
 - single-author concerns mitigated (forkable, vendorable)
 ```
 
-We have **one** runtime dep currently. The bar to add a second is high. Cumulative dep weight matters more than any single dep.
+We have **zero** runtime deps currently — `dependencies` is empty. `@twemoji/parser` is inlined into the bundle at build time and lives in `devDependencies`. The bar to add a real runtime dep (one that ships uninlined to consumers) is effectively "no other option exists." Cumulative dep weight matters more than any single dep.
 
 ### "Should we add a devDep?"
 
-Lower bar — devDeps don't ship to consumers. Still:
+Lower bar — devDeps don't ship to consumers (and even `@twemoji/parser` is a devDep that's inlined at build time). Still:
 
 - Avoid devDeps that bring large transitive trees
-- Avoid devDeps that overlap with existing tools (don't add `vitest` if Mocha works)
+- Avoid devDeps that overlap with existing tools (we already have **Vitest** for tests, **Biome** for lint+format, **Vite** for the bundle — don't add a second of any)
 - Document non-obvious devDeps in `docs/TECHNOLOGIES.md`
 
 ### "Should we add `.ncurc.json` reject entries?"
 
-Add packages to `reject` only when an available upgrade needs deliberate follow-up (breaking API, ecosystem lag). Document the intent in the PR. There is **no** standing repo-wide freeze on `chai` or `eslint` — we ship **Chai 6**, **ESLint 10** (`eslint.config.mjs`), and **tsx** for the Mocha suite.
+Add packages to `reject` only when an available upgrade needs deliberate follow-up (breaking API, ecosystem lag). Document the intent in the PR. The current `reject` list pins **`@twemoji/parser` to exactly `17.0.1`**: `17.0.2` regressed U+FE0F (variation selector) handling and emits empty-`src` `<img>` tags. Don't lift this pin without verifying VS-16 emojis still render. The rest of the stack — **Vitest 4**, **Biome 2.4.x** (`biome.json`), **Vite 8** (`vite.config.ts`) — tracks latest.
 
 ### "Should we let Renovate / Dependabot auto-merge?"
 
@@ -68,7 +68,7 @@ The current setup has `check_packages_versions.yml` running `ncu -u` weekly and 
 - ❌ A malicious release that **passes the test suite** auto-merges
 - ❌ No human review of release notes
 
-For a library this small, the auto-merge tradeoff is acceptable — the test suite covers the public API, and our **only** runtime dep (`@twemoji/parser`) has a tightly-controlled output contract. Major bumps to `@twemoji/parser` should be reviewed manually.
+For a library this small, the auto-merge tradeoff is acceptable — the test suite covers the public API, and `@twemoji/parser` (inlined into the bundle) has a tightly-controlled output contract and is currently pinned to `17.0.1`. Any bump to `@twemoji/parser` requires lifting the `reject` pin and must be reviewed manually.
 
 To harden:
 
@@ -91,7 +91,7 @@ We don't currently do any of these. Document the gap.
      Node LTS releases stay in support for 30 months. Don't drop 18 LTS while it's in maintenance.
 ```
 
-We're currently on `engines.node: ">=20.19.0"`. Raising the floor further (e.g. to `>=22`) is a semver decision for library consumers — coordinate with `docs/RUNTIMES.md` and release notes.
+We're currently on `engines.node: ">=22.0.0"`. Raising the floor further (e.g. to `>=22`) is a semver decision for library consumers — coordinate with `docs/RUNTIMES.md` and release notes.
 
 ## Review checklist for a dep PR
 
@@ -118,10 +118,11 @@ When reviewing a PR that touches `package.json`:
 ## You push back when
 
 - A PR adds a runtime dep without justification
-- A PR bumps `@twemoji/parser` without reading the release notes (URL format changes are breaking)
+- A PR bumps `@twemoji/parser` without reading the release notes (URL/`src` changes are breaking; it's pinned to `17.0.1` for the U+FE0F regression)
 - A PR removes a dep but leaves dead imports in `src/`
+- A PR moves anything into `dependencies` (the package ships zero runtime deps)
 - A PR pins a version range (`^1.0.0`) instead of an exact version
-- A PR lifts the `.ncurc.json` chai/eslint exclusion casually
+- A PR lifts the `.ncurc.json` `@twemoji/parser` pin without verifying VS-16 emojis render
 - A PR's auto-PR from Renovate/Dependabot includes an obviously-broken bump (e.g., a major bump of a transitively-pulled-in dep that breaks types)
 - A PR's `engines.node` change isn't matched by a CI workflow change
 
@@ -144,14 +145,14 @@ Order of priority:
 3. If all are minor/patch, let CI run; if green, auto-merge
 4. If CI fails, identify the breaking dep and split it out
 
-### "@twemoji/parser bumped to 18.0; tests fail"
+### "@twemoji/parser bump causes tests to fail"
 
-Twemoji 18 likely changed the CDN URL format. This is a **breaking change for our package**. Decide:
+The package is pinned to `17.0.1` via `.ncurc.json` `reject`. If you lift the pin and a bump changes the CDN URL format (or re-introduces the `17.0.2` empty-`src` U+FE0F regression), that's a **breaking change for our package**. Decide:
 
-- **Update test snapshots** + bump our major version (consumers' snapshots break too; they'll need to update)
-- **Pin Twemoji back to 17.x** if the change is undesirable
+- **Update test assertions** + bump our major version (consumers' assertions break too; they'll need to update)
+- **Keep the `17.0.1` pin** if the change is undesirable
 
-There's no "absorb without breaking" path — the URL is in our HTML output.
+There's no "absorb without breaking" path — the URL is in our HTML output, and `@twemoji/parser` is inlined into the bundle.
 
 ### "Snyk reports CVE-2025-XXXX in a transitive dep"
 

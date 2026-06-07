@@ -1,8 +1,8 @@
-import { expect } from 'chai'
-import { EmojiLibJsonType, EmojiType, ObjectType } from '../src/lib/type'
+import * as fs from 'node:fs'
 import emojilib from 'emojilib'
 import unicodeEmojiJson from 'unicode-emoji-json'
-import * as fs from 'fs'
+import { describe, expect, it } from 'vitest'
+import type { EmojiLibJsonType, EmojiType, ObjectType } from '../src/lib/type'
 
 describe('Prepare emoji parser assets', () => {
   const EMOJIS_SPECIAL_CASES: ObjectType = {
@@ -142,7 +142,6 @@ describe('Prepare emoji parser assets', () => {
      */
     const filePath: string = 'src/lib/emoji-lib-output.json'
     fs.writeFileSync(filePath, JSON.stringify(emojiLibJson, null, 2))
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    expect(fs.existsSync(filePath)).to.be.true
+    expect(fs.existsSync(filePath)).toBe(true)
   })
 })

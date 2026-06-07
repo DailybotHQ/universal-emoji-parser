@@ -12,18 +12,18 @@ Real problems hit while setting up and developing Universal Emoji Parser, with t
 
 ```
 npm error EBADENGINE Unsupported engine
-npm error EBADENGINE   required: { node: '>=20.19.0' }
+npm error EBADENGINE   required: { node: '>=22.0.0' }
 npm error EBADENGINE   current: { node: 'v18.x.x' }
 ```
 
-**Cause:** Node version is below the `engines.node: ">=20.19.0"` constraint in `package.json`.
+**Cause:** Node version is below the `engines.node: ">=22.0.0"` constraint in `package.json`.
 
 **Fix:**
 
 ```bash
 nvm install 24
 nvm use 24
-node --version    # confirm v24.x (or any v20.19+)
+node --version    # confirm v24.x (or any v22+)
 npm install
 ```
 
@@ -60,93 +60,105 @@ npm install
 
 ---
 
-## `ts-node` errors during tests
+## Type errors during tests
 
-**Symptom:** Mocha starts but immediately errors with TypeScript compile messages, e.g.:
+**Symptom:** Vitest starts but immediately errors with TypeScript compile messages, e.g.:
 
 ```
-TSError: ⨯ Unable to compile TypeScript:
+Error: Failed to load source: src/index.ts
 src/index.ts:1:1 - error TS6053: File 'src/index.ts' not found.
 ```
 
-**Cause:** Usually a `tsconfig.json` issue or a missing source file.
+**Cause:** Usually a `tsconfig.json` issue or a missing source file. Vitest transpiles `.ts` on the fly via esbuild, so this is a config/source problem, not a runner bug.
 
 **Fix:**
 
 1. Check `tsconfig.json` `"include": ["src/**/*"]` is intact
 2. Verify `src/index.ts` exists
 3. If you've been editing `tsconfig.json`, revert and try again
-4. As a last resort, `rm -rf node_modules && npm install` (reinstalls `ts-node` + `typescript`)
+4. As a last resort, `rm -rf node_modules && npm install` (reinstalls `vitest` + `typescript`)
 
 ---
 
-## `npm run build` fails with `Cannot find module 'clean-webpack-plugin'`
+## `npm run build` produces no `dist/index.js`
 
-**Symptom:** Webpack production build fails because `CleanWebpackPlugin` isn't found.
+**Symptom:** Vite production build finishes but `dist/index.js` is missing or empty.
 
-**Cause:** The `clean-webpack-plugin` import path changed across versions; the current code uses `require('clean-webpack-plugin')` and accesses `.CleanWebpackPlugin` on the export. If `node_modules` has a different version of the package, this can fail.
+**Cause:** `vite.config.ts` library-mode config got edited (wrong `lib.entry`, `formats`, or `fileName`), or the build silently failed before emitting.
 
 **Fix:**
 
 ```bash
-rm -rf node_modules
+rm -rf node_modules dist
 npm install
 npm run build
 ```
 
-If still broken, check `webpack.config.js`:
+`npm run build` runs `vite build && npm run build:types` — the second step (`tsc -p tsconfig.build.json --emitDeclarationOnly`) emits `dist/index.d.ts` + `dist/lib/type.d.ts`. If only the `.d.ts` files are missing, run `npm run build:types` on its own to isolate the type-emit step.
 
-```js
-const CleanWebPackPlugin = require('clean-webpack-plugin')
-// ...
-new CleanWebPackPlugin.CleanWebpackPlugin()
+If still broken, check `vite.config.ts` library mode:
+
+```ts
+build: {
+  lib: {
+    entry: 'src/index.ts',
+    formats: ['cjs'],
+    fileName: () => 'index.js',
+  },
+  minify: 'esbuild',
+}
 ```
 
-…matches the installed version of `clean-webpack-plugin` (currently 4.x).
+…and confirm `@twemoji/parser` is being inlined (it ships inside `dist/index.js`; the package has zero runtime dependencies).
 
 ---
 
-## ESLint fails with `Parsing error: Cannot read file 'tsconfig.json'`
+## Biome fails with `Cannot read file 'tsconfig.json'` or config errors
 
 **Symptom:**
 
 ```
-eslint.config.mjs » @typescript-eslint/...
-Parsing error: Cannot read file '/app/tsconfig.json'
+biome.json » error
+Cannot read file '/app/tsconfig.json'
 ```
 
-**Cause:** ESLint is being run from a directory that doesn't contain `tsconfig.json`.
+**Cause:** Biome is being run from a directory that doesn't contain `biome.json` / `tsconfig.json`.
 
 **Fix:** Run from the repo root:
 
 ```bash
 cd /app   # or wherever the repo root is
-npm run eslint:check
+npm run biome:check
 ```
 
 ---
 
-## Prettier check fails on `package.json`
+## Biome check fails on a file you didn't touch
 
 **Symptom:**
 
 ```
-Code style issues found in package.json
+Found N errors / warnings — formatter or linter issues
 ```
 
-**Cause:** `package.json` was reformatted by something (npm install, an editor, manual edit) and now violates Prettier's expectations.
+…on files outside your change.
 
-**Fix:** This file is **excluded** from Prettier formatting (`'!package.json'` in the `prettier:check` script). If `prettier:check` is reporting it, something's off:
+**Cause:** A file was reformatted by something (an editor, a stale config) and now violates `biome.json` (single quotes, no semicolons, es5 trailing commas, lineWidth 120).
 
-1. Confirm the script in `package.json` still includes `'!package.json'`:
-   ```json
-   "prettier:check": "prettier -c --ignore-path .gitignore '**/*.{css,html,js,ts,json,md,yaml,yml}' '!package.json'"
-   ```
-2. Run `prettier:check` directly:
+**Fix:** Let Biome fix it, then review the diff:
+
+1. Run the safe autofix:
    ```bash
-   npm run prettier:check
+   npm run biome:fix
    ```
-3. If it still picks up `package.json`, the exclusion isn't reaching prettier — make sure the script wasn't modified
+2. For lint rules that need riskier rewrites, use the unsafe fixer and review every change:
+   ```bash
+   npm run biome:fix:unsafe
+   ```
+3. Re-run the gate:
+   ```bash
+   npm run biome:check
+   ```
 
 ---
 
@@ -156,9 +168,9 @@ Code style issues found in package.json
 
 **Common causes:**
 
-1. **Different Node version** — local Node ≠ CI Node 24. Match locally with `nvm use 24` (or satisfy `engines.node` ≥ 20.19)
+1. **Different Node version** — local Node ≠ CI Node 24. Match locally with `nvm use 24` (or satisfy `engines.node` ≥ 22)
 2. **Different timezone / locale** — unlikely in this package (no date/locale handling) but possible if you've added time-sensitive logic
-3. **Race condition** — Mocha tests aren't supposed to interact, but if they share state, ordering can matter. Run `npm test` repeatedly locally; if it ever fails, you have a flake
+3. **Race condition** — Vitest tests aren't supposed to interact, but if they share state, ordering can matter. Run `npm test` repeatedly locally; if it ever fails, you have a flake
 4. **Env-var dependency** — code that reads `process.env.X` may behave differently with/without the var. The package shouldn't read env vars; check recent changes if it does
 5. **Stale CI cache** — re-run the workflow with cache disabled (push an empty commit, or add `--no-cache` to the cache key)
 
@@ -268,23 +280,23 @@ Then use HTTPS git remotes (which `gh` will sign for you).
 
 ---
 
-## Webpack build is suspiciously small
+## Vite build is suspiciously small
 
 **Symptom:** `dist/index.js` is < 100 KB after `npm run build`. Catalog is missing.
 
-**Cause:** `tsconfig.json`'s `resolveJsonModule: true` got disabled, or `webpack.config.js` is excluding the JSON catalog.
+**Cause:** `tsconfig.json`'s `resolveJsonModule: true` got disabled, or `vite.config.ts` is excluding the JSON catalog from the bundle.
 
 **Fix:**
 
 1. Check `tsconfig.json` has `"resolveJsonModule": true`
 2. Check `src/index.ts` line `import emojiLibJson from './lib/emoji-lib.json'` is intact
-3. Check `webpack.config.js` rules don't include a `json-loader` exclusion that breaks the default behavior
+3. Check `vite.config.ts` doesn't mark the catalog or `@twemoji/parser` as `external` — both must be inlined into the single CJS bundle (the published package has zero runtime dependencies)
 
 Sanity check:
 
 ```bash
 node -e "console.log(Object.keys(require('./dist/index.js').emojiLibJsonData).length)"
-# Should print 1906
+# Should print 1914
 ```
 
 ---
@@ -311,7 +323,7 @@ node -e "console.log(Object.keys(require('./dist/index.js').emojiLibJsonData).le
 
 ## Test runner hangs or times out
 
-**Symptom:** `npm test` runs for >25 seconds and fails with a timeout error.
+**Symptom:** `npm test` runs for a long time and fails with a timeout error.
 
 **Cause:** The regenerator was accidentally enabled (`it.skip` reverted to `it`).
 
@@ -327,7 +339,7 @@ If it reads `it(...)`, restore the `.skip` and re-run.
 
 ## "Cannot find module" for a path that exists
 
-**Symptom:** Mocha or ts-node fails to find a file you can clearly see.
+**Symptom:** Vitest fails to find a file you can clearly see.
 
 **Cause (typical):** Case sensitivity. macOS is case-insensitive by default; Linux (and most CI) is case-sensitive. `import './Index'` works on macOS but fails on CI.
 

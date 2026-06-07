@@ -38,19 +38,18 @@ If `main` is dirty or behind the remote, fix that first. A manual release from a
 
 ```bash
 npm install
-npm run eslint:check
-npm run prettier:check
+npm run biome:check
 npm test
 npm run build
 npm run build:tsc
 ```
 
-All five must pass. **Don't proceed if any fail** — the published artifact would be broken.
+All four must pass. **Don't proceed if any fail** — the published artifact would be broken.
 
 ### 3. Verify the bundle
 
 ```bash
-ls -lh dist/                         # index.js (~600 KB), index.d.ts, *.map
+ls -lh dist/                         # index.js (~403 KB minified CJS), index.d.ts, *.map
 node -e "console.log(Object.keys(require('./dist/index.js')))"
 node -e "console.log(require('./dist/index.js').parse('hello :smile: 🚀'))"
 ```
@@ -206,7 +205,7 @@ This adds a warning when consumers install the bad version. It doesn't block ins
 
 ## Pitfalls
 
-1. **Forgetting `npm run build:tsc`** — Webpack only emits `index.js`; tsc emits `index.d.ts`. Skipping `build:tsc` means consumers' TypeScript projects break. CI's release workflow has the same gap; fix it eventually
+1. **Skipping the type declarations** — `vite build` emits `index.js`; the declarations come from `build:types` (`tsc -p tsconfig.build.json --emitDeclarationOnly`), which `npm run build` runs after the Vite step. Don't run `vite build` alone — use `npm run build` so `index.d.ts` is emitted, or consumers' TypeScript projects break
 2. **Stale `dist/`** — if you skip `npm run build`, you publish whatever was previously in `dist/`. Always rebuild before publishing
 3. **Pushing tag without commit** — `git push origin v<version>` without `--follow-tags` pushes the tag but not the version commit. Always use `--follow-tags`
 4. **Missing release notes** — the GitHub Release without notes looks unprofessional. Generate them before creating the release
@@ -230,7 +229,7 @@ This adds a warning when consumers install the bad version. It doesn't block ins
 ## Verification checklist
 
 - [ ] Working tree clean; on `main`; up to date with origin
-- [ ] All five checks pass (lint, format, test, build, types)
+- [ ] All four checks pass (`biome:check`, test, build, types)
 - [ ] `npm pack --dry-run` shows only expected files
 - [ ] `npm version patch/minor/major` succeeded
 - [ ] `git push --follow-tags origin main` succeeded

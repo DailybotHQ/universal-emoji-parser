@@ -1,6 +1,6 @@
 # Standards
 
-Canonical coding rules for Universal Emoji Parser. Every contributor (human or agent) must follow these. ESLint + Prettier handle most details automatically — these standards cover decisions tools cannot make.
+Canonical coding rules for Universal Emoji Parser. Every contributor (human or agent) must follow these. Biome handles most details automatically (lint + format in one tool) — these standards cover decisions tools cannot make.
 
 ## Language
 
@@ -18,7 +18,7 @@ Canonical coding rules for Universal Emoji Parser. Every contributor (human or a
 - `noUnusedLocals: true`, `noUnusedParameters: true` — dead code fails the build
 - `declaration: true` — every public export gets a `.d.ts` entry
 
-If you need `any`, prefer `unknown` and narrow. If `any` is genuinely the right call, suppress with a targeted `// eslint-disable-next-line @typescript-eslint/no-explicit-any` and explain why.
+If you need `any`, prefer `unknown` and narrow. Biome's `noExplicitAny` is **off** in this repo, but treat `any` as a last resort and explain why when you reach for it.
 
 ### Explicit return types on exports
 
@@ -96,22 +96,22 @@ Rules:
 4. **Don't break dual ESM/CommonJS.** Both `import` and `require` consumers must keep working
 5. **Don't expose internal helpers.** If something's prefixed with `__`, it's internal. If you add a new helper, mark it the same way
 
-## Formatting (Prettier)
+## Formatting (Biome)
 
-Configured in `.prettierrc`:
+Configured in `biome.json` (Biome formats and lints in one tool):
 
-```json
+```jsonc
+// biome.json (formatter-relevant settings)
 {
-  "semi": false,
-  "singleQuote": true,
-  "trailingComma": "es5"
+  "javascript": { "formatter": { "semicolons": "asNeeded", "quoteStyle": "single", "trailingCommas": "es5" } },
+  "formatter": { "lineWidth": 120 }
 }
 ```
 
-Implications:
+In short: no semicolons, single quotes, ES5 trailing commas. Implications:
 
 ```ts
-// ✅ no semicolons (except where ASI hazards exist — Prettier inserts a leading semi)
+// ✅ no semicolons (except where ASI hazards exist — Biome inserts a leading semi)
 const x = 1
 const y = 2
 
@@ -124,31 +124,25 @@ const arr = ['a', 'b', 'c']
 fn('a', 'b', 'c') // ✅ no trailing comma in function call (es5)
 ```
 
-Auto-fix with `npm run prettier:fix`. CI fails on `prettier:check`, so always run before committing.
+Auto-fix with `npm run biome:fix`. CI fails on `npm run biome:check`, so always run before committing.
 
 ### Line length
 
-`.editorconfig` sets `max_line_length = 120`. Prettier reflows past it when possible (long string literals stay inline). Don't force-wrap shorter lines for cosmetic reasons.
+`biome.json` sets `lineWidth: 120` (and `.editorconfig` mirrors `max_line_length = 120`). Biome reflows past it when possible (long string literals stay inline). Don't force-wrap shorter lines for cosmetic reasons.
 
-## Linting (ESLint)
+## Linting (Biome)
 
-`eslint.config.mjs` (flat config) composes:
+`biome.json` is the single config for both lint and format. Notable rule choices:
 
-- `@eslint/js` `recommended`
-- `typescript-eslint` `recommended`
-- `eslint-plugin-prettier/recommended`
+| Rule            | Setting               | Reason                                                                                          |
+| --------------- | --------------------- | ---------------------------------------------------------------------------------------------- |
+| `noConsole`     | error in `src/` only  | This is a library — `console.*` in `src/` leaks into consumers. Tests may log freely            |
+| `noExplicitAny` | off                   | We sometimes need `any` for interop; treat it as a last resort and comment why                  |
+| `noCommonJs`    | off                   | The `module.exports = uEmojiParser` reattachment tail in `src/index.ts` must be allowed         |
 
-Custom rules:
+Semicolons (`semicolons: "asNeeded"`) and quote style are enforced by the formatter, not as separate lint rules. `.agents/skills/deepworkplan/` is excluded from formatting.
 
-| Rule                                       | Setting        | Reason                                                                                           |
-| ------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------ |
-| `no-console`                               | `2` (error)    | This is a library — `console.*` in `src/` leaks into consumers. Tests may log freely             |
-| `@typescript-eslint/no-inferrable-types`   | `off`          | We sometimes annotate inferable types for clarity (e.g., `const emojiCDN: string = '...'`)       |
-| `@typescript-eslint/no-non-null-assertion` | `off`          | Allowed sparingly when the type system can't see the invariant (e.g., dedup loop in regenerator) |
-| `@typescript-eslint/ban-ts-comment`        | `off`          | `// @ts-ignore` allowed for unavoidable interop                                                  |
-| `semi`                                     | `[2, 'never']` | Reinforces Prettier's `semi: false`                                                              |
-
-Run `npm run eslint:check` before committing; auto-fix is `npm run eslint:fix`.
+Run `npm run biome:check` before committing; auto-fix is `npm run biome:fix` (or `npm run biome:fix:unsafe` for fixes Biome flags as unsafe — review that diff).
 
 ## Comments
 
@@ -213,24 +207,25 @@ Rules:
 
 See [Testing Guide](TESTING_GUIDE.md). Summary:
 
-- Specs in `test/*.test.ts`, run by Mocha + Chai 6 + tsx
+- Specs in `test/*.test.ts`, run by Vitest (`vitest run`)
+- Import the test API: `import { describe, it, expect } from 'vitest'`
 - BDD style: `describe('Test emoji parser', () => { describe('Using default options', () => { it('should ...') })})`
 - One behavior per `it` — split if you'd write "and" in the name
-- `expect(result).to.be.equal(...)` for primitive equality; `.deep.equal` for objects/arrays
+- `expect(result).toBe(...)` for primitive equality; `.toEqual(...)` for objects/arrays
 - Paste the exact failing input verbatim when adding a regression test — don't summarize
 
 ## Catalog discipline
 
 - **Do not edit `src/lib/emoji-lib.json` by hand.** Regenerate via `prepareEmojiLibJson.test.ts`
 - **Do not commit `src/lib/emoji-lib-output.json`** — gitignored intentionally
-- **Do not export new fields from `EmojiType`** without measuring the bundle-size cost; every field × 1906 entries × every consumer's bundle adds up
+- **Do not export new fields from `EmojiType`** without measuring the bundle-size cost; every field × 1914 entries × every consumer's bundle adds up
 - **Do update `EMOJIS_SPECIAL_CASES`** in `prepareEmojiLibJson.test.ts` when a Slack-style alias needs to be supported
 
 See [`/regenerate-emoji-lib`](../.agents/commands/regenerate-emoji-lib.md) and [`/add-special-case`](../.agents/commands/add-special-case.md).
 
 ## Imports
 
-ESLint enforces no unused imports (`noUnusedLocals`). Prefer named imports for clarity:
+TypeScript's `noUnusedLocals` (and Biome) flag unused imports. Prefer named imports for clarity:
 
 ```ts
 // ✅ named — clear what we're using
@@ -278,18 +273,18 @@ CI's `npm version patch` is the right default. If a change deserves minor or maj
 - ❌ Add a new runtime dependency without measuring bundle-size impact
 - ❌ Change the HTML output template (`<img class="emoji" alt="..." src="..."/>`)
 - ❌ Use `console.log` / `console.error` in `src/`
-- ❌ Use `==` (TypeScript ESLint allows `===` only)
+- ❌ Use `==` (use `===` only)
 - ❌ Use `!!x` for boolean coercion in option parsing — use `Boolean(x)` (matches existing style)
-- ❌ Add semicolons (Prettier strips them; ESLint errors)
+- ❌ Add semicolons (Biome strips them and errors on them)
 - ❌ Use double quotes (`"..."`)
-- ❌ Skip `npm run eslint:check` / `prettier:check` before committing
+- ❌ Skip `npm run biome:check` before committing
 - ❌ Modify `EmojiType` shape without regenerating the catalog and bumping consumer-visible types
 
 ## Do
 
 - ✅ Run `npm run test:watch` while editing `src/`
 - ✅ Add a regression test for every parsing fix; paste the failing input verbatim
-- ✅ Use `npm run prettier:fix` and `npm run eslint:fix` before committing
+- ✅ Use `npm run biome:fix` before committing
 - ✅ Annotate exported function return types explicitly
 - ✅ Use `Object.getOwnPropertyDescriptor` for option-merge "explicit-undefined" detection
 - ✅ Update `EMOJIS_SPECIAL_CASES` for keyword overrides; never mutate the catalog at runtime
