@@ -1,5 +1,5 @@
+import * as fs from 'node:fs'
 import emojilib from 'emojilib'
-import * as fs from 'fs'
 import unicodeEmojiJson from 'unicode-emoji-json'
 import { describe, expect, it } from 'vitest'
 import type { EmojiLibJsonType, EmojiType, ObjectType } from '../src/lib/type'
