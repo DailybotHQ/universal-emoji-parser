@@ -78,11 +78,10 @@ To force a fresh install, bump the cache key (e.g., add `-v2`).
 #### 4. `deploy_validate_linters_and_code_format`
 
 ```yaml
-- run: npm run eslint:check
-- run: npm run prettier:check
+- run: npm run biome:check
 ```
 
-Hard gate. Both must pass.
+Hard gate. A single `biome check` covers both linting and formatting (it replaced the separate `eslint:check` + `prettier:check` steps). Must pass.
 
 #### 5. `deploy_tests`
 
@@ -90,7 +89,7 @@ Hard gate. Both must pass.
 - run: npm run test
 ```
 
-All Mocha specs must pass. The regenerator test (`prepareEmojiLibJson.test.ts`) is `it.skip`'d so it doesn't run.
+All Vitest specs must pass (`vitest run`). The regenerator test (`prepareEmojiLibJson.test.ts`) is `it.skip`'d so it doesn't run.
 
 #### 6. `build`
 
@@ -103,9 +102,9 @@ All Mocha specs must pass. The regenerator test (`prepareEmojiLibJson.test.ts`) 
     fi
 ```
 
-Webpack production build. The output (`dist/`) is cached for the publish job.
+Vite library build. `npm run build` runs `vite build && npm run build:types`, where `build:types` (`tsc -p tsconfig.build.json --emitDeclarationOnly`) emits `dist/index.d.ts` + `dist/lib/type.d.ts` alongside the single minified CJS `dist/index.js` (~403 KB). The output (`dist/`) is cached for the publish job.
 
-> **Gotcha**: this step doesn't run `npm run build:tsc`. Without it, `dist/index.d.ts` may be missing from the published tarball. If consumers report "no types," the fix is to add `npm run build:tsc` here.
+> **Always run `npm run build`, not `vite build` alone** — `vite build` skips `build:types`, so the published tarball would ship without `dist/index.d.ts` and consumers would report "no types." The `build` script chains both steps so declarations are always emitted.
 
 #### 7. `release_and_publish`
 
@@ -256,7 +255,7 @@ Required when: CI is down, the workflow is broken, an emergency hotfix needs to 
 
 See [`/release-npm`](../commands/release-npm.md) for the procedural walkthrough. Key points:
 
-1. **Always run the full check sequence** — never publish unverified
+1. **Always run the full check sequence** (`npm run biome:check`, `npm run test`, `npm run build`) — never publish unverified
 2. **Use `npm version`** to bump + commit + tag atomically (don't edit `package.json` by hand)
 3. **`git push --follow-tags`** — pushing without `--follow-tags` leaves the tag local
 4. **`npm publish`** requires `npm login` or `NODE_AUTH_TOKEN` env var
@@ -326,6 +325,12 @@ If the cache key uses `hashFiles('**/package-lock.json')` but you don't commit t
 key: ${{ runner.os }}-build-cache-node-modules-v2-${{ hashFiles('**/package-lock.json') }}
 ```
 
+## Runtime dependencies
+
+The published package has **zero runtime dependencies**. Vite's library build inlines `@twemoji/parser` into the single `dist/index.js` bundle (~403 KB), so nothing is installed transitively into a consumer's `node_modules` for this package.
+
+`@twemoji/parser` is pinned to exactly **`17.0.1`** — it's listed in the `reject` array of `.ncurc.json` because `17.0.2` regressed U+FE0F (variation selector) handling. Don't bump it without verifying the regression is fixed upstream.
+
 ## What gets published
 
 `.npmignore` controls the tarball:
@@ -337,12 +342,12 @@ Excluded:
   .babelrc, .env, .env_example
   .gitignore, .travis.yml
   package-lock.json
-  tsconfig.json, webpack.config.js
+  tsconfig.json, tsconfig.build.json, vite.config.ts, vitest.config.ts
   docker, .github
-  eslint.config.mjs (flat ESLint; `.eslintignore` removed — use `ignores` in config)
+  biome.json (single Biome lint + format config)
   get_github_release_log.sh
   git_logs.txt, git_logs_output.txt
-  .editorconfig, .prettierrc
+  .editorconfig
 
 Included by default (everything not excluded):
   dist/index.js

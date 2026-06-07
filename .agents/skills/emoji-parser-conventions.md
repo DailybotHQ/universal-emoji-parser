@@ -67,7 +67,7 @@ It doesn't, normally. Tier 1 only hits if `shortcode` is itself a unicode emoji 
 
 **Why the two-tier approach?** It's defensive — if someone calls `getEmojiObjectByShortcode('😎')` (passing a unicode char where a shortcode is expected), they still get a sensible answer. The function name suggests "shortcode" but the implementation gracefully handles either input.
 
-**Performance:** Tier 2 is O(M) where M = catalog size (1906). For a single call this is sub-millisecond, but if you're calling `getEmojiObjectByShortcode` in a hot loop, consider caching results.
+**Performance:** Tier 2 is O(M) where M = catalog size (1914). For a single call this is sub-millisecond, but if you're calling `getEmojiObjectByShortcode` in a hot loop, consider caching results.
 
 ## The catalog is keyed by unicode, not by slug
 
@@ -102,7 +102,7 @@ Several things to note:
 
 ### Why a single alternation?
 
-`(😀|😁|😂|...|🟫)` — 1906 alternates. JavaScript's regex engine handles this fine, but:
+`(😀|😁|😂|...|🟫)` — 1914 alternates. JavaScript's regex engine handles this fine, but:
 
 - **Construction is O(M)** — every call rebuilds the regex
 - **Matching uses NFA-style traversal** — performance depends on input length and pattern overlap
@@ -164,11 +164,15 @@ If you add a new internal helper to the `uEmojiParser` object, prefix it the sam
 
 ```ts
 export default uEmojiParser
-module.exports = uEmojiParser
-module.exports.emojiLibJsonData = emojiLibJsonData
+try {
+  module.exports = uEmojiParser
+  module.exports.emojiLibJsonData = emojiLibJsonData
+} catch {
+  // no-op under native ESM / Vitest, where `module` is undefined
+}
 ```
 
-Three lines that **look** redundant. They're not.
+These lines **look** redundant. They're not. The `try/catch` lets the same source run under both worlds: at runtime in the Vite-built CJS bundle `module.exports` exists and gets the reattachment; under native ESM or Vitest (where `module` is undefined) the assignment throws and is silently swallowed, leaving the `export default` / named exports to do their job.
 
 ### What ESM users get
 
@@ -187,7 +191,7 @@ const x = require('universal-emoji-parser')
 x.parse(...)        // ❌ TypeError — x doesn't have parse(), x.default does
 ```
 
-Webpack's `libraryTarget: 'commonjs2'` exports the module as `module.exports = { default, DEFAULT_EMOJI_CDN, emojiLibJsonData }`. The `default` key holds `uEmojiParser`, but `require()` consumers don't expect to type `.default`.
+Vite's library `commonjs` output exports the module as `module.exports = { default, DEFAULT_EMOJI_CDN, emojiLibJsonData }`. The `default` key holds `uEmojiParser`, but `require()` consumers don't expect to type `.default`.
 
 ### What the reattachment does
 
@@ -227,7 +231,7 @@ The current three lines are battle-tested across:
 - Node CJS consumers (`require`)
 - Node ESM consumers (`.mjs` / `"type": "module"`)
 - TypeScript consumers (with and without `esModuleInterop`)
-- Bundler consumers (webpack, rollup, vite, esbuild)
+- Bundler consumers (Vite, rollup, webpack, esbuild)
 
 Leave them alone.
 
@@ -292,7 +296,7 @@ If you change:
 
 - **Don't construct RegExp in a loop** when the pattern is constant
 - **Don't `JSON.parse(JSON.stringify(emojiLibJsonData))`** at runtime — it's a 5 MB clone
-- **Don't `console.log` in `src/`** — ESLint blocks it; consumers don't want library noise
+- **Don't `console.log` in `src/`** — Biome's `noConsole` blocks it (off in `test/**`); consumers don't want library noise
 - **Don't read process.env or global state** — keep the package pure
 
 ## Catalog mutation
