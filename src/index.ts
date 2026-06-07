@@ -1,6 +1,6 @@
-import { EmojiLibJsonType, EmojiParseOptionsType, EmojiType, TwemojiEntity, UEmojiParserType } from './lib/type'
-import emojiLibJson from './lib/emoji-lib.json'
 import { parse } from '@twemoji/parser'
+import emojiLibJson from './lib/emoji-lib.json'
+import type { EmojiLibJsonType, EmojiParseOptionsType, EmojiType, TwemojiEntity, UEmojiParserType } from './lib/type'
 
 /**
  * Constances

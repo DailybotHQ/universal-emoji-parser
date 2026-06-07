@@ -105,7 +105,7 @@ describe('Test emoji parser', () => {
     })
 
     it('should throw error with not string parameter', () => {
-      let text: any = undefined // eslint-disable-line
+      let text: any
       expect(() => {
         uEmojiParser.parse(text)
       }).to.throw(Error)
@@ -247,7 +247,7 @@ describe('Test emoji parser', () => {
     })
 
     it('should throw error with not string parameter', () => {
-      let text: any = undefined // eslint-disable-line
+      let text: any
       expect(() => {
         uEmojiParser.parse(text)
       }).to.throw(Error)

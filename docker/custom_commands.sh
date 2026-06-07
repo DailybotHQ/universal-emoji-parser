@@ -13,37 +13,21 @@ function print.error {
 }
 
 function check() {
-	print.success "Running ESLint..."
-	npm run eslint:check
+	print.success "Running Biome check (lint + format)..."
+	npm run biome:check
 	if [ $? != 0 ]; then
 		echo ''
-		print.error "⚠️ ESLint failed."
-		return 1
-	fi
-
-	print.success "Running Prettier check..."
-	npm run prettier:check
-	if [ $? != 0 ]; then
-		echo ''
-		print.error "⚠️ Prettier check failed."
+		print.error "⚠️ Biome check failed."
 		return 1
 	fi
 }
 
 function fix() {
-	print.success "Running ESLint with --fix..."
-	npm run eslint:fix
+	print.success "Running Biome check --write (lint + format, apply fixes)..."
+	npm run biome:fix
 	if [ $? != 0 ]; then
 		echo ''
-		print.error "⚠️ ESLint fix failed."
-		return 1
-	fi
-
-	print.success "Running Prettier --write..."
-	npm run prettier:fix
-	if [ $? != 0 ]; then
-		echo ''
-		print.error "⚠️ Prettier fix failed."
+		print.error "⚠️ Biome fix failed."
 		return 1
 	fi
 }
@@ -89,7 +73,7 @@ function codecheck() {
 		print.error "⚠️ Tests failed."
 		return 1
 	fi
-	print.success "✅ codecheck passed (eslint + prettier + build:tsc + webpack + test)"
+	print.success "✅ codecheck passed (biome + build:tsc + webpack + test)"
 }
 
 function install() {
@@ -322,11 +306,11 @@ function show_welcome() {
     echo "Useful commands:"
     echo "  • check_devcontainer  - Check if running inside Docker container (CRITICAL)"
     echo "  • help                 - Show this message"
-    echo "  • check                - npm run eslint:check + prettier:check (CI lint/format gate)"
-    echo "  • fix                  - npm run eslint:fix + prettier:fix"
+    echo "  • check                - npm run biome:check (CI lint/format gate)"
+    echo "  • fix                  - npm run biome:fix (lint + format, apply fixes)"
     echo "  • test                 - npm run test (Mocha + tsx)"
     echo "  • build                - npm run build:tsc + npm run build (types + webpack)"
-    echo "  • codecheck            - check + test + build (full local gate before push)"
+    echo "  • codecheck            - check (biome) + build + test (full local gate before push)"
     echo "  • install              - npm install"
     echo ""
     echo "AI Assistant commands:"

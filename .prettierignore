@@ -1,4 +1,0 @@
-# Vendored DeepWorkPlan skill pack — installed via `npx skills add` and pinned by
-# skills-lock.json (computedHash). It is tracked in git but kept pristine so it
-# keeps matching the lockfile; do not reformat third-party skill content.
-.agents/skills/deepworkplan/

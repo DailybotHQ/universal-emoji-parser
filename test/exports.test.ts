@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, statSync, readdirSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { expect } from 'chai'
 import uEmojiParser, { DEFAULT_EMOJI_CDN, emojiLibJsonData } from '../src/index'
@@ -75,18 +75,15 @@ describe('Public exports surface', () => {
 
     before(function () {
       if (!existsSync(distPath)) {
-        // eslint-disable-next-line no-console
         console.log('       (skipping bundle suite: dist/index.js not built — run `npm run build`)')
         this.skip()
       }
       const distMtime = statSync(distPath).mtimeMs
       const newestSrcMtime = newestMtimeUnder(resolve(repoRoot, 'src'))
       if (distMtime < newestSrcMtime) {
-        // eslint-disable-next-line no-console
         console.log('       (skipping bundle suite: dist/index.js is older than src/ — run `npm run build`)')
         this.skip()
       }
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
       dist = require(distPath) as Record<string, unknown>
     })
 

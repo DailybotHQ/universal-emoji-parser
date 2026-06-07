@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { emojiLibJsonData } from '../src/index'
-import { EmojiType } from '../src/lib/type'
+import type { EmojiType } from '../src/lib/type'
 
 describe('Test emoji lib json data', () => {
   describe('Validate json data', () => {
