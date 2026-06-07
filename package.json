@@ -36,9 +36,10 @@
     "release": "npm version patch -m \"[🤖 DailyBot] New release to v%s launched 🚀\"",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "build": "webpack --mode production --progress",
-    "build:dev": "webpack --mode development --progress",
-    "build:tsc": "tsc --build tsconfig.build.json",
+    "build": "vite build && npm run build:types",
+    "build:dev": "vite build --mode development",
+    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build:tsc": "tsc -p tsconfig.build.json --noEmit",
     "ncu:check": "ncu",
     "ncu:upgrade": "ncu -u"
   },
@@ -53,27 +54,23 @@
     "email": "developers@dailybot.com"
   },
   "homepage": "https://github.com/DailyBotHQ/universal-emoji-parser#readme",
-  "dependencies": {
-    "@twemoji/parser": "17.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@biomejs/biome": "2.4.16",
+    "@twemoji/parser": "17.0.1",
     "@types/chai": "5.2.3",
     "@types/mocha": "10.0.10",
     "@types/node": "25.6.0",
     "chai": "6.2.2",
-    "clean-webpack-plugin": "4.0.0",
     "emojilib": "4.0.3",
     "mocha": "11.7.5",
     "nodemon": "3.1.14",
     "npm-check-updates": "22.1.0",
-    "ts-loader": "9.5.7",
     "ts-node": "10.9.2",
     "tsx": "4.21.0",
     "typescript": "6.0.3",
     "unicode-emoji-json": "0.9.0",
-    "webpack": "5.106.2",
-    "webpack-cli": "7.0.2"
+    "vite": "8.0.16"
   },
   "engines": {
     "node": ">=20.19.0"
