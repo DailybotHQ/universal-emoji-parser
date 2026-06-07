@@ -63,11 +63,13 @@ An addon MAY additionally ship per-stack presets, examples, or migration notes.
 | Devcontainer support | [`addons/devcontainer/`](devcontainer/SKILL.md) | **Authored** — compose-based `.devcontainer/` + `docker/` with AI-CLI persistence, `dailybot-project-network`, `DOCKER_DEV_ENV=vscode`, project-identity precedence, public-OSS variant, 7 reasoning presets. |
 | Dailybot integration | [`addons/dailybot/`](dailybot/SKILL.md) | **Authored** — opt-in install of the Dailybot agent skill / CLI, auth **deferred** to the Dailybot skill's own consent flow, and an **optional, best-effort, never-blocking** progress/milestone report wired into DWP execution (a plan completion → a Dailybot milestone report). The core methodology has **zero** Dailybot dependency. |
 | Dependency upgrade | [`addons/dependency-upgrade/`](dependency-upgrade/SKILL.md) | **Authored** — opt-in, **package-manager-agnostic** dependency upgrades: detect the repo's real manager (npm/pnpm/yarn + ncu, pip/poetry/uv, cargo, go mod, bundler, composer…), classify by semver, upgrade in safe batches, run the repo's **real** validation gate after each batch, revert a failing batch, summarize. Installs a `/lib-upgrade` delegator into the repo's `.agents/commands/` only when accepted. |
+| Design system | [`addons/design-system/`](design-system/SKILL.md) | **Authored** — opt-in, **frontend-scoped** `DESIGN.md` at `docs/DESIGN.md` (indexed from `AGENTS.md`; root only if no `docs/` tree): reason about the repo's **real** design tokens (CSS vars / Tailwind config / token files / component styles), document the canonical sections (colors & roles, typography, layout, elevation, shapes, components, responsive, do's & don'ts, agent prompt guide), check **WCAG AA** contrast + token integrity, reconcile an existing `DESIGN.md` instead of clobbering it. Offered by `onboard` **only when a UI surface / design system is detected**. |
 
 > This README is the mechanism doc. The first addon, `addons/devcontainer/`, is
 > the methodology's proof that the mechanism works; the second,
 > `addons/dailybot/`, shows an addon can layer optional team visibility while
 > keeping the methodology fully vendor-neutral; the third,
 > `addons/dependency-upgrade/`, shows an addon can encode a recurring maintenance
-> workflow that reasons about each repo's actual stack (a repo is conformant with
-> zero addons).
+> workflow that reasons about each repo's actual stack; the fourth,
+> `addons/design-system/`, shows an addon can capture durable, repo-native UI
+> design context for frontend repos (a repo is conformant with zero addons).

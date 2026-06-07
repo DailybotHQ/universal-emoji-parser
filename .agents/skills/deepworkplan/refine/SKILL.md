@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-refine
 description: Refine a Deep Work Plan draft or modify an existing final plan. Use when the developer wants to adjust scope, tasks, or details of a draft in .dwp/drafts/ or a plan in .dwp/plans/.
-version: "2.5.0"
+version: "2.7.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write

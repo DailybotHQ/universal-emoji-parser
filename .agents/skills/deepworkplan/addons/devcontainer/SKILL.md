@@ -1,7 +1,7 @@
 ---
 name: deepworkplan-addon-devcontainer
 description: Optional DeepWorkPlan addon that adds (or reconciles) a compose-based devcontainer to a repo — base image and supporting services reasoned from the detected stack, with persistent AI-CLI auth, the dailybot-project-network, the DOCKER_DEV_ENV=vscode convention, and project-identity precedence. Opt-in, never required, reconciles existing setups instead of clobbering them. Use when the developer wants a reproducible isolated dev container for an AI-first repo.
-version: "2.5.0"
+version: "2.7.0"
 documentation_url: https://deepworkplan.com
 user-invocable: true
 allowed-tools: Bash, Read, Grep, Glob, Edit, Write
