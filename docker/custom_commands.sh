@@ -14,7 +14,7 @@ function print.error {
 
 function check() {
 	print.success "Running Biome check (lint + format)..."
-	npm run biome:check
+	corepack pnpm run biome:check
 	if [ $? != 0 ]; then
 		echo ''
 		print.error "⚠️ Biome check failed."
@@ -24,7 +24,7 @@ function check() {
 
 function fix() {
 	print.success "Running Biome check --write (lint + format, apply fixes)..."
-	npm run biome:fix
+	corepack pnpm run biome:fix
 	if [ $? != 0 ]; then
 		echo ''
 		print.error "⚠️ Biome fix failed."
@@ -34,18 +34,18 @@ function fix() {
 
 function test() {
 	print.success "Running tests..."
-	npm run test
+	corepack pnpm run test
 }
 
 function build() {
 	print.success "Running TypeScript type-check (tsc --noEmit)..."
-	npm run build:tsc
+	corepack pnpm run build:tsc
 	if [ $? != 0 ]; then
 		print.error "⚠️ tsc type-check failed."
 		return 1
 	fi
 	print.success "Running Vite production build (+ tsc declarations)..."
-	npm run build
+	corepack pnpm run build
 	if [ $? != 0 ]; then
 		print.error "⚠️ Vite build failed."
 		return 1
@@ -77,8 +77,8 @@ function codecheck() {
 }
 
 function install() {
-  print.success "Running npm install..."
-	npm install
+  print.success "Running pnpm install..."
+	corepack pnpm install
 }
 
 # ================================
@@ -306,12 +306,12 @@ function show_welcome() {
     echo "Useful commands:"
     echo "  • check_devcontainer  - Check if running inside Docker container (CRITICAL)"
     echo "  • help                 - Show this message"
-    echo "  • check                - npm run biome:check (CI lint/format gate)"
-    echo "  • fix                  - npm run biome:fix (lint + format, apply fixes)"
-    echo "  • test                 - npm run test (Vitest)"
-    echo "  • build                - npm run build:tsc + npm run build (type-check + Vite + tsc declarations)"
+    echo "  • check                - corepack pnpm run biome:check (CI lint/format gate)"
+    echo "  • fix                  - corepack pnpm run biome:fix (lint + format, apply fixes)"
+    echo "  • test                 - corepack pnpm run test (Vitest)"
+    echo "  • build                - corepack pnpm run build:tsc + build (type-check + Vite + tsc declarations)"
     echo "  • codecheck            - check (biome) + build + test (full local gate before push)"
-    echo "  • install              - npm install"
+    echo "  • install              - corepack pnpm install"
     echo ""
     echo "AI Assistant commands:"
     echo "  • claude            - Claude Code CLI"

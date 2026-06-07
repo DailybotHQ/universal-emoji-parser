@@ -30,8 +30,18 @@ ENV CHROMIUM_FLAGS="--no-sandbox"
 RUN echo 'node ALL=(root) NOPASSWD:ALL' > /etc/sudoers.d/node \
     && chmod 0440 /etc/sudoers.d/node
 
-# Make node user's CLI install dirs available on PATH (npm globals, Claude, Cursor agent)
-ENV PATH=/home/node/.npm-global/bin:/home/node/.local/bin:/home/node/.cursor/bin:$PATH
+# Enable Corepack so pnpm is provisioned from the version pinned in package.json's
+# "packageManager" field. Avoid `npm install -g pnpm` — it defeats the pin.
+RUN corepack enable
+
+# pnpm home/store dir. pnpm writes global binaries to ${PNPM_HOME}/bin, so that
+# subdirectory must be on PATH for `corepack pnpm add -g <pkg>` to succeed.
+ENV PNPM_HOME=/usr/local/share/pnpm
+RUN mkdir -p "${PNPM_HOME}/bin" \
+    && chown -R node:node "${PNPM_HOME}"
+
+# Make CLI install dirs available on PATH (pnpm globals, npm globals, Claude, Cursor agent)
+ENV PATH=${PNPM_HOME}/bin:${PNPM_HOME}:/home/node/.npm-global/bin:/home/node/.local/bin:/home/node/.cursor/bin:$PATH
 
 # Source custom commands for node user
 RUN echo 'source /app/docker/custom_commands.sh' >> /home/node/.bashrc \
@@ -65,6 +75,16 @@ RUN git config --global init.defaultBranch main \
     && git config --global safe.directory '*'
 
 USER root
+
+# Redirect any `npm` invocation to pnpm — this repo uses pnpm exclusively, so
+# running npm would corrupt node_modules and pnpm-lock.yaml. Replace the real npm
+# binary at /usr/local/bin/npm (always on PATH, regardless of how the shell is
+# launched — interactive, Remote SSH, exec, scripts). This runs AFTER the global
+# Codex CLI install above, so that install still uses the real npm during build.
+RUN rm -f /usr/local/bin/npm && \
+    printf '#!/bin/bash\necho "[npm→pnpm] Redirecting \"npm $*\" to pnpm (this repo uses pnpm)." >&2\nexec corepack pnpm "$@"\n' \
+    > /usr/local/bin/npm \
+    && chmod +x /usr/local/bin/npm
 
 # Copy and setup entrypoint script
 COPY universalemojiparser/entrypoint.sh /usr/local/bin/entrypoint.sh

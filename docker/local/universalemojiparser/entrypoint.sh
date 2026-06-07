@@ -272,6 +272,10 @@ setup_nodejs() {
     # Ensure npm cache directory exists with correct ownership for node user
     mkdir -p /home/node/.npm
     chown -R node:node /home/node/.npm
+    # Ensure the pnpm store/state dir exists (pnpm uses ~/.local/share/pnpm).
+    # This repo uses pnpm; npm is routed to pnpm via the wrapper at /usr/local/bin/npm.
+    mkdir -p /home/node/.local/share/pnpm
+    chown -R node:node /home/node/.local/share/pnpm 2>/dev/null || true
 }
 
 # Setup Git configuration (simplified - main config is in Dockerfile)
