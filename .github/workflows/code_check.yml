@@ -59,10 +59,8 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
-      - name: Step 1 - 🧪 Run eslint linter
-        run: npm run eslint:check
-      - name: Step 2 - 🧪🧪 Run prettier
-        run: npm run prettier:check
+      - name: Step 1 - 🧪 Run Biome (lint + format check)
+        run: npm run biome:check
 
   tests:
     needs: validate_linters_and_code_format
